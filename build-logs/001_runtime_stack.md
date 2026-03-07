@@ -53,7 +53,7 @@ The local Ollama API is now running at:
 
 Screenshot
 
-docs/screenshots/runtime/ollama-installation.png
+![Ollama installation](../docs/screenshots/runtime/ollama-installation.png)
 
 ---
 
@@ -73,7 +73,9 @@ The download completed successfully and passed SHA256 verification.
 
 Screenshot
 
-docs/screenshots/runtime/model-download.png
+Screenshot
+
+![Model download](../docs/screenshots/runtime/model-download.png)
 
 ---
 
@@ -98,7 +100,9 @@ The model returned a valid response, confirming that:
 
 Screenshot
 
-docs/screenshots/runtime/model-first-response.png
+Screenshot
+
+![First model response](../docs/screenshots/runtime/model-first-response.png)
 
 ---
 
@@ -123,7 +127,9 @@ The Llama 3.1 8B model appears as a ~4.6 GB blob file.
 
 Screenshot
 
-docs/screenshots/runtime/model-storage-location.png
+Screenshot
+
+![Model storage location](../docs/screenshots/runtime/model-storage-location.png)
 
 ---
 
