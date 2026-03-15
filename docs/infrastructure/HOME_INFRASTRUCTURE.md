@@ -1,4 +1,4 @@
-# Home Infrastructure Map
+# Home Infrastructure Overview
 
 Owner: Richard Bayer
 
@@ -8,6 +8,11 @@ Document the structure of the home computing environment used for the Jarvis AI 
 This file provides a quick architectural overview of machines, roles, networking, storage, and hardware expansion capability.
 
 Build logs and detailed setup steps are documented separately in the respective project repositories.
+
+For visual diagrams of the system architecture and hardware layout,
+see:
+
+**[HOME_SYSTEM_MAP.md](HOME_SYSTEM_MAP.md)**
 
 ---
 
