@@ -5,7 +5,7 @@ Owner: Richard Bayer
 Purpose:
 Document the structure of the home computing environment used for the Jarvis AI system, Linux practice environments, and virtualization lab infrastructure.
 
-This file provides a **quick architectural overview** of machines, roles, networking, and storage.
+This file provides a quick architectural overview of machines, roles, networking, storage, and hardware expansion capability.
 
 Build logs and detailed setup steps are documented separately in the respective project repositories.
 
@@ -13,82 +13,147 @@ Build logs and detailed setup steps are documented separately in the respective 
 
 # Network Architecture
 
-Primary connectivity is provided through **Tailscale**, creating a secure private mesh network between all machines.
+Primary connectivity is provided through Tailscale, creating a secure private mesh network between all machines.
 
 Devices can communicate using either:
 
-* local LAN IP addresses
-* Tailscale mesh IP addresses
-* MagicDNS hostnames
+local LAN IP addresses  
+Tailscale mesh IP addresses  
+MagicDNS hostnames  
 
 Example SSH access:
 
-ssh richb@lenovolegion
-ssh richb@linuxpractice
+ssh richb@lenovolegion  
+ssh richb@linuxpractice  
 
 ---
 
 # Primary Compute Node
 
-Hostname
-LenovoLegion
+Hostname  
+LenovoLegion  
 
-Role
-Primary workstation and infrastructure host
+Role  
+Primary workstation and infrastructure host  
 
-Operating System
-Windows 11 Home
+Operating System  
+Windows 11 Home  
 
 Hardware
 
-CPU
-AMD Ryzen 7 5800X (16 threads)
+CPU  
+AMD Ryzen 7 5800 (8 cores / 16 threads)
 
-RAM
-32 GB
+RAM  
+32 GB (2 x 16GB DIMMs)
 
-GPU
+GPU  
 NVIDIA RTX 3060 (12 GB VRAM)
 
-Motherboard
+Motherboard  
 Lenovo 3716 (B550 chipset)
+
+Platform notes
+
+AMD B550 platform  
+PCIe 4.0 support from CPU lanes  
+Chipset provides additional PCIe expansion lanes  
+
+---
+
+# Motherboard Expansion Layout
+
+The Lenovo 3716 motherboard provides the following expansion interfaces.
+
+M.2 NVMe Slot #1  
+Location: under CPU cooler area  
+Device installed: Samsung 256GB NVMe  
+Role: Windows boot drive  
+
+M.2 NVMe Slot #2  
+Location: above GPU area  
+Device installed: Samsung 990 Pro 2TB  
+Role: primary high-speed storage  
+
+M.2 Key-E Slot  
+Location: near rear IO area  
+Device installed: WiFi / Bluetooth card  
+
+PCIe x16 Slot  
+Device installed: NVIDIA RTX 3060 GPU  
+
+PCIe x1 Slot  
+Currently unused  
+Available for expansion  
+
+Expansion capability notes
+
+The PCIe x1 slot can support:
+
+NVMe adapter card  
+10Gb networking card  
+capture card  
+additional storage controllers  
+
+An NVMe adapter in this slot would operate at approximately 1GB/s bandwidth (PCIe 3.0 x1).
 
 ---
 
 # Storage Layout
 
 C:
-Windows operating system
+256GB Samsung NVMe
+
+Windows operating system  
+system tools  
+applications  
 
 G:
-Primary NVMe storage
-Used for AI workspace and WSL filesystem
+2TB Samsung 990 Pro NVMe
 
-/mnt/g/ai contains:
-
-models
-runtime
-memory
-projects
-logs
-backups
-
-V:
-VMware virtual machine storage
-
-4 TB External USB HDD
+Primary high speed workspace
 
 Used for:
 
-backups
-ISO images
-future archive storage
+Jarvis AI environment  
+personal files  
+games  
+development repositories  
+
+Jarvis filesystem structure
+
+/mnt/g/ai contains:
+
+models  
+runtime  
+memory  
+projects  
+logs  
+backups  
+
+V:
+1TB Western Digital HDD
+
+Used for:
+
+VMware virtual machines  
+homelab experimentation  
+
+External Storage
+
+4TB Seagate Expansion USB HDD
+
+Used for:
+
+backups  
+ISO images  
+future archive storage  
 
 ---
 
 # AI Platform (Jarvis)
 
-Environment
+Environment  
 WSL2 Ubuntu
 
 Repository location
@@ -97,17 +162,17 @@ Repository location
 
 Major components
 
-Ollama
-local LLM runtime
+Ollama  
+local LLM runtime  
 
-Open WebUI
-browser interface (Docker container)
+Open WebUI  
+browser interface (Docker container)  
 
-Chroma
-vector database
+Chroma  
+vector database  
 
-LlamaIndex
-document ingestion and retrieval
+LlamaIndex  
+document ingestion and retrieval  
 
 Python runtime
 
@@ -137,11 +202,11 @@ LenovoLegion (Windows 11)
 
 VMware virtual networks
 
-VMnet8
-NAT network
+VMnet8  
+NAT network  
 
-VMnet1
-Host-only network
+VMnet1  
+Host-only network  
 
 ---
 
@@ -159,10 +224,10 @@ Purpose
 
 Infrastructure lab for:
 
-Linux server practice
-VM deployment
-container experimentation
-future automation and orchestration work
+Linux server practice  
+VM deployment  
+container experimentation  
+future automation and orchestration work  
 
 Networking
 
@@ -196,9 +261,9 @@ Purpose
 
 Dedicated Linux training environment for:
 
-Bash scripting
-Linux command practice
-system administration exercises
+Bash scripting  
+Linux command practice  
+system administration exercises  
 
 Networking
 
@@ -224,9 +289,9 @@ Primary development console
 
 Used for
 
-SSH access
-VS Code remote editing
-Jarvis development
+SSH access  
+VS Code remote editing  
+Jarvis development  
 
 Connected via Tailscale
 
@@ -254,8 +319,8 @@ Windows 11
 │   └─ Jarvis AI Platform
 │
 └─ VMware Workstation
-├─ Proxmox Homelab VM
-└─ LinuxPractice Rocky VM
+    ├─ Proxmox Homelab VM
+    └─ LinuxPractice Rocky VM
 
 All machines connected through Tailscale mesh networking.
 
@@ -263,21 +328,167 @@ All machines connected through Tailscale mesh networking.
 
 # Design Goals
 
-Local-first AI infrastructure
-Secure remote administration
-Hands-on Linux system administration practice
-Automation experimentation
-Professional portfolio development
+Local-first AI infrastructure  
+Secure remote administration  
+Hands-on Linux system administration practice  
+Automation experimentation  
+Professional portfolio development  
 
 ---
 
-# Future Expansion
+# Hardware Expansion Strategy
 
-Possible future additions include:
+The Legion workstation currently acts as:
 
-additional Proxmox nodes
-automation via Ansible
-log analysis integration with Jarvis
-home automation integration
-AI-assisted infrastructure monitoring
+AI compute node  
+development workstation  
+virtualization host  
 
+As Jarvis evolves, hardware upgrades will focus on maintaining balanced system performance rather than maximizing a single component.
+
+Priority order is based on likely bottlenecks.
+
+---
+
+# Upgrade Roadmap
+
+Stage 1 — Storage Architecture Improvement
+
+Replace current 256GB Windows NVMe with a 2TB NVMe drive.
+
+New layout:
+
+2TB NVMe (C:)  
+Windows  
+applications  
+personal files  
+games  
+
+2TB Samsung 990 Pro (G:)  
+Jarvis AI workspace  
+
+Jarvis components on dedicated drive:
+
+vector database  
+embeddings  
+datasets  
+AI models  
+
+Benefits
+
+reduces disk contention  
+isolates AI workloads  
+provides additional system storage headroom  
+
+---
+
+Stage 2 — Memory Expansion
+
+Upgrade RAM
+
+32GB → 64GB
+
+Configuration
+
+4 x 16GB DDR4
+
+Benefits
+
+larger document ingestion runs  
+bigger vector database caches  
+multiple AI agents simultaneously  
+reduced disk swapping  
+
+---
+
+Stage 3 — VM Storage Upgrade
+
+Replace current 1TB mechanical HDD with SATA SSD.
+
+Benefits
+
+dramatically faster VM boot times  
+better Proxmox nested performance  
+improved homelab usability  
+
+---
+
+Stage 4 — NVMe Expansion
+
+Install PCIe x1 NVMe adapter in available expansion slot.
+
+Purpose
+
+additional high-speed storage for:
+
+AI datasets  
+model experimentation  
+future indexing workloads  
+
+---
+
+Stage 5 — Dedicated Infrastructure Node
+
+Introduce a small secondary server.
+
+Possible hardware
+
+refurbished Lenovo ThinkCentre Tiny  
+Dell OptiPlex Micro  
+HP EliteDesk Mini  
+
+Purpose
+
+24/7 infrastructure services
+
+Home Assistant  
+automation tools  
+monitoring stack  
+API services  
+
+Legion remains the primary AI compute node.
+
+---
+
+Stage 6 — Future AI Compute Expansion
+
+Potential GPU upgrade when larger models become desirable.
+
+Options may include GPUs with:
+
+16GB VRAM  
+24GB VRAM  
+
+Benefits
+
+larger model support  
+higher context windows  
+multiple model execution  
+
+---
+
+# Long-Term Architecture Vision
+
+Jarvis infrastructure will gradually evolve toward a distributed architecture.
+
+AI compute node  
+Legion workstation  
+
+Infrastructure node  
+automation services  
+
+Storage node  
+NAS or backup server  
+
+All systems connected through Tailscale mesh networking.
+
+---
+
+# Future Expansion Possibilities
+
+additional Proxmox nodes  
+automation via Ansible  
+log analysis integration with Jarvis  
+home automation integration  
+AI-assisted infrastructure monitoring  
+distributed AI services
