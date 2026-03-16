@@ -1,0 +1,55 @@
+/mnt/g/ai
+├── backups
+├── logs
+├── memory
+│   ├── chroma
+│   │   ├── 2d7b1406-b001-4f42-894a-e76755878b44
+│   │   │   ├── data_level0.bin
+│   │   │   ├── header.bin
+│   │   │   ├── length.bin
+│   │   │   └── link_lists.bin
+│   │   └── chroma.sqlite3
+│   └── knowledge
+│       ├── home_infrastructure.md
+│       └── linux_notes.txt
+├── models
+├── projects
+│   └── jarvis
+│       ├── bootstrap
+│       ├── build-logs
+│       │   ├── 000_foundation.md
+│       │   ├── 001_runtime_stack.md
+│       │   ├── 002_interface_layer.md
+│       │   ├── 003_knowledge_layer.md
+│       │   ├── 004_knowledge_retrieval.md
+│       │   ├── 005_logic_layer_router.md
+│       │   ├── 006_rag_reasoning_integration.md
+│       │   └── 007_backup_and_rebuild_foundations.md
+│       ├── diagrams
+│       ├── docs
+│       │   ├── ai-stack
+│       │   ├── architecture
+│       │   ├── hardware
+│       │   ├── infrastructure
+│       │   ├── jarvis_development_notebook.md
+│       │   ├── network
+│       │   ├── screenshots
+│       │   ├── security
+│       │   ├── vision
+│       │   └── voice
+│       ├── scripts
+│       │   ├── index_knowledge.py
+│       │   ├── jarvis_router.py
+│       │   └── query_knowledge.py
+│       └── tools
+└── runtime
+    └── python
+        └── jarvis-env
+            ├── bin
+            ├── include
+            ├── lib
+            ├── lib64 -> lib
+            ├── pyvenv.cfg
+            └── share
+
+33 directories, 20 files

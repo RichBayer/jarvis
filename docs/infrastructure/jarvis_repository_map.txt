@@ -1,0 +1,64 @@
+.
+├── bootstrap
+├── build-logs
+│   ├── 000_foundation.md
+│   ├── 001_runtime_stack.md
+│   ├── 002_interface_layer.md
+│   ├── 003_knowledge_layer.md
+│   ├── 004_knowledge_retrieval.md
+│   ├── 005_logic_layer_router.md
+│   ├── 006_rag_reasoning_integration.md
+│   └── 007_backup_and_rebuild_foundations.md
+├── diagrams
+├── docs
+│   ├── ai-stack
+│   ├── architecture
+│   │   ├── jarvis_vision.md
+│   │   └── system_architecture.md
+│   ├── hardware
+│   ├── infrastructure
+│   │   ├── home_infrastructure.md
+│   │   ├── home_system_map.md
+│   │   └── jarvis_repository_map.txt
+│   ├── jarvis_development_notebook.md
+│   ├── network
+│   ├── screenshots
+│   │   ├── backups
+│   │   │   ├── jarvis-backup-directory-structure.png
+│   │   │   ├── jarvis-backup-disk-layout.png
+│   │   │   └── jarvis-backup-mount.png
+│   │   ├── interface
+│   │   │   ├── docker-install-verification.png
+│   │   │   ├── ollama-api-listening.png
+│   │   │   ├── webui-chat-working.png
+│   │   │   └── webui-container-running.png
+│   │   ├── knowledge
+│   │   │   ├── chroma-database.png
+│   │   │   ├── indexing-script.png
+│   │   │   ├── knowledge-directory.png
+│   │   │   ├── knowledge-index-success.png
+│   │   │   ├── query-script.png
+│   │   │   └── retrieval-command.png
+│   │   ├── logic
+│   │   │   ├── jarvis-logic-layer-repo-structure.png
+│   │   │   └── logic-router-knowledge-retrieval-test.png
+│   │   ├── rag
+│   │   │   ├── embedding-model-load-warning.png
+│   │   │   ├── module-import-error.png
+│   │   │   ├── router-constructed-prompt.png
+│   │   │   └── router-jarvis-response.png
+│   │   └── runtime
+│   │       ├── model-download.png
+│   │       ├── model-first-response.png
+│   │       ├── model-storage-location.png
+│   │       └── ollama-installation.png
+│   ├── security
+│   ├── vision
+│   └── voice
+├── scripts
+│   ├── index_knowledge.py
+│   ├── jarvis_router.py
+│   └── query_knowledge.py
+└── tools
+
+22 directories, 40 files
