@@ -5,41 +5,55 @@ from llama_index.core import Settings
 import chromadb
 import sys
 
-# Use the same embedding model used during indexing
+
+# Configure embedding model (must match indexing configuration)
 Settings.embed_model = HuggingFaceEmbedding(
     model_name="sentence-transformers/all-MiniLM-L6-v2"
 )
 
-# connect to persistent chroma database
-chroma_client = chromadb.PersistentClient(
-    path="/mnt/g/ai/memory/chroma"
-)
 
-# load the jarvis knowledge collection
-collection = chroma_client.get_collection("jarvis_knowledge")
+def retrieve_knowledge(question: str, top_k: int = 2) -> str:
+    """
+    Retrieve relevant knowledge chunks from the Jarvis Chroma database.
+    """
 
-vector_store = ChromaVectorStore(
-    chroma_collection=collection
-)
+    # Connect to persistent Chroma database
+    chroma_client = chromadb.PersistentClient(
+        path="/mnt/g/ai/memory/chroma"
+    )
 
-# rebuild index interface
-index = VectorStoreIndex.from_vector_store(vector_store)
+    # Load the Jarvis knowledge collection
+    collection = chroma_client.get_collection("jarvis_knowledge")
 
-# create retriever
-retriever = index.as_retriever(similarity_top_k=2)
+    vector_store = ChromaVectorStore(
+        chroma_collection=collection
+    )
 
-# user question
-question = " ".join(sys.argv[1:])
+    # Rebuild index interface
+    index = VectorStoreIndex.from_vector_store(vector_store)
 
-if not question:
-    print("Please provide a question.")
-    sys.exit()
+    # Create retriever
+    retriever = index.as_retriever(similarity_top_k=top_k)
 
-# retrieve context
-results = retriever.retrieve(question)
+    # Retrieve relevant chunks
+    results = retriever.retrieve(question)
 
-print("\n--- Retrieved Knowledge Context ---\n")
+    # Combine retrieved text into a clean context block
+    context = "\n\n".join(r.text for r in results)
 
-for r in results:
-    print(r.text)
-    print("\n---\n")
+    return context
+
+
+# CLI compatibility (so the script can still run directly)
+if __name__ == "__main__":
+
+    question = " ".join(sys.argv[1:])
+
+    if not question:
+        print("Please provide a question.")
+        sys.exit()
+
+    context = retrieve_knowledge(question)
+
+    print("\n--- Retrieved Knowledge Context ---\n")
+    print(context)
