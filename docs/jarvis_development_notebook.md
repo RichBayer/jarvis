@@ -1,107 +1,147 @@
 # Jarvis Development Notebook
 
-This document acts as a **working notebook for ideas discovered while building Jarvis**.
+Working notebook for ideas and experiments discovered while building Jarvis.
 
-Unlike the Vision, Architecture, and Build Log documents, the notes here are intentionally informal.
+This document intentionally contains exploratory thoughts rather than finalized architecture decisions.
 
-Purpose of this document:
-
-- capture interesting ideas during development
-- record experiments worth exploring later
-- keep track of small improvements discovered while working on the system
-
-Items listed here are **not committed design decisions**.
-
-If an idea proves useful, it may later be moved into:
-
-- the Architecture document
-- a Build Log
-- or an implementation task
+Ideas captured here may later evolve into architecture changes, new subsystems, or implementation work.
 
 ---
 
-# CLI Interaction Experiments
+# Distributed Jarvis Infrastructure
 
-While developing Jarvis, the `ai` command-line helper has proven useful for interacting with the local AI system directly from the terminal.
+As Jarvis grows, certain components may become too heavy for a single workstation.
 
-Current examples that already work well:
+Future exploration may involve separating system components across multiple machines.
 
-```
-journalctl -xe | ai
-dmesg | ai
+Possible directions:
+
+Legion workstation  
+AI reasoning and orchestration
+
+Mini server  
+vector database and embedding storage
+
+Additional compute node  
+model inference workloads
+
+This could allow Jarvis to scale into a distributed personal AI infrastructure rather than a single-machine system.
+
+Areas to explore:
+
+- running vector databases on separate machines
+- separating embedding generation from inference
+- dedicated inference nodes with larger GPUs
+- distributed storage for large knowledge datasets
+
+---
+
+# Vector Database Scaling
+
+Large knowledge bases may eventually cause vector databases to grow significantly.
+
+Possible scaling strategies include:
+
+- splitting vector collections by category
+- running multiple vector databases
+- moving vector storage to a dedicated machine
+- indexing knowledge by domain
+
+Example conceptual separation:
+
+technical knowledge  
+home infrastructure  
+personal notes  
+project documentation
+
+Each could be indexed separately and queried independently.
+
+---
+
+# Autonomous System Awareness
+
+Experiment with allowing Jarvis to monitor system events automatically.
+
+Concept:
+
+system logs  
+↓  
+event filtering  
+↓  
+Jarvis analysis  
+↓  
+human explanation
+
+Example workflow:
+
+journalctl  
+↓  
+filter important events  
+↓  
+Jarvis explains what happened
+
+Possible use cases:
+
+- summarize system errors
+- explain unusual behavior
+- assist with troubleshooting infrastructure issues
+
+---
+
+# CLI Workflow Improvements
+
+Continue improving the `ai` helper command so it behaves like a natural Linux tool.
+
+Examples already possible:
+
+journalctl -xe | ai  
+dmesg | ai  
 ai /etc/fstab
-```
 
-Possible areas to explore:
+Areas to explore:
 
-- making log analysis easier
-- simplifying troubleshooting workflows
-- reducing typing when sending command output to Jarvis
-- improving readability of AI responses for terminal use
-- creating helper commands for common diagnostic tasks
+- easier piping workflows
+- command explanation tools
+- log summarization
+- troubleshooting helpers
+- system explanation tools
 
-Goal: make Jarvis feel like a **natural extension of the Linux command line**.
+Goal:
+
+Make Jarvis feel like a **native Linux troubleshooting assistant**.
 
 ---
 
-# Multi-Model Routing Experiments
+# Model Specialization Experiments
 
-Currently Jarvis runs a single model.
+Experiment with routing tasks to specialized models.
 
-Future experiments may explore selecting different models depending on the task.
+Example concept:
 
-Possible directions:
-
-- general reasoning model for normal questions
-- coding-focused model for scripts and debugging
-- lightweight model for fast responses
-- larger reasoning models for complex analysis
-
-Conceptual flow:
-
-```
-user request
-↓
-logic router
-↓
+user request  
+↓  
+Jarvis router  
+↓  
+task classification  
+↓  
 model selection
-↓
-response
-```
 
-This would allow Jarvis to evolve into a **multi-model system without requiring the user to manually choose models**.
+Possible model roles:
+
+general reasoning model  
+coding model  
+system troubleshooting model
+
+The goal would be allowing the user to interact with Jarvis normally while the system automatically selects the most appropriate model.
 
 ---
 
-# System Log Awareness
+# Long-Term Experiment Ideas
 
-While troubleshooting Linux systems, piping logs into Jarvis has been useful.
+Additional concepts worth exploring later:
 
-Example:
-
-```
-journalctl -xe | ai
-```
-
-Future experiments could explore making Jarvis more aware of system state.
-
-Possible directions:
-
-- detecting important system events automatically
-- forwarding interesting log entries to Jarvis for interpretation
-- summarizing errors in plain language
-- assisting with troubleshooting infrastructure issues
-
-Conceptual idea:
-
-```
-system logs
-↓
-event filter
-↓
-Jarvis analysis
-↓
-notification or explanation
-```
-
-This could eventually evolve into a **system diagnostic assistant for homelab environments**.
+- automated infrastructure diagnostics
+- knowledge graph construction
+- personal project indexing
+- AI-assisted system administration
+- automated documentation generation
