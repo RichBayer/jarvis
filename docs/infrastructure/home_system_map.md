@@ -28,11 +28,11 @@ readable on GitHub, and easy to update.
         │                                 │
  ┌──────┴──────────┐            ┌──────────┴───────────┐
  │                 │            │                      │
-WSL Ubuntu     VMware WS     C: Windows             G: Jarvis
+WSL Ubuntu     VMware WS     C: Windows             G: NeuroCore
  │                 │          256GB NVMe             2TB NVMe
  │            ┌────┴─────┐
  │            │          │
-Jarvis AI   Proxmox   LinuxPractice
+NeuroCore AI Proxmox   LinuxPractice
 Platform      VM           VM
 ```
 
