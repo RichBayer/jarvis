@@ -74,7 +74,7 @@ Tool Layer
 (system scripts, diagnostics, future integrations)
 
 AI Runtime  
-(Ollama using llama3.1:8b)
+(Ollama using llama3.1:8b via HTTP API)
 
 ---
 
@@ -88,9 +88,60 @@ NeuroCore is currently capable of:
 - performing RAG (retrieval augmented generation)  
 - generating responses using local models  
 
+Recent improvements:
+
+- migrated from subprocess-based execution to Ollama HTTP API  
+- implemented streaming responses for real-time output  
+- optimized retrieval pipeline (no repeated initialization)  
+- reduced response time from ~2–3 minutes to ~4–10 seconds  
+
 The logic router is implemented and working.
 
-We are actively expanding system capabilities and improving structure.
+---
+
+## Current Limitation
+
+NeuroCore currently runs in a **stateless execution model**:
+
+- each query runs as a new Python process  
+- retrieval system initializes on each run  
+- no persistent session or runtime  
+
+This is the primary remaining performance and usability limitation.
+
+---
+
+## Current Phase
+
+We are now entering the **runtime phase**.
+
+Goal:
+
+Build a persistent NeuroCore runtime that:
+
+- runs continuously  
+- avoids repeated initialization  
+- supports interactive CLI usage  
+- supports command piping  
+- behaves like a native system tool  
+
+---
+
+## Target Runtime Behavior
+
+Desired usage patterns:
+
+```bash
+ai "Describe my system"
+df -h | ai
+ai
+```
+
+Interactive mode:
+
+```text
+NeuroCore > question
+```
 
 ---
 
@@ -154,14 +205,12 @@ Keep things efficient, practical, and structured.
 
 ## Current Focus
 
-We are continuing NeuroCore development.
-
 Focus on:
 
-- strengthening the logic layer  
-- improving system awareness  
-- expanding real-world utility  
-- preparing for future automation and tooling  
+- building persistent runtime architecture  
+- eliminating repeated initialization overhead  
+- enabling CLI command integration  
+- preparing for tool execution layer  
 
 ---
 
