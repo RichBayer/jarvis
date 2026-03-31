@@ -1,29 +1,36 @@
 #!/usr/bin/env python3
 
 """
-NeuroCore Logic Router (API + Streaming)
+NeuroCore Logic Router
 
 Responsibilities:
 - Accept a user request
 - Detect intent
-- Retrieve relevant knowledge
+- Retrieve relevant knowledge (via KnowledgeBase)
 - Build prompt
 - Send to Ollama via API (streaming)
-- Display response in real-time
+- Return response (runtime) or print (CLI)
+
+This module supports:
+1. CLI usage
+2. Runtime usage (via run_query)
 """
 
 import argparse
 import requests
 import json
 
-from query_knowledge import retrieve_knowledge
+from scripts.query_knowledge import KnowledgeBase
+
+
+# ----------------------------
+# GLOBAL (LIGHTWEIGHT) OBJECT
+# ----------------------------
+
+knowledge_base = KnowledgeBase()
 
 
 def detect_intent(user_request: str) -> str:
-    """
-    Simple rule-based intent detection.
-    Currently defaults to knowledge.
-    """
     request = user_request.lower()
 
     for word in ["what", "how", "explain", "tell", "find", "search", "describe"]:
@@ -34,10 +41,6 @@ def detect_intent(user_request: str) -> str:
 
 
 def query_ollama(prompt: str) -> str:
-    """
-    Send prompt to Ollama API using streaming response.
-    """
-
     url = "http://localhost:11434/api/generate"
 
     payload = {
@@ -45,7 +48,7 @@ def query_ollama(prompt: str) -> str:
         "prompt": prompt,
         "stream": True,
         "options": {
-            "num_predict": 200  # limits response size for speed
+            "num_predict": 200
         }
     }
 
@@ -72,7 +75,7 @@ def query_ollama(prompt: str) -> str:
                 except json.JSONDecodeError:
                     continue
 
-        print()  # newline after streaming completes
+        print()
         return output
 
     except Exception as e:
@@ -80,22 +83,8 @@ def query_ollama(prompt: str) -> str:
         return ""
 
 
-def main():
-    parser = argparse.ArgumentParser(description="NeuroCore Logic Router")
-    parser.add_argument("request", help="User request")
-
-    args = parser.parse_args()
-
-    intent = detect_intent(args.request)
-
-    if intent == "knowledge":
-
-        context = retrieve_knowledge(args.request)
-
-        # Optional debug (uncomment if needed)
-        # print(f"\n--- Context Length: {len(context)} chars ---\n")
-
-        prompt = f"""
+def build_prompt(user_request: str, context: str) -> str:
+    return f"""
 You are NeuroCore, a local-first AI assistant.
 
 You were previously known as Jarvis. Some internal systems and older documentation may still reference that name.
@@ -106,17 +95,37 @@ Context:
 {context}
 
 Question:
-{args.request}
+{user_request}
 
 Answer:
 """
 
-        print("\n--- Constructed Prompt ---\n")
-        print(prompt)
 
-        print("\n--- NeuroCore Response ---\n")
+def run_query(user_request: str) -> str:
+    """
+    Runtime entry point.
+    """
 
-        query_ollama(prompt)
+    intent = detect_intent(user_request)
+
+    if intent == "knowledge":
+        context = knowledge_base.retrieve(user_request)
+        prompt = build_prompt(user_request, context)
+
+        return query_ollama(prompt)
+
+    return "No valid intent detected."
+
+
+def main():
+    parser = argparse.ArgumentParser(description="NeuroCore Logic Router")
+    parser.add_argument("request", help="User request")
+
+    args = parser.parse_args()
+
+    print("\n--- NeuroCore Response ---\n")
+
+    run_query(args.request)
 
 
 if __name__ == "__main__":

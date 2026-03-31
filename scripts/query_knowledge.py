@@ -1,64 +1,73 @@
+#!/usr/bin/env python3
+
+"""
+NeuroCore Knowledge Retrieval Module
+
+Responsibilities:
+- Initialize embedding model and vector store (once)
+- Provide fast retrieval interface
+- Avoid heavy initialization at import time
+
+This module is now controlled by the Runtime Manager.
+"""
+
 from llama_index.core import VectorStoreIndex
 from llama_index.vector_stores.chroma import ChromaVectorStore
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from llama_index.core import Settings
 import chromadb
-import sys
-
-# ----------------------------
-# GLOBAL INITIALIZATION (RUNS ONCE)
-# ----------------------------
-
-embed_model = HuggingFaceEmbedding(
-    model_name="sentence-transformers/all-MiniLM-L6-v2"
-)
-
-Settings.embed_model = embed_model
-
-# Connect to Chroma once
-chroma_client = chromadb.PersistentClient(
-    path="/mnt/g/ai/memory/chroma"
-)
-
-collection = chroma_client.get_collection("jarvis_knowledge")
-
-vector_store = ChromaVectorStore(
-    chroma_collection=collection
-)
-
-# Build index ONCE
-index = VectorStoreIndex.from_vector_store(vector_store)
-
-# Create retriever ONCE
-retriever = index.as_retriever(similarity_top_k=2)
 
 
-# ----------------------------
-# FAST QUERY FUNCTION
-# ----------------------------
+class KnowledgeBase:
+    def __init__(self):
+        """
+        Initialize placeholders (no heavy loading yet)
+        """
+        self.retriever = None
+        self.initialized = False
 
-def retrieve_knowledge(question: str) -> str:
-    """
-    Retrieve relevant knowledge chunks quickly (no re-init)
-    """
+    def initialize(self):
+        """
+        Perform heavy initialization ONCE.
+        """
+        if self.initialized:
+            return
 
-    results = retriever.retrieve(question)
+        print("[Knowledge] Initializing embedding model and vector store...")
 
-    context = "\n\n".join(r.text for r in results)
+        embed_model = HuggingFaceEmbedding(
+            model_name="sentence-transformers/all-MiniLM-L6-v2"
+        )
 
-    return context
+        Settings.embed_model = embed_model
 
+        chroma_client = chromadb.PersistentClient(
+            path="/mnt/g/ai/memory/chroma"
+        )
 
-# CLI support
-if __name__ == "__main__":
+        collection = chroma_client.get_collection("jarvis_knowledge")
 
-    question = " ".join(sys.argv[1:])
+        vector_store = ChromaVectorStore(
+            chroma_collection=collection
+        )
 
-    if not question:
-        print("Please provide a question.")
-        sys.exit()
+        index = VectorStoreIndex.from_vector_store(vector_store)
 
-    context = retrieve_knowledge(question)
+        self.retriever = index.as_retriever(similarity_top_k=2)
 
-    print("\n--- Retrieved Knowledge Context ---\n")
-    print(context)
+        self.initialized = True
+
+        print("[Knowledge] Initialization complete.")
+
+    def retrieve(self, question: str) -> str:
+        """
+        Retrieve relevant knowledge.
+        """
+        if not self.initialized:
+            self.initialize()
+
+        results = self.retriever.retrieve(question)
+
+        context = "\n\n".join(r.text for r in results)
+
+        return context
