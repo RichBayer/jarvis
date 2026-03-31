@@ -340,4 +340,4 @@ NeuroCore is now:
 - implement CLI interface (`ai` command)
 - separate streaming output from returned response
 - introduce session memory handling
-- begin tool integration layer
+- begin tool integration layerexit

@@ -6,108 +6,169 @@ NeuroCore was previously known as "Jarvis". References to Jarvis in file names, 
 
 ---
 
-## Current System State (CRITICAL)
+# 🚨 CRITICAL OPERATING RULES (DO NOT BREAK)
 
-NeuroCore has transitioned from a stateless script-based system into a **persistent daemon-based architecture**.
-
-### Completed Milestones
-
-* Local AI runtime (Ollama) operational
-* Knowledge system (Chroma + LlamaIndex) operational
-* RAG pipeline functional
-* Router logic implemented (`jarvis_router.py`)
-* Performance optimized (HTTP API + streaming)
-
-### NEW (Latest Milestone)
-
-* NeuroCore daemon implemented
-* UNIX socket IPC established (`/tmp/neurocore.sock`)
-* Structured request/response protocol defined
-* End-to-end communication verified
-
-Build log reference:
-
-build-logs/009_neurocore_daemon_foundation.md
+* Do NOT guess system state, paths, or architecture
+* If something is unclear → ASK before proceeding
+* Always use real paths from this system
+* Always provide copy/paste-ready commands
+* Move one step at a time (no multi-step jumps)
+* Explain WHY before implementation
+* Validate each step before continuing
+* Never assume code works—test it
+* Never introduce temporary fixes that break architecture later
 
 ---
 
-## Environment
+# 🧠 CURRENT SYSTEM STATE (CRITICAL)
 
-Host system:
+NeuroCore is now a **persistent, stateful daemon-based AI system**
 
-Lenovo Legion Desktop
-Ryzen 7 5800X
-32 GB RAM
-RTX 3060 12 GB
+---
 
-Operating system:
+## ✅ COMPLETED CAPABILITIES
 
-Windows 11 with WSL2 Ubuntu
+* UNIX socket daemon (`/tmp/neurocore.sock`)
+* Runtime Manager (persistent processing layer)
+* Router integrated into runtime
+* Knowledge system refactored to lazy initialization
+* Embedding model loads ONLY on first query
+* Chroma vector DB persists across queries
+* Full request → response pipeline operational
+* Second query executes in ~3 seconds (no re-init)
 
-Working directory:
+---
 
-~/ai/projects/jarvis
+## 🔥 KEY ARCHITECTURAL WIN (IMPORTANT)
+
+Previously:
+
+* knowledge system initialized at import time ❌
+
+Now:
+
+* knowledge system initializes ONLY on first query ✅
+* system startup is instant ✅
+* runtime controls initialization lifecycle ✅
+
+---
+
+# ⚠️ LESSONS LEARNED (DO NOT REPEAT THESE MISTAKES)
+
+### 1. Python Module Execution
+
+DO NOT run:
+
+python runtime/neurocore_daemon.py ❌
+
+ALWAYS run:
+
+python -m runtime.neurocore_daemon ✅
+
+Reason:
+
+* ensures correct package resolution
+* prevents import failures
+
+---
+
+### 2. Absolute Imports ONLY
+
+All internal imports must be:
+
+from scripts.query_knowledge import ...
+from runtime.runtime_manager import ...
+
+NEVER:
+
+from query_knowledge import ... ❌
+
+---
+
+### 3. NO Heavy Initialization at Import
+
+NEVER do this again:
+
+embed_model = ...
+chroma_client = ...
+retriever = ...
+
+at global scope ❌
+
+Instead:
+
+* wrap in class
+* initialize lazily
+* control from runtime manager
+
+---
+
+### 4. Persistent System Behavior
+
+Expected behavior:
+
+Startup:
+
+* instant
+* no model load
+
+First query:
+
+* initializes knowledge system
+
+Second query:
+
+* fast
+* no reinitialization
+
+---
+
+# 🏗️ CURRENT ARCHITECTURE
+
+Client
+↓
+UNIX Socket (/tmp/neurocore.sock)
+↓
+NeuroCore Daemon
+↓
+Runtime Manager (persistent state)
+↓
+Router (`jarvis_router.py`)
+↓
+KnowledgeBase (lazy-loaded)
+↓
+Chroma + Embeddings
+↓
+Ollama (LLM)
+
+---
+
+# 📁 PATHING RULES (CRITICAL)
 
 Workspace root:
 
 ~/ai → /mnt/g/ai
 
-Python environment:
-
-~/ai/runtime/python/jarvis-env
-
----
-
-## Pathing Rules (CRITICAL)
-
-The system uses a symlinked workspace.
-
-Primary working path:
-
-~/ai → /mnt/g/ai
-
-All commands should use:
-
-~/ai/...
-
-NOT:
-
-/mnt/g/ai/... (unless explicitly required)
-
----
-
-## Repository Root
-
-NeuroCore project root:
+Project root:
 
 ~/ai/projects/jarvis
 
-All development commands should assume:
+ALWAYS use:
 
-cd ~/ai/projects/jarvis
+~/ai/...
 
----
+NEVER default to:
 
-## Python Environment
-
-Virtual environment location:
-
-~/ai/runtime/python/jarvis-env
-
-Activation command:
-
-source ~/ai/runtime/python/jarvis-env/bin/activate
-
-All Python execution should occur within this environment.
+/mnt/g/...
 
 ---
 
-## File Placement Rules
+# 📁 KEY DIRECTORIES
 
-* Runtime code:
+* Runtime:
   ~/ai/projects/jarvis/runtime/
 
-* Scripts (existing logic):
+* Scripts:
   ~/ai/projects/jarvis/scripts/
 
 * Build logs:
@@ -116,195 +177,140 @@ All Python execution should occur within this environment.
 * Screenshots:
   ~/ai/projects/jarvis/docs/screenshots/
 
----
-
-## Command Requirements
-
-* Always provide copy/paste-ready commands
-* Always assume current directory is:
-  ~/ai/projects/jarvis
-* Do not invent or assume alternate paths
-* If uncertain about a path, ask before proceeding
+* Knowledge DB:
+  ~/ai/memory/chroma
 
 ---
 
-## System Map Reference (Optional)
+# 🧪 EXECUTION RULES
 
-Detailed system structure is documented in:
+Activate environment:
 
-docs/infrastructure/home_system_map.md
-docs/infrastructure/jarvis_repository_map.txt
+source ~/ai/runtime/python/jarvis-env/bin/activate
 
-Use these only for deeper context—not for guessing paths.
+Shortcut available:
 
----
+jarvisenv
 
-## Current Architecture
+Run daemon:
 
-NeuroCore now follows a **daemon-based architecture**:
-
-Client (CLI / future interfaces)
-↓
-UNIX Socket (/tmp/neurocore.sock)
-↓
-NeuroCore Daemon
-↓
-(Runtime Manager – NOT YET IMPLEMENTED)
-↓
-Router (jarvis_router.py)
-↓
-Knowledge System + Model
+python -m runtime.neurocore_daemon
 
 ---
 
-## Current Capability
+# 🧾 DOCUMENTATION RULES (MANDATORY)
 
-NeuroCore can:
+Every milestone MUST include:
 
-* receive structured requests
-* process them through daemon
-* return structured responses
+1. Build log
+2. Screenshots
+3. Embedded image markdown
+4. Explanation of:
 
-⚠️ The system does NOT yet perform real reasoning through the daemon
-
----
-
-## Current Limitation (TOP PRIORITY)
-
-NeuroCore does NOT yet have a persistent runtime layer.
-
-This means:
-
-* router is NOT loaded inside daemon
-* knowledge system is NOT persistent
-* each query is NOT yet using the real AI pipeline
+   * what was built
+   * why it was built
+   * issues encountered
+   * how issues were resolved
 
 ---
 
-## Current Phase
+# 📸 SCREENSHOT RULES
 
-We are entering the **Runtime Integration Phase**
+Screenshots must prove behavior:
 
----
+1. Startup (no initialization)
+2. First query (initialization)
+3. Second query (fast path)
 
-## Immediate Goal (NEXT STEP)
+Naming format:
 
-Build the **Runtime Manager**
-
-This component will:
-
-* initialize ONCE at daemon startup
-* load:
-
-  * router
-  * knowledge system (Chroma + LlamaIndex)
-* process queries without reinitialization
-* replace placeholder response with real AI output
+neurocore-<component>-<behavior>.png
 
 ---
 
-## Target Behavior (Near-Term)
+# 📦 REQUIRED FILES FOR NEW SESSION
 
-```bash
-ai "Explain my system"
-df -h | ai
-ai
-```
+If context is missing, request these:
 
-All routed through the daemon.
+* System State File
+* Home System Map
+* Repository Map
+* NeuroCore Vision Document
 
----
+Located in:
 
-## Request Format (LOCKED)
+docs/infrastructure/
+docs/architecture/
 
-All requests follow:
-
-{
-"type": "query" | "event",
-"user_id": "richard",
-"client_id": "cli",
-"session_id": "default",
-"payload": {
-"text": "..."
-}
-}
+DO NOT assume these are loaded
 
 ---
 
-## Design Principles
+# 🧠 DEVELOPMENT STYLE
 
-* build the correct architecture first
-* avoid temporary or throwaway solutions
-* keep components modular
+Act as a senior systems engineer.
+
+* prioritize correct architecture over speed
+* avoid temporary hacks
 * maintain separation of concerns:
 
-  * daemon (processing)
-  * client (interface)
-  * runtime (state)
-* no overengineering, no shortcuts
+  * daemon = communication
+  * runtime = state
+  * router = logic
+* verify before moving forward
 
 ---
 
-## Development Style
+# 🎯 CURRENT PHASE
 
-* explain WHY before implementation
-* move in small, controlled steps
-* validate each step before proceeding
-* do not assume previous steps succeeded
-* stop at logical checkpoints
-* document milestones with build logs + screenshots
+Runtime Integration COMPLETE ✅
 
 ---
 
-## What You Should Do
+# 🚀 NEXT PHASE
 
-Act as a senior systems engineer guiding development.
-
-* provide exact commands
-* validate each step before proceeding
-* prevent architectural mistakes
-* keep implementation aligned with vision
+CLI Interface Layer
 
 ---
 
-## Session Discipline
+# 🎯 NEXT OBJECTIVE
 
-Before ending a session:
+Replace manual socket interaction with CLI tool
 
-* update build logs
-* update system maps if needed
-* update this prompt if state changes
+Target usage:
 
-Do not assume context persists between sessions.
-
----
-
-## Current Focus
-
-Focus ONLY on:
-
-* runtime manager implementation
-* integrating router into daemon
-* eliminating repeated initialization
-
-Do NOT:
-
-* build UI
-* build voice system
-* build perception system
+ai "Explain SELinux"
+df -h | ai
+ai
 
 ---
 
-## Resume Instruction
+# 🔧 NEXT IMPLEMENTATION TARGET
 
-Start by implementing:
+Create:
 
-runtime/runtime_manager.py
+scripts/ai_cli.py
 
-Then integrate it into:
+Responsibilities:
 
-runtime/neurocore_daemon.py
+* connect to UNIX socket
+* send structured request
+* receive response
+* support stdin piping
+
+---
+
+# 🧭 RESUME INSTRUCTION
+
+Start with:
+
+CLI interface design
+
+Then implement:
+
+scripts/ai_cli.py
 
 Goal:
 
-Replace placeholder response with real query processing.
+Natural command-line interaction with NeuroCore without manual Python socket usage.
+
