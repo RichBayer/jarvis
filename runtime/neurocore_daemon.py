@@ -1,22 +1,5 @@
 #!/usr/bin/env python3
 
-"""
-NeuroCore Daemon
-
-Responsibilities:
-- Run as a persistent background process
-- Accept incoming client connections via UNIX socket
-- Receive structured JSON requests
-- Pass requests to Runtime Manager
-- Return structured responses
-
-This daemon serves as the central communication layer for NeuroCore.
-
-Architecture:
-
-Client → UNIX Socket → Daemon → Runtime Manager → Router → Response → Client
-"""
-
 import socket
 import os
 import json
@@ -27,75 +10,116 @@ from runtime.runtime_manager import RuntimeManager
 
 
 SOCKET_PATH = "/tmp/neurocore.sock"
+BUFFER_SIZE = 4096
 
 
 def cleanup():
-    """
-    Remove socket file on shutdown to prevent conflicts.
-    """
     if os.path.exists(SOCKET_PATH):
         os.remove(SOCKET_PATH)
 
 
 def handle_exit(signum, frame):
-    """
-    Handle graceful shutdown.
-    """
     print("\nShutting down NeuroCore daemon...")
     cleanup()
     sys.exit(0)
 
 
-# Register signal handlers
 signal.signal(signal.SIGINT, handle_exit)
 signal.signal(signal.SIGTERM, handle_exit)
 
 
-def main():
-    """
-    Entry point for NeuroCore daemon.
-    """
+def normalize_request(message):
+    if "data" in message and isinstance(message["data"], dict):
+        input_text = message["data"].get("input")
 
-    # Ensure no stale socket exists
+        if input_text:
+            return {
+                "type": "query",
+                "payload": {
+                    "text": input_text
+                }
+            }
+
+    if "query" in message:
+        return {
+            "type": "query",
+            "payload": {
+                "text": message["query"]
+            }
+        }
+
+    raise ValueError("Invalid request format: no input found")
+
+
+def recv_full(conn):
+    chunks = []
+    while True:
+        chunk = conn.recv(BUFFER_SIZE)
+        if not chunk:
+            break
+        chunks.append(chunk)
+
+    return b"".join(chunks)
+
+
+def main():
     cleanup()
 
-    # Create UNIX socket server
     server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
     server.bind(SOCKET_PATH)
     server.listen(5)
 
     print(f"NeuroCore daemon listening on {SOCKET_PATH}")
 
-    # Initialize runtime manager ONCE (persistent system state)
     runtime = RuntimeManager()
 
     while True:
         conn, _ = server.accept()
 
         try:
-            data = conn.recv(4096)
+            raw_data = recv_full(conn)
 
-            if not data:
+            if not raw_data:
                 conn.close()
                 continue
 
-            message = json.loads(data.decode())
+            message = json.loads(raw_data.decode())
 
             print("\n--- Incoming Request ---")
             print(json.dumps(message, indent=2))
 
-            # Pass request to runtime manager
-            response = runtime.process_request(message)
+            normalized = normalize_request(message)
 
-            # Send response back to client
+            result = runtime.process_request(normalized)
+
+            if isinstance(result, dict) and result.get("status") == "error":
+                response = {
+                    "status": "error",
+                    "response": None,
+                    "error": result.get("message")
+                }
+            else:
+                response = {
+                    "status": "success",
+                    "response": result.get("response") if isinstance(result, dict) else result,
+                    "error": None
+                }
+
+            # 🔥 CRITICAL FIX: send then CLOSE immediately
             conn.sendall(json.dumps(response).encode())
+            conn.shutdown(socket.SHUT_WR)
 
         except Exception as e:
-            error = {
-                "status": "error",
-                "message": str(e)
-            }
-            conn.sendall(json.dumps(error).encode())
+            try:
+                error = {
+                    "status": "error",
+                    "response": None,
+                    "error": str(e)
+                }
+                conn.sendall(json.dumps(error).encode())
+                conn.shutdown(socket.SHUT_WR)
+            except:
+                pass
 
         finally:
             conn.close()

@@ -8,11 +8,6 @@ Responsibilities:
 - Process incoming requests from daemon
 - Route queries to logic layer (router)
 - Return structured responses
-
-This is the bridge between:
-daemon (communication layer)
-and
-router (intelligence layer)
 """
 
 from scripts.jarvis_router import run_query
@@ -22,11 +17,6 @@ class RuntimeManager:
     def __init__(self):
         """
         Initialize runtime components.
-
-        In future:
-        - Load knowledge system once
-        - Initialize memory systems
-        - Load tool interfaces
         """
         print("Initializing NeuroCore Runtime Manager...")
 
@@ -34,12 +24,9 @@ class RuntimeManager:
         """
         Process a structured request.
 
-        Expected request format:
+        Expected format:
         {
             "type": "query",
-            "user_id": "...",
-            "client_id": "...",
-            "session_id": "...",
             "payload": {
                 "text": "..."
             }
@@ -79,7 +66,6 @@ class RuntimeManager:
 
         print(f"\n[Runtime] Processing query: {user_input}")
 
-        # Call your existing logic layer
         response_text = run_query(user_input)
 
         return {
