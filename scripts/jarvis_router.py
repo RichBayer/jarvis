@@ -1,21 +1,5 @@
 #!/usr/bin/env python3
 
-"""
-NeuroCore Logic Router
-
-Responsibilities:
-- Accept a user request
-- Detect intent
-- Retrieve relevant knowledge (via KnowledgeBase)
-- Build prompt
-- Send to Ollama via API (streaming)
-- Return response (runtime) or print (CLI)
-
-This module supports:
-1. CLI usage
-2. Runtime usage (via run_query)
-"""
-
 import argparse
 import requests
 import json
@@ -23,24 +7,43 @@ import json
 from scripts.query_knowledge import KnowledgeBase
 
 
-# ----------------------------
-# GLOBAL (LIGHTWEIGHT) OBJECT
-# ----------------------------
-
 knowledge_base = KnowledgeBase()
 
 
 def detect_intent(user_request: str) -> str:
-    request = user_request.lower()
-
-    for word in ["what", "how", "explain", "tell", "find", "search", "describe"]:
-        if word in request:
-            return "knowledge"
-
     return "knowledge"
 
 
+# ----------------------------
+# NON-STREAMING
+# ----------------------------
+
 def query_ollama(prompt: str) -> str:
+    url = "http://localhost:11434/api/generate"
+
+    payload = {
+        "model": "llama3.1:8b",
+        "prompt": prompt,
+        "stream": False,
+        "options": {
+            "num_predict": 200
+        }
+    }
+
+    response = requests.post(url, json=payload)
+
+    if response.status_code != 200:
+        return f"Error: {response.text}"
+
+    data = response.json()
+    return data.get("response", "")
+
+
+# ----------------------------
+# STREAMING (FIXED)
+# ----------------------------
+
+def query_ollama_stream(prompt: str):
     url = "http://localhost:11434/api/generate"
 
     payload = {
@@ -52,44 +55,42 @@ def query_ollama(prompt: str) -> str:
         }
     }
 
-    try:
-        response = requests.post(url, json=payload, stream=True)
+    response = requests.post(url, json=payload, stream=True)
 
-        if response.status_code != 200:
-            print("Error contacting Ollama:\n")
-            print(response.text)
-            return ""
+    if response.status_code != 200:
+        yield f"\nError contacting Ollama:\n{response.text}\n"
+        return
 
-        output = ""
+    for line in response.iter_lines(decode_unicode=True):
+        if not line:
+            continue
 
-        for line in response.iter_lines():
-            if line:
-                try:
-                    data = json.loads(line.decode("utf-8"))
+        try:
+            data = json.loads(line)
 
-                    if "response" in data:
-                        chunk = data["response"]
-                        print(chunk, end="", flush=True)
-                        output += chunk
+            # 🔥 Yield only real text
+            chunk = data.get("response", "")
 
-                except json.JSONDecodeError:
-                    continue
+            if chunk:
+                yield chunk
 
-        print()
-        return output
+            # 🔥 Stop cleanly when done
+            if data.get("done"):
+                break
 
-    except Exception as e:
-        print(f"Error during Ollama request: {e}")
-        return ""
+        except json.JSONDecodeError:
+            continue
 
+
+# ----------------------------
+# PROMPT
+# ----------------------------
 
 def build_prompt(user_request: str, context: str) -> str:
     return f"""
-You are NeuroCore, a local-first AI assistant.
+You are NeuroCore.
 
-You were previously known as Jarvis. Some internal systems and older documentation may still reference that name.
-
-Answer concisely and clearly.
+Answer clearly and concisely.
 
 Context:
 {context}
@@ -101,31 +102,35 @@ Answer:
 """
 
 
+# ----------------------------
+# ENTRY POINTS
+# ----------------------------
+
 def run_query(user_request: str) -> str:
-    """
-    Runtime entry point.
-    """
+    context = knowledge_base.retrieve(user_request)
+    prompt = build_prompt(user_request, context)
 
-    intent = detect_intent(user_request)
+    return query_ollama(prompt)
 
-    if intent == "knowledge":
-        context = knowledge_base.retrieve(user_request)
-        prompt = build_prompt(user_request, context)
 
-        return query_ollama(prompt)
+def run_query_stream(user_request: str):
+    context = knowledge_base.retrieve(user_request)
+    prompt = build_prompt(user_request, context)
 
-    return "No valid intent detected."
+    return query_ollama_stream(prompt)
 
+
+# ----------------------------
+# CLI TEST
+# ----------------------------
 
 def main():
-    parser = argparse.ArgumentParser(description="NeuroCore Logic Router")
-    parser.add_argument("request", help="User request")
-
+    parser = argparse.ArgumentParser()
+    parser.add_argument("request")
     args = parser.parse_args()
 
     print("\n--- NeuroCore Response ---\n")
-
-    run_query(args.request)
+    print(run_query(args.request))
 
 
 if __name__ == "__main__":

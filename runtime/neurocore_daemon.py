@@ -7,6 +7,7 @@ import signal
 import sys
 
 from runtime.runtime_manager import RuntimeManager
+from scripts.jarvis_router import run_query_stream
 
 
 SOCKET_PATH = "/tmp/neurocore.sock"
@@ -62,6 +63,25 @@ def recv_full(conn):
     return b"".join(chunks)
 
 
+def handle_streaming(conn, user_input):
+    print(f"\n[Streaming] {user_input}")
+
+    try:
+        for chunk in run_query_stream(user_input):
+            if chunk:
+                conn.sendall(chunk.encode("utf-8"))
+
+        conn.shutdown(socket.SHUT_WR)
+
+    except Exception as e:
+        error_msg = f"\nError during streaming: {e}\n"
+        try:
+            conn.sendall(error_msg.encode("utf-8"))
+            conn.shutdown(socket.SHUT_WR)
+        except:
+            pass
+
+
 def main():
     cleanup()
 
@@ -90,6 +110,11 @@ def main():
 
             normalized = normalize_request(message)
 
+            if message.get("stream") is True:
+                user_input = normalized["payload"]["text"]
+                handle_streaming(conn, user_input)
+                continue
+
             result = runtime.process_request(normalized)
 
             if isinstance(result, dict) and result.get("status") == "error":
@@ -105,7 +130,6 @@ def main():
                     "error": None
                 }
 
-            # 🔥 CRITICAL FIX: send then CLOSE immediately
             conn.sendall(json.dumps(response).encode())
             conn.shutdown(socket.SHUT_WR)
 

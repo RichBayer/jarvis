@@ -12,331 +12,160 @@ NeuroCore was previously known as "Jarvis". References to Jarvis in file names, 
 * If something is unclear → ASK before proceeding
 * Always use real paths from this system
 * Always provide copy/paste-ready commands
-* Move one step at a time (no multi-step jumps)
-* Explain WHY before implementation
-* Validate each step before continuing
-* Never assume code works—test it
+* Deliver full production-quality implementations (no toy or partial builds)
+* Execution should be guided step-by-step when applying changes (one command at a time when needed)
+* Prioritize clean, complete solutions over incremental or temporary approaches
 * Never introduce temporary fixes that break architecture later
+* Assume system is evolving toward production-grade architecture, not experimentation
 
 ---
 
 # 🧠 CURRENT SYSTEM STATE (CRITICAL)
 
-NeuroCore is now a **persistent, stateful daemon-based AI system with a functional CLI interface**
+NeuroCore is now a persistent, streaming, daemon-based AI system with an interactive CLI
 
 ---
 
 ## ✅ COMPLETED CAPABILITIES
 
-* UNIX socket daemon (`/tmp/neurocore.sock`)
+* UNIX socket daemon (/tmp/neurocore.sock)
 * Runtime Manager (persistent processing layer)
 * Router integrated into runtime
-* Knowledge system refactored to lazy initialization
-* Embedding model loads ONLY on first query
-* Chroma vector DB persists across queries
-* Full request → response pipeline operational
-* CLI interface implemented (`scripts/ai_cli.py`)
-* System command available:
-
-    ai "your query"
-
-* Stable IPC communication (no deadlocks, no crashes)
-* Second query executes in ~3–5 seconds (no re-init)
+* Knowledge system with lazy initialization
+* Chroma vector DB persistence
+* CLI interface installed as system command (ai)
+* Interactive CLI mode (multi-query session)
+* Streaming response pipeline (end-to-end)
 
 ---
 
-## 🔥 KEY ARCHITECTURAL WIN (IMPORTANT)
+## 🔥 MAJOR ARCHITECTURAL WIN (STREAMING PIPELINE)
 
-Previously:
+Streaming is now implemented across the entire system:
 
-* knowledge system initialized at import time ❌
+Ollama (streaming API)  
+↓  
+Router (generator-based streaming)  
+↓  
+Daemon (chunk forwarding over socket)  
+↓  
+CLI (real-time output)
 
-Now:
+This enables:
 
-* knowledge system initializes ONLY on first query ✅
-* system startup is instant ✅
-* runtime controls initialization lifecycle ✅
-
----
-
-## 🔥 NEW ARCHITECTURAL WIN (CLI + IPC)
-
-The system now includes a fully functional interface layer.
-
-Key fixes implemented:
-
-* request normalization (daemon boundary)
-* full socket read handling (no partial reads)
-* client request termination (`shutdown(SHUT_WR)`)
-* daemon response signaling
-* broken pipe protection (no daemon crashes)
-* deadlock between client and daemon resolved
-
-Result:
-
-* stable request/response lifecycle
-* persistent daemon never crashes
-* CLI communicates reliably with runtime
+* real-time responses
+* improved UX
+* foundation for API + UI streaming
+* future voice integration
 
 ---
 
-# ⚠️ LESSONS LEARNED (DO NOT REPEAT THESE MISTAKES)
+## 🔥 CLI CAPABILITIES
 
-### 1. Python Module Execution
+NeuroCore CLI now supports:
 
-DO NOT run:
+One-shot mode:
+ai "your query"
 
-python runtime/neurocore_daemon.py ❌
+Interactive mode:
+ai
+> query
+> query
+> exit
 
-ALWAYS run:
+Exit methods:
 
-python -m runtime.neurocore_daemon ✅
-
----
-
-### 2. Absolute Imports ONLY
-
-All internal imports must be:
-
-from scripts.query_knowledge import ...
-from runtime.runtime_manager import ...
+* exit / quit
+* CTRL + C
+* CTRL + D
 
 ---
 
-### 3. NO Heavy Initialization at Import
+## ⚠️ LESSONS LEARNED
 
-NEVER do this again:
+1. Streaming must originate at source  
+Do NOT print inside router  
+Use generators → propagate through system  
 
-embed_model = ...
-chroma_client = ...
-retriever = ...
+2. CLI naming conflicts  
+Shell functions can override binaries  
+Always verify with: type ai  
 
-at global scope ❌
+3. Silent failures in streaming  
+If no chunks appear:  
+* verify generator output  
+* inspect daemon streaming loop  
 
----
-
-### 4. Persistent System Behavior
-
-Expected behavior:
-
-Startup:
-
-* instant
-* no model load
-
-First query:
-
-* initializes knowledge system
-* may take longer
-* CLI may timeout
-
-Second query:
-
-* fast
-* no reinitialization
-
----
-
-### 5. Socket Communication Rules
-
-Client MUST signal end of request:
-
-client.shutdown(socket.SHUT_WR)
-
-Daemon MUST handle:
-
-* partial reads
-* client disconnects
-* response completion
-
-Failure to do this results in:
-
-* deadlocks
-* broken pipe crashes
-* inconsistent behavior
+4. Clean separation of concerns  
+* Router = data generation  
+* Daemon = transport  
+* CLI = interface  
 
 ---
 
 # 🏗️ CURRENT ARCHITECTURE
 
-CLI (`ai` command)
-↓
-UNIX Socket (/tmp/neurocore.sock)
-↓
-NeuroCore Daemon
-↓
-Runtime Manager (persistent state)
-↓
-Router (`jarvis_router.py`)
-↓
-KnowledgeBase (lazy-loaded)
-↓
-Chroma + Embeddings
-↓
-Ollama (LLM)
+CLI (ai)  
+↓  
+UNIX Socket (/tmp/neurocore.sock)  
+↓  
+NeuroCore Daemon  
+↓  
+Runtime Manager  
+↓  
+Router (run_query / run_query_stream)  
+↓  
+KnowledgeBase (lazy-loaded)  
+↓  
+Chroma + Embeddings  
+↓  
+Ollama (LLM)  
 
 ---
 
-# 📁 PATHING RULES (CRITICAL)
+# 📁 PATHING RULES
 
-Workspace root:
+Workspace root:  
+~/ai  
 
-~/ai → /mnt/g/ai
-
-Project root:
-
-~/ai/projects/jarvis
-
-ALWAYS use:
-
-~/ai/...
-
-NEVER default to:
-
-/mnt/g/...
-
----
-
-# 📁 KEY DIRECTORIES
-
-* Runtime:
-  ~/ai/projects/jarvis/runtime/
-
-* Scripts:
-  ~/ai/projects/jarvis/scripts/
-
-* Build logs:
-  ~/ai/projects/jarvis/build-logs/
-
-* Screenshots:
-  ~/ai/projects/jarvis/docs/screenshots/
-
-* Knowledge DB:
-  ~/ai/memory/chroma
-
----
-
-# 🧪 EXECUTION RULES
-
-Activate environment:
-
-source ~/ai/runtime/python/jarvis-env/bin/activate
-
-Shortcut:
-
-jarvisenv
-
-Run daemon:
-
-python -m runtime.neurocore_daemon
-
-Run CLI:
-
-ai "your query"
-
----
-
-# 🧾 DOCUMENTATION RULES (MANDATORY)
-
-Every milestone MUST include:
-
-1. Build log
-2. Screenshots
-3. Embedded image markdown
-4. Explanation of:
-
-   * what was built
-   * why it was built
-   * issues encountered
-   * how issues were resolved
-
----
-
-# 📸 SCREENSHOT RULES
-
-Screenshots must prove behavior:
-
-1. CLI timeout (cold start)
-2. Daemon initialization
-3. CLI fast response (warm state)
-
-Naming format:
-
-neurocore-<component>-<behavior>.png
-
----
-
-# 📦 REQUIRED FILES FOR NEW SESSION
-
-If context is missing, request:
-
-* System State File
-* Home System Map
-* Repository Map
-* NeuroCore Vision Document
-
-Located in:
-
-docs/infrastructure/
-docs/architecture/
-
----
-
-# 🧠 DEVELOPMENT STYLE
-
-Act as a senior systems engineer.
-
-* prioritize correct architecture over speed
-* avoid temporary hacks
-* maintain separation of concerns:
-
-  * daemon = communication
-  * runtime = state
-  * router = logic
-
-* verify before moving forward
+Project root:  
+~/ai/projects/jarvis  
 
 ---
 
 # 🎯 CURRENT PHASE
 
-CLI Interface Layer COMPLETE ✅
+Streaming + Interactive CLI COMPLETE
 
 ---
 
 # 🚀 NEXT PHASE
 
-CLI Usability + Interaction Layer
+CLI Enhancement + System Integration
 
 ---
 
-# 🎯 NEXT OBJECTIVE
+# 🎯 NEXT OBJECTIVES
 
-Improve CLI usability beyond single-command execution.
+1. STDIN ingestion  
+df -h | ai  
+cat logs.txt | ai  
 
-Target usage:
+2. Session memory (multi-turn context)
 
-ai
-> interactive session
-
-df -h | ai   (future)
+3. Tool execution integration
 
 ---
 
-# 🔧 NEXT IMPLEMENTATION TARGET
+# 🧭 DEVELOPMENT STYLE
 
-Enhance CLI to support:
+Act as a senior systems engineer.
 
-1. Interactive mode
-
-   ai
-   > continuous conversation
-
-2. Improved usability
-
-   * persistent session loop
-   * clean prompt handling
-   * graceful exit
+* architecture first  
+* no shortcuts  
+* full implementations over partial edits  
+* validate after each change  
+* maintain clean separation of concerns  
 
 ---
 
@@ -344,12 +173,4 @@ Enhance CLI to support:
 
 Start with:
 
-Interactive CLI design
-
-Then implement:
-
-Interactive mode inside scripts/ai_cli.py
-
-Goal:
-
-Transform CLI from single-command tool into a usable conversational interface.
+STDIN ingestion design and implementation
