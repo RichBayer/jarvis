@@ -144,7 +144,7 @@ The daemon then attempted to send a response and crashed:
 
 ### Screenshot
 
-![Daemon Broken Pipe Crash](../docs/screenshots/interface/neurocore-daemon-broken-pipe-crash.png)
+![Daemon Broken Pipe Crash](../docs/screenshots/interface/cli_interface_layer/neurocore-daemon-broken-pipe-crash.png)
 
 ### Fix
 
@@ -167,7 +167,7 @@ Result:
 
 ### Screenshot
 
-![CLI Timeout](../docs/screenshots/interface/neurocore-cli-timeout.png)
+![CLI Timeout](../docs/screenshots/interface/cli_interface_layer/neurocore-cli-timeout.png)
 
 ### Root Cause
 
@@ -211,7 +211,7 @@ Daemon output during first run:
 
 ### Screenshot
 
-![Daemon Initialization](../docs/screenshots/interface/neurocore-daemon-initialization.png)
+![Daemon Initialization](../docs/screenshots/interface/cli_interface_layer/neurocore-daemon-initialization.png)
 
 The CLI timed out on this first run, which is expected due to initialization time.
 
@@ -236,7 +236,7 @@ Result:
 
 ### Screenshot
 
-![CLI Fast Response](../docs/screenshots/interface/neurocore-cli-fast-response.png)
+![CLI Fast Response](../docs/screenshots/interface/cli_interface_layer/neurocore-cli-fast-response.png)
 
 ---
 
