@@ -1,6 +1,5 @@
 .
 ├── .gitignore
-
 ├── bootstrap
 │   └── (initial environment setup scripts)
 
@@ -15,10 +14,12 @@
 │   ├── 007_backup_and_rebuild_foundations.md
 │   ├── 008_runtime_performance_and_api_migration.md
 │   ├── 009_neurocore_daemon_foundation.md
-│   └── 010_runtime_integration.md   ← runtime + persistence milestone
+│   ├── 010_runtime_integration.md
+│   ├── 011_cli_interface_layer.md
+│   └── 012_streaming_pipeline_and_cli_behavior.md   ← streaming milestone
 
 ├── diagrams
-│   └── (architecture diagrams and visual references)
+│   └── (architecture diagrams and references)
 
 ├── docs
 │   ├── ai-operations
@@ -43,24 +44,27 @@
 │   ├── screenshots
 │   │   ├── backups
 │   │   ├── daemon
-│   │   │   ├── neurocore-daemon-client-response.png
-│   │   │   └── neurocore-daemon-incoming-request.png
-│   │   │
 │   │   ├── interface
+│   │   │   └── cli_interface_layer
+│   │   │
 │   │   ├── knowledge
 │   │   ├── logic
 │   │   ├── rag
 │   │   │
-│   │   ├── runtime              ← model install + runtime setup
+│   │   ├── runtime
 │   │   │   ├── model-download.png
 │   │   │   ├── model-first-response.png
 │   │   │   ├── model-storage-location.png
 │   │   │   └── ollama-installation.png
 │   │   │
-│   │   └── runtime-behavior     ← NEW (system behavior proof)
+│   │   └── runtime-behavior
 │   │       ├── neurocore-runtime-daemon-start.png
 │   │       ├── neurocore-runtime-first-query-init.png
-│   │       └── neurocore-runtime-second-query-fast.png
+│   │       ├── neurocore-runtime-second-query-fast.png
+│   │       │
+│   │       └── 012_streaming_pipeline
+│   │           ├── neurocore-cli-streaming-output.png
+│   │           └── neurocore-daemon-streaming-chunks.png
 │   │
 │   ├── security
 │   ├── vision
@@ -68,14 +72,15 @@
 
 ├── runtime
 │   ├── __init__.py
-│   ├── neurocore_daemon.py     ← persistent UNIX socket server
-│   └── runtime_manager.py      ← request handling + system state
+│   ├── neurocore_daemon.py     ← persistent daemon (streaming enabled)
+│   └── runtime_manager.py      ← request processing layer
 
 ├── scripts
 │   ├── __init__.py
+│   ├── ai_cli.py               ← CLI interface (interactive + streaming)
 │   ├── index_knowledge.py
-│   ├── jarvis_router.py        ← logic layer (run_query entry point)
-│   └── query_knowledge.py      ← KnowledgeBase (lazy-loaded system)
+│   ├── jarvis_router.py        ← logic layer (streaming + non-streaming)
+│   └── query_knowledge.py      ← KnowledgeBase (lazy-loaded)
 
 ├── tools
-│   └── (future integrations and automation tools)
+│   └── (future integrations)
