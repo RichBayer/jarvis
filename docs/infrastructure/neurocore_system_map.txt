@@ -1,55 +1,194 @@
-/mnt/g/ai
-├── backups
-├── logs
-├── memory
-│   ├── chroma
-│   │   ├── 2d7b1406-b001-4f42-894a-e76755878b44
-│   │   │   ├── data_level0.bin
-│   │   │   ├── header.bin
-│   │   │   ├── length.bin
-│   │   │   └── link_lists.bin
-│   │   └── chroma.sqlite3
-│   └── knowledge
-│       ├── home_infrastructure.md
-│       └── linux_notes.txt
-├── models
-├── projects
-│   └── jarvis
-│       ├── bootstrap
-│       ├── build-logs
-│       │   ├── 000_foundation.md
-│       │   ├── 001_runtime_stack.md
-│       │   ├── 002_interface_layer.md
-│       │   ├── 003_knowledge_layer.md
-│       │   ├── 004_knowledge_retrieval.md
-│       │   ├── 005_logic_layer_router.md
-│       │   ├── 006_rag_reasoning_integration.md
-│       │   └── 007_backup_and_rebuild_foundations.md
-│       ├── diagrams
-│       ├── docs
-│       │   ├── ai-stack
-│       │   ├── architecture
-│       │   ├── hardware
-│       │   ├── infrastructure
-│       │   ├── jarvis_development_notebook.md
-│       │   ├── network
-│       │   ├── screenshots
-│       │   ├── security
-│       │   ├── vision
-│       │   └── voice
-│       ├── scripts
-│       │   ├── index_knowledge.py
-│       │   ├── jarvis_router.py
-│       │   └── query_knowledge.py
-│       └── tools
-└── runtime
-    └── python
-        └── jarvis-env
-            ├── bin
-            ├── include
-            ├── lib
-            ├── lib64 -> lib
-            ├── pyvenv.cfg
-            └── share
 
-33 directories, 20 files
+NeuroCore System Map
+
+Root:
+ /mnt/g/ai
+
+├── backups
+│   └── (system backups)
+
+├── logs
+│   └── (runtime logs)
+
+├── memory
+│   ├── chroma
+│   │   ├── chroma.sqlite3        ← vector database
+│   │   └── <uuid>/
+│   │       ├── data_level0.bin
+│   │       ├── header.bin
+│   │       ├── length.bin
+│   │       └── link_lists.bin
+│   │
+│   └── knowledge
+│       ├── home_infrastructure.md
+│       └── linux_notes.txt
+
+├── models
+│   └── (managed by Ollama)
+
+├── projects
+│   └── jarvis
+│       ├── .gitignore
+│       │
+│       ├── bootstrap
+│       │
+│       ├── build-logs
+│       │   ├── 000_foundation.md
+│       │   ├── 001_runtime_stack.md
+│       │   ├── 002_interface_layer.md
+│       │   ├── 003_knowledge_layer.md
+│       │   ├── 004_knowledge_retrieval.md
+│       │   ├── 005_logic_layer_router.md
+│       │   ├── 006_rag_reasoning_integration.md
+│       │   ├── 007_backup_and_rebuild_foundations.md
+│       │   ├── 008_runtime_performance_and_api_migration.md
+│       │   ├── 009_neurocore_daemon_foundation.md
+│       │   ├── 010_runtime_integration.md
+│       │   ├── 011_cli_interface_layer.md
+│       │   └── 012_streaming_pipeline_and_cli_behavior.md
+│       │
+│       ├── diagrams
+│       │
+│       ├── docs
+│       │   ├── ai-operations
+│       │   ├── ai-stack
+│       │   ├── architecture
+│       │   ├── hardware
+│       │   ├── infrastructure
+│       │   ├── network
+│       │   ├── neurocore_development_notebook.md
+│       │   ├── screenshots
+│       │   ├── security
+│       │   ├── vision
+│       │   └── voice
+│       │
+│       ├── runtime
+│       │   ├── neurocore_daemon.py     ← persistent daemon (streaming enabled)
+│       │   └── runtime_manager.py      ← request handling + system state
+│       │
+│       ├── scripts
+│       │   ├── ai_cli.py               ← CLI interface (interactive + streaming)
+│       │   ├── index_knowledge.py
+│       │   ├── jarvis_router.py        ← logic layer (streaming + non-streaming)
+│       │   └── query_knowledge.py      ← KnowledgeBase (lazy-loaded)
+│       │
+│       └── tools
+│           └── (future integrations)
+
+├── runtime
+│   └── python
+│       └── jarvis-env
+│           └── (Python virtual environment)
+
+├── system
+│   └── system_state.md
+
+---
+
+Runtime Execution Flow
+
+CLI (ai command)
+    scripts/ai_cli.py
+    - user interface
+    - interactive + one-shot modes
+    - streaming output
+
+↓
+
+UNIX Socket
+    /tmp/neurocore.sock
+
+↓
+
+NeuroCore Daemon
+    runtime/neurocore_daemon.py
+    - persistent process
+    - request normalization
+    - streaming transport layer
+
+↓
+
+Runtime Manager
+    runtime/runtime_manager.py
+    - request routing
+    - system coordination
+
+↓
+
+Logic Layer (Router)
+    scripts/jarvis_router.py
+    - intent detection
+    - prompt construction
+    - streaming generator (run_query_stream)
+
+↓
+
+Knowledge System
+    scripts/query_knowledge.py
+    - lazy initialization
+    - embedding model load
+    - semantic retrieval
+
+↓
+
+Vector Store (Chroma)
+    /mnt/g/ai/memory/chroma
+    - persistent embeddings
+
+↓
+
+Model Runtime (Ollama)
+    http://localhost:11434
+    - local LLM
+    - streaming API
+
+↓
+
+Response Flow (Streaming)
+
+    Ollama
+    ↓
+    Router (yields chunks)
+    ↓
+    Daemon (forwards chunks)
+    ↓
+    CLI (prints in real time)
+
+---
+
+System Behavior
+
+Cold Start:
+    - embeddings + vector DB initialize
+    - slower first query
+
+Warm State:
+    - no reinitialization
+    - fast streaming responses
+
+---
+
+System Properties
+
+- persistent daemon
+- stateless CLI
+- lazy-loaded knowledge system
+- real-time streaming pipeline
+- local-first execution
+
+---
+
+Current Capabilities
+
+- semantic retrieval (RAG)
+- streaming LLM responses
+- interactive CLI
+- persistent runtime
+
+---
+
+Next Phase
+
+- stdin ingestion (df -h | ai)
+- session memory
+- tool execution layer
