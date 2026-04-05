@@ -46,13 +46,31 @@ class KnowledgeBase:
 
         print("[Knowledge] Initialization complete.")
 
-    # 🔥 SIMPLE COMMAND DETECTION
+    # ----------------------------
+    # 🔥 IMPROVED COMMAND DETECTION
+    # ----------------------------
     def extract_command(self, question: str):
-        match = re.search(r"\b([a-z]+)\b", question.lower())
-        if match:
-            return match.group(1)
+        # Known commands from your knowledge base
+        known_commands = [
+            "df", "du", "mount",
+            "ps", "top",
+            "chmod", "chown",
+            "systemctl",
+            "ip", "ss",
+            "grep", "awk", "sed"
+        ]
+
+        question = question.lower()
+
+        for cmd in known_commands:
+            if re.search(rf"\b{cmd}\b", question):
+                return cmd
+
         return None
 
+    # ----------------------------
+    # 🔥 RETRIEVAL
+    # ----------------------------
     def retrieve(self, question: str) -> str:
         if not self.initialized:
             self.initialize()
@@ -72,7 +90,7 @@ class KnowledgeBase:
             if docs:
                 return "\n\n".join(docs)
 
-        # fallback (no match or no results)
+        # 🔥 FALLBACK (semantic search)
         results = self.retriever.retrieve(question)
         context = "\n\n".join(r.text for r in results)
 
