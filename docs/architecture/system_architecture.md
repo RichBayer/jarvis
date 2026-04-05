@@ -18,7 +18,7 @@ OS: Windows 11 with WSL2 Ubuntu
 
 NeuroCore currently runs primarily on this workstation.
 
-Although the system is currently hosted on a single machine, the architecture is designed so that components may later be distributed across multiple nodes for scalability.
+The architecture is designed to support future distribution across multiple nodes.
 
 ---
 
@@ -27,33 +27,35 @@ Although the system is currently hosted on a single machine, the architecture is
 Primary NVMe (G:)
 
 G:\ai
-models
-runtime
-memory
-projects
-logs
-backups
+- models
+- runtime
+- memory
+- projects
+- logs
+- backups
 
 External HDD (4TB)
 
-Archive storage  
-camera recordings  
-AI memory archive  
-system backups  
+- archive storage  
+- camera recordings  
+- AI memory archive  
+- system backups  
 
-This structure keeps all NeuroCore data visible, portable, and easy to back up.
+All system state is filesystem-visible and portable.
 
 ---
 
 # System Architecture (Layered)
 
-NeuroCore is built as a layered system:
+NeuroCore is now a **context-aware, retrieval-grounded system** built as:
 
 Interface Layer  
 ↓  
 Transport Layer (Daemon + Socket)  
 ↓  
 Runtime Layer  
+↓  
+Reasoning Layer (NEW)  
 ↓  
 Logic Layer  
 ↓  
@@ -65,7 +67,7 @@ Model Layer
 
 # Interface Layer
 
-Provides user interaction with the system.
+Provides user interaction.
 
 Current:
 
@@ -74,12 +76,10 @@ CLI
 
 Future:
 
-Open WebUI  
-Mobile devices (via Tailscale)  
-Tablets  
+Web UI (Open WebUI)  
+Mobile devices (Tailscale)  
 Voice nodes  
-
-The interface layer sends structured requests into the system.
+Tablet interfaces  
 
 ---
 
@@ -99,9 +99,7 @@ Responsibilities:
 Maintain persistent process  
 Accept client connections  
 Normalize requests  
-Stream responses back to clients  
-
-This layer decouples the interface from the runtime.
+Stream responses  
 
 ---
 
@@ -113,11 +111,57 @@ File:
 
 Responsibilities:
 
-Process incoming requests  
-Coordinate system behavior  
-Route requests to the logic layer  
+Coordinate system execution  
+Route requests to logic layer  
+Maintain runtime state  
 
-This acts as the system’s central controller.
+---
+
+# 🧠 Reasoning Layer (NEW)
+
+This is the most important upgrade in the current system.
+
+Components:
+
+Session Memory  
+Query Rewriting  
+
+Files:
+
+[scripts/session_memory.py](../../scripts/session_memory.py)  
+[scripts/jarvis_router.py](../../scripts/jarvis_router.py)
+
+---
+
+## Session Memory
+
+Storage:
+
+/mnt/g/ai/memory/sessions/richard/session.json  
+
+Responsibilities:
+
+Store recent interactions  
+Provide conversational context  
+Enable multi-turn reasoning  
+
+---
+
+## Query Rewriting
+
+Purpose:
+
+Convert ambiguous follow-up questions into fully qualified technical queries.
+
+Example:
+
+"What column shows disk usage percentage?"
+
+→
+
+"What column in df -h output shows disk usage percentage?"
+
+This ensures accurate retrieval.
 
 ---
 
@@ -129,10 +173,11 @@ File:
 
 Responsibilities:
 
-Interpret user requests  
-Determine intent  
+Interpret user intent  
+Apply query rewriting  
+Integrate memory context  
 Build prompts  
-Interact with AI models  
+Control LLM interaction  
 Stream responses  
 
 Key functions:
@@ -148,23 +193,52 @@ File:
 
 [scripts/query_knowledge.py](../../scripts/query_knowledge.py)
 
-Core components:
+Core Components:
 
-Chroma – vector database  
-Embedding model  
+Chroma vector database  
+Embedding model (MiniLM)  
 
-Responsibilities:
-
-Index documents  
-Store embeddings  
-Retrieve relevant context  
-
-Data location:
+Data Locations:
 
 /mnt/g/ai/memory/knowledge  
 /mnt/g/ai/memory/chroma  
 
-This enables retrieval augmented generation (RAG).
+---
+
+## Knowledge System Capabilities
+
+- Persistent vector storage  
+- Metadata-based indexing  
+- Command-aware retrieval (df, ps, etc.)  
+- Fallback semantic search  
+
+---
+
+## 🔥 Metadata-Aware Retrieval (CRITICAL)
+
+Retrieval is now constrained by detected command:
+
+Example:
+
+df query → only df documents  
+
+This eliminates cross-command contamination.
+
+---
+
+## 🔥 Knowledge Normalization (CRITICAL)
+
+Raw man pages are converted into structured operational knowledge.
+
+Example:
+
+Internal doc field:
+pcent  
+
+CLI output:
+Use%  
+
+System uses CLI-facing representation.
 
 ---
 
@@ -185,53 +259,52 @@ Provide streaming output
 
 ---
 
-# Streaming Pipeline (Core Feature)
-
-Streaming is implemented across the full system:
+# Streaming Pipeline
 
 Ollama (streaming API)  
 ↓  
-Router (generator yields chunks)  
+Router (generator)  
 ↓  
-Daemon (forwards chunks over socket)  
+Daemon (socket streaming)  
 ↓  
-CLI (prints in real time)  
-
-This enables:
-
-Real-time responses  
-Improved user experience  
-Foundation for future interfaces (UI, voice, API)
+CLI (real-time output)  
 
 ---
 
-# Execution Flow (Current System)
+# Execution Flow (UPDATED)
 
 1. User runs:
 
    ai "query"
 
-2. CLI sends request to daemon via UNIX socket
+2. CLI sends request via UNIX socket
 
 3. Daemon:
-   - normalizes request
-   - forwards to runtime manager
+   - receives request  
+   - forwards to runtime manager  
 
 4. Runtime Manager:
-   - routes to logic layer
+   - routes request to logic layer  
 
-5. Logic Layer:
-   - retrieves knowledge context
-   - builds prompt
-   - sends request to Ollama
+5. Reasoning Layer:
+   - loads session memory  
+   - rewrites query if needed  
 
-6. Ollama streams response
+6. Knowledge Layer:
+   - detects command  
+   - performs metadata-filtered retrieval  
 
-7. Response propagates back:
+7. Logic Layer:
+   - builds prompt  
+   - sends to Ollama  
 
-   Router → Daemon → CLI
+8. Ollama streams response  
 
-8. CLI prints output in real time
+9. Response flow:
+
+   Router → Daemon → CLI  
+
+10. Memory updated
 
 ---
 
@@ -240,102 +313,109 @@ Foundation for future interfaces (UI, voice, API)
 Cold Start:
 
 Embedding model loads  
-Vector database initializes  
+Vector DB initializes  
 First query slower  
 
 Warm State:
 
+Fast responses  
 No reinitialization  
-Fast streaming responses  
 
 ---
 
 # Memory Layer
 
-Separate from knowledge system.
+Separate from knowledge.
 
 Types:
 
-Conversation memory  
-User memory  
-System memory  
+Session memory (implemented)  
+User memory (future)  
+System memory (future)  
 
-Memory must remain isolated per user.
+Memory is per-user isolated.
 
 ---
 
-# Tool Execution Layer
+# Tool Execution Layer (NEXT)
 
-Allows interaction with external systems.
+This is the next major phase.
 
-Examples:
+Capabilities to add:
 
-System diagnostics  
-Internet search  
-Automation commands  
-Development tools  
+Execute system commands  
+Capture CLI output  
+Analyze live system data  
+Route queries between tools and LLM  
 
-The logic layer determines when tools are used.
+Example:
+
+ai "check disk usage"
+
+→ runs df -h  
+→ analyzes output  
 
 ---
 
 # Perception Layer (Future)
 
-Potential inputs:
+Inputs:
 
 Microphones  
 Cameras  
 Sensors  
 Smart devices  
 
-This enables environmental awareness.
-
 ---
 
 # Automation Layer (Future)
 
-Powered by Home Assistant.
+Integration:
+
+Home Assistant  
+MQTT  
 
 Controls:
 
 Lights  
-Cameras  
 Sensors  
-Automation rules  
-
-Communication via MQTT or similar protocols.
+Cameras  
+Rules  
 
 ---
 
 # Distributed Architecture (Future)
 
-Planned node roles:
+Planned nodes:
 
 AI compute node  
 Knowledge node  
 Automation node  
 Interface nodes  
 
-This allows horizontal scaling over time.
-
 ---
 
 # Design Principles
 
 Local-first computing  
-Transparent filesystem-based state  
+Transparent filesystem state  
 Modular architecture  
 Persistent runtime  
 Real-time streaming  
+Deterministic retrieval  
+Context-aware reasoning  
 
 ---
 
 # Current Capabilities
 
 Interactive CLI  
-Real-time streaming responses  
-Semantic knowledge retrieval (RAG)  
-Persistent daemon-based runtime  
+Streaming responses  
+RAG (vector retrieval)  
+Session memory  
+Query rewriting  
+Metadata-aware retrieval  
+Knowledge normalization  
 
 ---
 
@@ -354,9 +434,7 @@ Resume Prompt
 
 # Next Phase
 
-STDIN ingestion (df -h | ai)  
-Session memory  
-Tool execution expansion  
+Tool Execution Layer
 
 ---
 
@@ -364,4 +442,14 @@ Tool execution expansion
 
 Centralized intelligence with distributed interaction points.
 
-One powerful AI core supported by modular subsystems and flexible interfaces.
+NeuroCore is evolving from:
+
+information retrieval system  
+
+to:
+
+context-aware reasoning system  
+
+next:
+
+action-capable system
