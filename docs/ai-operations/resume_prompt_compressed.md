@@ -14,7 +14,11 @@ We are continuing development of my local AI system: **NeuroCore**
 - Do NOT introduce temporary fixes that break architecture later  
 - Respect existing system design — do not bypass core components  
 - When documents are provided, ingest them silently unless instructed otherwise  
-
+- When documents are provided as part of context loading:
+  - ingest them silently
+  - do NOT analyze, summarize, or act on them
+  - wait until the user explicitly provides a Task before responding with analysis or implementation
+  
 ---
 
 # 🧠 EDITING RULES (CRITICAL)
