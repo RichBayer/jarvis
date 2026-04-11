@@ -1,137 +1,126 @@
+# /mnt/g/ai/projects/neurocore/runtime/control_plane.py
+
 from __future__ import annotations
 
 from dataclasses import dataclass
-from enum import Enum
 from typing import Any, Dict
-import re
 
-
-class SourceType(str, Enum):
-    CLI_DIRECT = "cli_direct"
-    CLI_PIPE = "cli_pipe"
-    CLI_INTERACTIVE = "cli_interactive"
-
-
-class RequestClass(str, Enum):
-    CONVERSATIONAL = "conversational"
-    KNOWLEDGE = "knowledge"
-    EXTERNAL_INPUT = "external_input"
-    EXECUTION_INTENT = "execution_intent"
-
-
-class OperatingMode(str, Enum):
-    REASONING = "reasoning"
-    ANALYSIS = "analysis"
-    EXECUTION_CANDIDATE = "execution_candidate"
+from tools.execution_engine import ExecutionEngine
+from tools.tool_registry import registry
 
 
 @dataclass
 class AuthorizedRequest:
     normalized_input: str
-    source: SourceType
-    request_class: RequestClass
-    mode: OperatingMode
-    session_memory_allowed: bool
-    retrieval_allowed: bool
-    external_input_present: bool
+    session_memory_allowed: bool = True
+    external_input_present: bool = False
+
+    class RequestClass:
+        value = "reasoning"
+
+    request_class = RequestClass()
 
 
 class ControlPlane:
-    """
-    Phase 5A control-plane skeleton.
 
-    Responsibilities:
-    - classify request source
-    - classify request type
-    - assign operating mode
-    - grant or deny memory / retrieval usage
-    - detect execution intent without executing anything
-    """
+    EXECUTION_KEYWORDS = {"start", "stop", "restart", "status"}
+    CONFIRM_PREFIX = "confirm "
 
-    EXECUTION_PATTERNS = [
-        r"^\s*(run|execute|restart|stop|start|kill|delete|remove|rm|shutdown|reboot|install|uninstall|create|index|backup|snapshot)\b",
-        r"^\s*(apt|apt-get|dnf|yum|systemctl|service|rm|mv|cp|chmod|chown|docker|podman|kubectl)\b",
-    ]
+    def __init__(self) -> None:
+        self.execution_engine = ExecutionEngine()
 
-    KNOWLEDGE_HINTS = [
-        "what",
-        "how",
-        "why",
-        "explain",
-        "describe",
-        "define",
-    ]
+    # -------------------------
+    # REASONING COMPATIBILITY
+    # -------------------------
 
     def authorize(self, request: Dict[str, Any]) -> AuthorizedRequest:
-        user_input = self._extract_input(request)
-        source = self._detect_source(request)
-        request_class = self._classify(user_input, source)
-        mode = self._select_mode(request_class)
+        text = request.get("data", {}).get("input", "")
+        return AuthorizedRequest(normalized_input=text)
 
-        session_memory_allowed = mode == OperatingMode.REASONING
-        retrieval_allowed = mode == OperatingMode.REASONING
-        external_input_present = source == SourceType.CLI_PIPE
+    # -------------------------
+    # MAIN ENTRY
+    # -------------------------
 
-        return AuthorizedRequest(
-            normalized_input=user_input,
-            source=source,
-            request_class=request_class,
-            mode=mode,
-            session_memory_allowed=session_memory_allowed,
-            retrieval_allowed=retrieval_allowed,
-            external_input_present=external_input_present,
-        )
+    def process(self, request: Dict[str, Any]) -> Dict[str, Any]:
+        query = request.get("query", "").strip()
 
-    def _extract_input(self, request: Dict[str, Any]) -> str:
-        if "data" in request and isinstance(request["data"], dict):
-            text = request["data"].get("input")
-            if isinstance(text, str) and text.strip():
-                return text.strip()
+        if not self._is_execution_request({"query": query}):
+            return {
+                "status": "pass_through",
+                "message": "Not execution",
+            }
 
-        if "payload" in request and isinstance(request["payload"], dict):
-            text = request["payload"].get("text")
-            if isinstance(text, str) and text.strip():
-                return text.strip()
+        confirmed = self._is_confirmed(query)
+        cleaned_query = self._strip_confirm(query)
 
-        if "query" in request and isinstance(request["query"], str) and request["query"].strip():
-            return request["query"].strip()
+        structured = self._build_execution_request({"query": cleaned_query})
 
-        raise ValueError("Invalid request format: no input found")
+        tool = registry.get(structured["tool"])
 
-    def _detect_source(self, request: Dict[str, Any]) -> SourceType:
-        source = request.get("source")
-        mode = request.get("mode")
+        if not tool:
+            return {
+                "status": "error",
+                "error_type": "tool_not_found",
+                "message": f"Tool '{structured['tool']}' not found",
+            }
 
-        if source == "cli_pipe" or mode == "pipe":
-            return SourceType.CLI_PIPE
+        # 🔥 POLICY ENFORCEMENT
+        mode = tool.execution_mode
 
-        if mode == "interactive":
-            return SourceType.CLI_INTERACTIVE
+        if mode == "manual" and not confirmed:
+            return {
+                "status": "confirmation_required",
+                "tool": tool.name,
+                "message": f"Tool '{tool.name}' requires confirmation",
+                "data": {
+                    "confirm_command": f'ai "confirm {cleaned_query}"'
+                },
+            }
 
-        return SourceType.CLI_DIRECT
+        if mode == "dry-run":
+            return {
+                "status": "policy_denied",
+                "message": "Tool is dry-run only",
+            }
 
-    def _classify(self, text: str, source: SourceType) -> RequestClass:
-        lowered = text.lower()
+        # 🔥 EXECUTE
+        return self.execution_engine.execute(structured)
 
-        if source == SourceType.CLI_PIPE:
-            return RequestClass.EXTERNAL_INPUT
+    # -------------------------
+    # HELPERS
+    # -------------------------
 
-        if self._is_execution_intent(lowered):
-            return RequestClass.EXECUTION_INTENT
+    def _is_execution_request(self, request: Dict[str, Any]) -> bool:
+        text = request.get("query", "").lower().strip()
+        if not text:
+            return False
 
-        if any(hint in lowered for hint in self.KNOWLEDGE_HINTS):
-            return RequestClass.KNOWLEDGE
+        text = self._strip_confirm(text)
+        words = text.split()
 
-        return RequestClass.CONVERSATIONAL
+        if not words:
+            return False
 
-    def _select_mode(self, request_class: RequestClass) -> OperatingMode:
-        if request_class == RequestClass.EXTERNAL_INPUT:
-            return OperatingMode.ANALYSIS
+        return words[0] in self.EXECUTION_KEYWORDS
 
-        if request_class == RequestClass.EXECUTION_INTENT:
-            return OperatingMode.EXECUTION_CANDIDATE
+    def _is_confirmed(self, query: str) -> bool:
+        return query.lower().startswith(self.CONFIRM_PREFIX)
 
-        return OperatingMode.REASONING
+    def _strip_confirm(self, query: str) -> str:
+        if query.lower().startswith(self.CONFIRM_PREFIX):
+            return query[len(self.CONFIRM_PREFIX):].strip()
+        return query
 
-    def _is_execution_intent(self, text: str) -> bool:
-        return any(re.search(pattern, text, flags=re.IGNORECASE) for pattern in self.EXECUTION_PATTERNS)
+    def _build_execution_request(self, request: Dict[str, Any]) -> Dict[str, Any]:
+        words = request.get("query", "").lower().split()
+
+        action = words[0] if len(words) > 0 else ""
+        service = words[1] if len(words) > 1 else ""
+
+        return {
+            "tool": "service_manager",
+            "input": {
+                "action": action,
+                "service": service,
+            },
+        }
