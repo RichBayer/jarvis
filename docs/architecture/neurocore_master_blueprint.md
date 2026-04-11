@@ -1,345 +1,401 @@
-# NeuroCore Master Blueprint
-
-## 1. Purpose
-
-NeuroCore is a local-first personal AI infrastructure system designed to operate as a persistent cognitive runtime rather than a stateless chatbot or simple application.
-
-It is intended to provide:
-
-- knowledge management
-- software development assistance
-- technical troubleshooting
-- home infrastructure support
-- daily life assistance
-- long-term adaptive interaction for multiple users
-
-NeuroCore must remain:
-
-- local-first
-- inspectable
-- reproducible
-- modular
-- scalable
-- human-controlled
+# NeuroCore – Master Blueprint
 
 ---
 
-## 2. System Identity
+# Purpose of This Document
 
-NeuroCore is not a chatbot.
+This document defines:
 
-NeuroCore is a persistent cognitive infrastructure system.
+- how NeuroCore evolves
+- how major capabilities are introduced
+- what systems must exist before others
+- the order of architectural expansion
 
-Its core design assumption is that intelligence should be centralized, stateful, and governed by a single runtime spine, while interfaces, tools, perception systems, and external services connect to that spine in a controlled way.
+This is NOT:
+- a vision document
+- a system architecture breakdown
+- a code-level implementation guide
 
----
-
-## 3. Governing Architectural Principles
-
-### 3.1 Runtime-Centric Design
-All interaction and all future environmental events must enter through the NeuroCore daemon and be governed by the Runtime Manager.
-
-Nothing bypasses the runtime spine.
-
-### 3.2 Local-First Operation
-Core reasoning, memory, knowledge retrieval, and primary functionality must operate locally.
-
-### 3.3 Filesystem-Visible State
-Memory and system state should remain visible in the filesystem whenever possible.
-
-### 3.4 Controlled Execution
-NeuroCore must never directly execute arbitrary model-generated commands.
-
-### 3.5 Human-Controlled Long-Term Memory
-No silent accumulation of long-term memory.
-
-### 3.6 Multi-User Isolation
-Strict per-user memory separation.
-
-### 3.7 Centralized Intelligence
-Legion = brain  
-R730 = infrastructure  
-Nodes = interfaces
-
-### 3.8 Phased Deployment Without Redesign
-Architecture remains constant regardless of hardware stage.
+This is the **control document for system evolution**
 
 ---
 
-## 4. High-Level System Model
+# System Definition
 
-- Cognitive Core (Legion)
-- Infrastructure Core (R730)
-- Edge Interaction Layer (Nodes)
-- Perception Network (Sensors)
+NeuroCore is a persistent, local-first AI system designed to operate as a **cognitive runtime** rather than a stateless tool.
 
----
+It is intended to:
 
-## 5. Logical Architecture
-
-### 5.1 Interface Layer
-CLI (current), UI, voice (future)
-
-### 5.2 Transport Layer
-UNIX socket → future network
-
-### 5.3 Daemon Layer
-runtime/neurocore_daemon.py
-
-### 5.4 Runtime Manager
-runtime/runtime_manager.py
-
-### 5.5 Orchestration Layer
-scripts/jarvis_router.py
-
-Handles:
-- intent
-- rewriting
-- routing
-- grounding
+- maintain context over time
+- reason about problems
+- take controlled actions
+- observe environmental signals
+- operate safely under defined constraints
+- recover from failure
 
 ---
 
-### 5.6 Knowledge Layer
+# Current System State (Baseline)
 
-- scripts/query_knowledge.py
-- Chroma
-- metadata filtering
-- grounded retrieval
+NeuroCore currently has:
 
----
+- persistent daemon (UNIX socket)
+- runtime manager (central processing layer)
+- router (reasoning + query rewriting)
+- RAG-based knowledge system
+- metadata-aligned retrieval
+- session memory (short-term)
+- real-time streaming pipeline
+- CLI interface (`ai` command)
 
-### 5.7 Memory Layer
+At this stage, the system is:
 
-#### Session Memory (Short-Term)
-
-Current implementation:
-
-Session memory is stored per user at:
-
-/mnt/g/ai/memory/sessions/<user>/session.json
-
-Example (current system):
-/mnt/g/ai/memory/sessions/richard/session.json
-
-Managed by:
-scripts/session_memory.py
-
-Format:
-- JSON
-- rolling window of recent interactions
-
-Purpose:
-- query rewriting
-- follow-up resolution
-- conversational continuity
-
-Session memory is stored outside the project repository to ensure:
-- separation from version control
-- local-first persistence
-- easy backup and restoration
-- multi-user scalability
+> a reasoning system with strong interaction capabilities
 
 ---
 
-#### Project Memory
+# Transition Point
 
-Stored under:
-/mnt/g/ai/projects/
+The system is now moving from:
 
-User-controlled.
+> answering questions
 
----
+to:
 
-#### Personal Memory
+> performing controlled actions within an environment
 
-- preferences
-- personality
-- tone
-
-Stored only with approval.
+This transition introduces **execution, control, and safety requirements**
 
 ---
 
-#### Knowledge Memory
+# Core Architectural Rule
 
-- indexed docs
-- RAG
+All system behavior must pass through:
 
----
+> Runtime Manager (control plane)
 
-#### Future Working Memory
+Nothing:
+- executes
+- modifies state
+- accesses memory
+- or interacts with external systems
 
-- active tasks
-
----
-
-### 5.8 Model Layer
-
-Ollama
+without passing through the runtime.
 
 ---
 
-### 5.9 Tool Execution Layer
+# Phase 5 – Execution & Control Architecture
 
-Controlled Tool Registry
+Phase 5 introduces all systems required for **safe, controlled execution**
 
-#### Tier 1 (Auto)
-- read-only
+This phase must be completed in order.
 
-#### Tier 2 (Approval)
-- web / external
+---
 
-#### Tier 3 (Approval)
-- mutating
+## Phase 5A – Runtime Control Plane
 
-Rules:
+### Goal
+Establish a single authority layer for all system behavior.
+
+### Build
+- structured request format
+- centralized routing enforcement
+- runtime-level decision control
+
+### Outcome
+- no hidden execution paths
+- consistent system behavior
+- foundation for all future control systems
+
+---
+
+## Phase 5B – Tool Interface Standard
+
+### Goal
+Define what a "tool" is in a controlled system.
+
+### Build
+- tool schema:
+  - inputs
+  - outputs
+  - risk level
+  - execution type
+  - approval requirements
+
+### Outcome
 - no raw command execution
-- structured outputs
-- runtime-controlled
+- structured, predictable capabilities
+- reusable tool definitions
 
 ---
 
-### 5.10 Perception Layer
+## Phase 5C – Security, Policy, Authority
 
-Structured events only.
+### Goal
+Define system boundaries and permissions.
 
-All inputs must be converted into structured events before entering NeuroCore.
+### Build
+- policy engine
+- permission model
+- approval system
 
----
+### Enforcement
+- user-level authority
+- action-level restrictions
+- memory access control
 
-### 5.11 Response Layer
-
-- text
-- audio
-- UI
-- actions
-
----
-
-## 6. Current Runtime Pipeline
-
-User  
-→ CLI  
-→ Socket  
-→ Daemon  
-→ Runtime Manager  
-→ Router  
-→ Session Memory  
-→ Rewrite  
-→ Retrieval  
-→ Ollama  
-→ Stream  
-→ Memory Update
+### Outcome
+- safe automation
+- controlled execution
+- protection from unintended behavior
 
 ---
 
-## 7. Physical Architecture
+## Phase 5D – Observability & Tracing
 
-### Legion
-- brain
+### Goal
+Make all system activity visible and traceable.
 
-### R730
-- services
+### Build
+- structured logs
+- request tracing
+- tool execution logs
 
-### Nodes
-- input/output
-
-### Sensors
-- perception
-
----
-
-## 8. Phase 1 Deployment
-
-Everything runs on Legion  
-Architecture unchanged
+### Outcome
+- debugging capability
+- system transparency
+- execution traceability
 
 ---
 
-## 9. Memory Summary
+## Phase 5E – Evaluation & Regression
 
-Session → automatic  
-Project → user-triggered  
-Personal → suggestion + approval  
-Knowledge → manual  
+### Goal
+Ensure system behavior remains correct over time.
 
----
+### Build
+- test scenarios
+- evaluation harness
+- regression tracking
 
-## 10. Tool Summary
-
-Controlled execution  
-Tiered permissions  
-Approval system  
-
----
-
-## 11. Perception Summary
-
-Preprocessed structured events  
-Unified ingestion  
+### Outcome
+- stable system evolution
+- measurable improvements
+- prevention of silent degradation
 
 ---
 
-## 12. Repo Mapping
+## Phase 5F – Execution Safety & Recovery
 
-runtime/  
-scripts/  
-memory/  
-projects/  
+### Goal
+Handle failure safely.
 
----
+### Build
+- retry logic
+- abort conditions
+- error classification
 
-## 13. Current Capabilities
-
-- daemon
-- streaming
-- RAG
-- metadata filtering
-- session memory
-- query rewriting
-- grounded responses
+### Outcome
+- controlled failure handling
+- safe long-running execution
+- resilience under error conditions
 
 ---
 
-## 14. Rules
+## Phase 5G – Task / Workflow State Layer
+
+### Goal
+Allow the system to maintain work over time.
+
+### Build
+- task objects
+- step tracking
+- persistent state
+
+### Outcome
+- multi-step execution
+- long-running tasks
+- structured workflows
+
+---
+
+## Phase 5H – Tool Execution Layer
+
+### Goal
+Enable controlled interaction with the system environment.
+
+### Build
+- tool registry
+- execution engine
+- integration with approval system
+
+### Outcome
+- system can perform actions
+- execution is controlled and auditable
+
+---
+
+## Phase 5I – Safe Local Tools
+
+### Goal
+Introduce low-risk capabilities first.
+
+### Build
+- file inspection tools
+- system diagnostics
+- log analysis
+- network inspection
+
+### Constraints
+- read-only by default
+- no destructive actions
+
+### Outcome
+- useful functionality without risk
+
+---
+
+## Phase 5J – External Threat Defense
+
+### Goal
+Protect the system before exposing it to external inputs.
+
+### Build
+- prompt injection protection
+- input validation
+- tool isolation
+
+### Outcome
+- hardened system boundaries
+- safe handling of untrusted input
+- readiness for external integration
+
+---
+
+## Phase 5K – External Tools
+
+### Goal
+Extend system capabilities beyond the local environment.
+
+### Build
+- web integrations
+- API tools
+- external data sources
+
+### Requirements
+- strict policy enforcement
+- approval gating
+- all inputs pass through defensive layer
+
+### Outcome
+- expanded capability without compromising safety
+
+---
+
+## Phase 5L – Security Intelligence Pipeline
+
+### Goal
+Continuously improve system security awareness.
+
+### Build
+- threat ingestion
+- analysis system
+- recommendation engine
+
+### Outcome
+- adaptive defense model
+- evolving security posture
+
+---
+
+## Phase 5M – Memory Expansion
+
+### Goal
+Improve long-term continuity.
+
+### Build
+- summarization layer
+- working memory system
+
+### Outcome
+- persistent context
+- improved reasoning across time
+
+---
+
+## Phase 5N – Self-Reconstruction System
+
+### Goal
+Enable full system recovery and validation.
+
+### Build
+- system scanner
+- documentation analyzer
+- drift detection
+- rebuild playbooks
+
+### Outcome
+- reproducible system
+- no fear of failure
+- long-term maintainability
+
+---
+
+# Execution Model (Reference)
+
+All operations follow:
+
+request/event  
+→ runtime manager  
+→ policy evaluation  
+→ routing  
+→ memory + knowledge  
+→ tool/model execution  
+→ response/action  
+→ logging + state update  
+
+---
+
+# System Invariants (Non-Negotiable Rules)
 
 ### Forbidden
-- bypass daemon
-- raw command exec
-- hidden memory
-- split brain
+
+- bypassing the runtime
+- raw command execution
+- hidden memory writes
+- uncontrolled tool usage
+- unlogged execution
+
+---
 
 ### Required
-- structured input
-- controlled tools
-- visible memory
+
+- structured inputs and outputs
+- policy enforcement
+- observable execution
+- controlled memory access
+- reproducible behavior
 
 ---
 
-## 15. Roadmap
-
-Phase 5 next:
-Tool Execution Layer
-
----
-
-## 16. Immediate Next Step
-
-Build:
-- tool registry
-- executor
-- approval manager
-
----
-
-## 17. Definition of Success
+# Definition of Success
 
 NeuroCore becomes:
 
 - persistent
-- local
+- local-first
 - controlled
-- scalable
-- context-aware
-- action-capable
+- observable
+- secure
+- capable of action
+- capable of long-running work
+- capable of self-recovery
+
+If the system becomes:
+
+- fragile
+- unpredictable
+- difficult to understand
+- difficult to rebuild
+
+then the architecture must be corrected.
