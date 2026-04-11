@@ -7,7 +7,6 @@ import signal
 import sys
 
 from runtime.runtime_manager import RuntimeManager
-from scripts.jarvis_router import run_query_stream
 
 
 SOCKET_PATH = "/tmp/neurocore.sock"
@@ -30,26 +29,41 @@ signal.signal(signal.SIGTERM, handle_exit)
 
 
 def normalize_request(message):
+    """
+    Normalize incoming client messages into the runtime request shape.
+
+    Important:
+    We preserve current CLI compatibility while adding the source hint
+    needed by the control plane.
+    """
+    input_text = None
+
     if "data" in message and isinstance(message["data"], dict):
         input_text = message["data"].get("input")
 
-        if input_text:
-            return {
-                "type": "query",
-                "payload": {
-                    "text": input_text
-                }
-            }
+    if not input_text and "query" in message:
+        input_text = message["query"]
 
-    if "query" in message:
-        return {
-            "type": "query",
-            "payload": {
-                "text": message["query"]
-            }
+    if not input_text:
+        raise ValueError("Invalid request format: no input found")
+
+    source = message.get("source")
+    mode = message.get("mode", "cli")
+
+    if source is None:
+        # Current CLI does not explicitly send source. Use mode as the best available hint.
+        source = "cli_pipe" if mode == "pipe" else "cli_direct"
+
+    return {
+        "type": "query",
+        "user": message.get("user", "richard"),
+        "mode": mode,
+        "stream": message.get("stream", False),
+        "source": source,
+        "data": {
+            "input": input_text
         }
-
-    raise ValueError("Invalid request format: no input found")
+    }
 
 
 def recv_full(conn):
@@ -59,27 +73,7 @@ def recv_full(conn):
         if not chunk:
             break
         chunks.append(chunk)
-
     return b"".join(chunks)
-
-
-def handle_streaming(conn, user_input):
-    print(f"\n[Streaming] {user_input}")
-
-    try:
-        for chunk in run_query_stream(user_input):
-            if chunk:
-                conn.sendall(chunk.encode("utf-8"))
-
-        conn.shutdown(socket.SHUT_WR)
-
-    except Exception as e:
-        error_msg = f"\nError during streaming: {e}\n"
-        try:
-            conn.sendall(error_msg.encode("utf-8"))
-            conn.shutdown(socket.SHUT_WR)
-        except:
-            pass
 
 
 def main():
@@ -110,39 +104,35 @@ def main():
 
             normalized = normalize_request(message)
 
-            if message.get("stream") is True:
-                user_input = normalized["payload"]["text"]
-                handle_streaming(conn, user_input)
+            if normalized.get("stream") is True:
+                for chunk in runtime.handle_stream_request(normalized):
+                    if chunk:
+                        conn.sendall(chunk.encode("utf-8"))
+
+                conn.shutdown(socket.SHUT_WR)
                 continue
 
-            result = runtime.process_request(normalized)
+            result = runtime.handle_request(normalized)
 
-            if isinstance(result, dict) and result.get("status") == "error":
-                response = {
-                    "status": "error",
-                    "response": None,
-                    "error": result.get("message")
-                }
-            else:
-                response = {
-                    "status": "success",
-                    "response": result.get("response") if isinstance(result, dict) else result,
-                    "error": None
-                }
+            response = {
+                "status": "success",
+                "response": result,
+                "error": None
+            }
 
             conn.sendall(json.dumps(response).encode())
             conn.shutdown(socket.SHUT_WR)
 
         except Exception as e:
+            error = {
+                "status": "error",
+                "response": None,
+                "error": str(e)
+            }
             try:
-                error = {
-                    "status": "error",
-                    "response": None,
-                    "error": str(e)
-                }
                 conn.sendall(json.dumps(error).encode())
                 conn.shutdown(socket.SHUT_WR)
-            except:
+            except Exception:
                 pass
 
         finally:

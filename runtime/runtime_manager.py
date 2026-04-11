@@ -1,75 +1,76 @@
-#!/usr/bin/env python3
+from scripts.jarvis_router import run_authorized_query, run_authorized_stream_query
+from runtime.control_plane import ControlPlane
+import re
 
-"""
-NeuroCore Runtime Manager
 
-Responsibilities:
-- Manage persistent system state
-- Process incoming requests from daemon
-- Route queries to logic layer (router)
-- Return structured responses
-"""
+def is_ambiguous(query: str) -> bool:
+    q = query.lower().strip()
+    q = re.sub(r"[^\w\s]", "", q)
 
-from scripts.jarvis_router import run_query
+    words = q.split()
+
+    vague_words = {"what", "does", "that", "mean", "it", "this", "explain"}
+
+    return len(words) <= 5 and all(w in vague_words for w in words)
+
+
+def no_context_response() -> str:
+    return (
+        "I do not have enough context to know what you're referring to. "
+        "Please include the specific command output, error message, or topic you want explained."
+    )
 
 
 class RuntimeManager:
     def __init__(self):
-        """
-        Initialize runtime components.
-        """
         print("Initializing NeuroCore Runtime Manager...")
+        self.control_plane = ControlPlane()
 
-    def process_request(self, request: dict) -> dict:
-        """
-        Process a structured request.
+    def handle_request(self, request):
+        # 🔥 USE RAW INPUT — NOT normalized
+        raw_input = request.get("payload", {}).get("text", "")
 
-        Expected format:
-        {
-            "type": "query",
-            "payload": {
-                "text": "..."
-            }
-        }
-        """
+        # 🔥 HARD GUARD BEFORE ANY PROCESSING
+        if is_ambiguous(raw_input):
+            return no_context_response()
 
-        try:
-            request_type = request.get("type")
+        authorized = self.control_plane.authorize(request)
 
-            if request_type == "query":
-                return self._handle_query(request)
+        if authorized.request_class.value == "execution_intent":
+            return self._downgrade_execution(authorized)
 
-            return {
-                "status": "error",
-                "message": f"Unsupported request type: {request_type}"
-            }
+        return run_authorized_query(authorized)
 
-        except Exception as e:
-            return {
-                "status": "error",
-                "message": str(e)
-            }
+    def handle_stream_request(self, request):
+        # 🔥 USE RAW INPUT — NOT normalized
+        raw_input = request.get("payload", {}).get("text", "")
 
-    def _handle_query(self, request: dict) -> dict:
-        """
-        Handle query-type requests.
-        """
+        # 🔥 HARD GUARD BEFORE ANY PROCESSING
+        if is_ambiguous(raw_input):
+            yield no_context_response()
+            return
 
-        payload = request.get("payload", {})
-        user_input = payload.get("text", "")
+        authorized = self.control_plane.authorize(request)
 
-        if not user_input:
-            return {
-                "status": "error",
-                "message": "No query text provided"
-            }
+        if authorized.request_class.value == "execution_intent":
+            yield "[Control Plane] Execution not allowed.\n\n"
+            yield self._downgrade_execution(authorized)
+            return
 
-        print(f"\n[Runtime] Processing query: {user_input}")
+        for chunk in run_authorized_stream_query(authorized):
+            yield chunk
 
-        response_text = run_query(user_input)
+    def _downgrade_execution(self, authorized):
+        advisory_prompt = (
+            "The user requested an action, but NeuroCore does not execute commands.\n"
+            "Provide safe, manual instructions only.\n\n"
+            f"User request: {authorized.normalized_input}"
+        )
 
-        return {
-            "status": "ok",
-            "type": "query",
-            "response": response_text
-        }
+        class Advisory:
+            def __init__(self, text):
+                self.normalized_input = text
+                self.session_memory_allowed = False
+                self.external_input_present = False
+
+        return run_authorized_query(Advisory(advisory_prompt))

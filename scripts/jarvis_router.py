@@ -1,80 +1,43 @@
 #!/usr/bin/env python3
 
-import argparse
-import requests
 import json
+import requests
+import re
 
-from scripts.query_knowledge import KnowledgeBase
-from scripts.session_memory import get_recent_history, add_interaction
+from scripts.session_memory import add_interaction
+
+# ----------------------------
+# AMBIGUITY DETECTION (FINAL)
+# ----------------------------
+
+def is_ambiguous(query: str) -> bool:
+    q = query.lower().strip()
+
+    # Remove punctuation
+    q = re.sub(r"[^\w\s]", "", q)
+
+    # Tokenize
+    words = q.split()
+
+    # 🔥 Core logic:
+    # Very short + vague queries = ambiguous
+    if len(words) <= 5:
+        vague_words = {"what", "does", "that", "mean", "it", "this", "explain"}
+        if all(w in vague_words for w in words):
+            return True
+
+    return False
 
 
-knowledge_base = KnowledgeBase()
+def no_context_response() -> str:
+    return (
+        "I do not have enough context to know what you're referring to. "
+        "Please include the specific command output, error message, or topic you want explained."
+    )
 
 
 # ----------------------------
-# QUERY REWRITE
-# ----------------------------
-
-def rewrite_query(user_request: str) -> str:
-    history = get_recent_history()
-
-    if not history:
-        return user_request
-
-    last = history[-1]
-
-    prompt = f"""
-You are a system that rewrites follow-up questions into fully self-contained technical questions.
-
-Rules:
-- Use previous conversation to resolve ambiguity
-- Identify the command, tool, or topic explicitly
-- Include it clearly in the rewritten question
-- Be specific and technical
-- Output ONLY the rewritten question
-
-Previous conversation:
-User: {last['user']}
-Assistant: {last['assistant']}
-
-Follow-up question:
-{user_request}
-
-Rewritten question:
-"""
-
-    rewritten = query_ollama_once(prompt)
-
-    # Fallback if rewrite fails
-    if not rewritten or len(rewritten.split()) < 4:
-        return user_request
-
-    return rewritten.strip()
-
-
-def query_ollama_once(prompt: str) -> str:
-    url = "http://localhost:11434/api/generate"
-
-    payload = {
-        "model": "llama3.1:8b",
-        "prompt": prompt,
-        "stream": False,
-        "options": {
-            "num_predict": 100
-        }
-    }
-
-    try:
-        response = requests.post(url, json=payload)
-        if response.status_code != 200:
-            return ""
-        return response.json().get("response", "").strip()
-    except:
-        return ""
-
-
-# ----------------------------
-# NON-STREAMING
+# MODEL CALLS
 # ----------------------------
 
 def query_ollama(prompt: str) -> str:
@@ -84,23 +47,12 @@ def query_ollama(prompt: str) -> str:
         "model": "llama3.1:8b",
         "prompt": prompt,
         "stream": False,
-        "options": {
-            "num_predict": 600
-        }
+        "options": {"num_predict": 600},
     }
 
-    try:
-        response = requests.post(url, json=payload)
-        if response.status_code != 200:
-            return f"Error: {response.text}"
-        return response.json().get("response", "")
-    except Exception as e:
-        return f"Error: {e}"
+    response = requests.post(url, json=payload)
+    return response.json().get("response", "")
 
-
-# ----------------------------
-# STREAMING
-# ----------------------------
 
 def query_ollama_stream(prompt: str):
     url = "http://localhost:11434/api/generate"
@@ -109,57 +61,37 @@ def query_ollama_stream(prompt: str):
         "model": "llama3.1:8b",
         "prompt": prompt,
         "stream": True,
-        "options": {
-            "num_predict": 600
-        }
+        "options": {"num_predict": 600},
     }
 
-    try:
-        response = requests.post(url, json=payload, stream=True)
+    response = requests.post(url, json=payload, stream=True)
 
-        if response.status_code != 200:
-            yield f"\nError contacting Ollama:\n{response.text}\n"
-            return
+    for line in response.iter_lines(decode_unicode=True):
+        if not line:
+            continue
 
-        for line in response.iter_lines(decode_unicode=True):
-            if not line:
-                continue
+        try:
+            data = json.loads(line)
+            chunk = data.get("response", "")
 
-            try:
-                data = json.loads(line)
-                chunk = data.get("response", "")
+            if chunk:
+                yield chunk
 
-                if chunk:
-                    yield chunk
-
-                if data.get("done"):
-                    break
-
-            except:
-                continue
-
-    except Exception as e:
-        yield f"\nStreaming error: {e}\n"
+            if data.get("done"):
+                break
+        except:
+            continue
 
 
 # ----------------------------
-# PROMPT
+# PROMPTS
 # ----------------------------
 
-def build_prompt(user_request: str, context: str) -> str:
+def build_prompt(user_request: str) -> str:
     return f"""
 You are NeuroCore, a Linux systems assistant.
 
-You MUST base your answer on the provided context.
-
-Rules:
-- Use ONLY the provided context
-- Do NOT hallucinate or invent details
-- Be precise and technical
-- When referring to command output fields or column names, use EXACT names from the context
-
-Context:
-{context}
+Answer clearly and technically.
 
 Question:
 {user_request}
@@ -168,52 +100,62 @@ Answer:
 """
 
 
+def build_analysis_prompt(user_input: str) -> str:
+    return f"""
+You are analyzing raw system output.
+
+Rules:
+- ONLY describe what is directly observable
+- DO NOT guess meaning
+- DO NOT infer purpose
+
+Input:
+{user_input}
+
+Analysis:
+"""
+
+
 # ----------------------------
-# ENTRY POINTS
+# CORE EXECUTION
 # ----------------------------
 
-def run_query(user_request: str) -> str:
-    rewritten = rewrite_query(user_request)
+def run_authorized_query(authorized) -> str:
+    user_request = authorized.normalized_input
 
-    context = knowledge_base.retrieve(rewritten)
-    prompt = build_prompt(rewritten, context)
+    # PIPE MODE
+    if authorized.external_input_present:
+        return query_ollama(build_analysis_prompt(user_request))
 
-    response = query_ollama(prompt)
+    # 🔥 FINAL ambiguity guard
+    if is_ambiguous(user_request):
+        return no_context_response()
 
-    add_interaction(user_request, response)
+    response = query_ollama(build_prompt(user_request))
+
+    if authorized.session_memory_allowed:
+        add_interaction(user_request, response)
 
     return response
 
 
-def run_query_stream(user_request: str):
-    rewritten = rewrite_query(user_request)
+def run_authorized_stream_query(authorized):
+    user_request = authorized.normalized_input
 
-    context = knowledge_base.retrieve(rewritten)
-    prompt = build_prompt(rewritten, context)
+    if authorized.external_input_present:
+        for chunk in query_ollama_stream(build_analysis_prompt(user_request)):
+            yield chunk
+        return
 
-    generator = query_ollama_stream(prompt)
+    if is_ambiguous(user_request):
+        yield no_context_response()
+        return
 
-    full_response = ""
+    full = ""
 
-    for chunk in generator:
-        full_response += chunk
+    for chunk in query_ollama_stream(build_prompt(user_request)):
+        full += chunk
         yield chunk
 
-    add_interaction(user_request, full_response)
-
-
-# ----------------------------
-# CLI TEST
-# ----------------------------
-
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("request")
-    args = parser.parse_args()
-
-    print("\n--- NeuroCore Response ---\n")
-    print(run_query(args.request))
-
-
-if __name__ == "__main__":
-    main()
+    if authorized.session_memory_allowed:
+        add_interaction(user_request, full)
