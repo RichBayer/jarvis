@@ -123,16 +123,16 @@ Start where it makes sense for you:
 
 ### 👀 Just Exploring?
 
-- 👉 docs/architecture/neurocore_vision.md  
-- 👉 docs/architecture/system_architecture.md  
+- 👉 [Platform Vision](./docs/architecture/platform_vision.md)  
+- 👉 [System Architecture](./docs/architecture/system_architecture.md)  
 
 ---
 
 ### 🛠 Want to See How It Actually Works?
 
-- 👉 docs/architecture/control_plane.md  
-- 👉 docs/architecture/tool_execution.md  
-- 👉 docs/architecture/system_state.md  
+- 👉 [Control Plane](./docs/architecture/control_plane.md)  
+- 👉 [Tool Execution System](./docs/architecture/tool_execution.md)  
+- 👉 [System State](./docs/architecture/system_state.md)  
 
 ---
 
@@ -148,7 +148,7 @@ A dedicated homelab system:
 
 ### 📚 Want the Full Build History?
 
-- 👉 build-logs/
+- 👉 [Build Logs](./build-logs/)  
 
 ---
 
