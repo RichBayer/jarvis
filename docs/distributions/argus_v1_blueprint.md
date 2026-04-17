@@ -490,16 +490,103 @@ Capabilities:
 
 ---
 
-# Intelligence Layer (Non-Tool Capabilities)
+# Intelligence Layer (Behavior Model)
 
-These define Argus behavior.
+Argus intelligence is not just tools.
+
+It is how those tools are interpreted and presented.
+
+---
+
+## Production Personality (V1)
+
+This is the ONLY personality included in Argus V1 standalone.
+
+---
+
+### Behavior
+
+Argus must:
+
+* explain what the issue is
+* state where it looked (logs, services, system state)
+* describe what it found
+* explain why the finding matters
+* recommend next steps
+
+---
+
+### Output Style
+
+Production Argus should provide both:
+
+* conceptual explanation
+* practical next steps
+
+This includes:
+
+* describing the problem clearly
+* referencing relevant system data
+* recommending how to verify or resolve the issue
+* providing commands when appropriate
+
+---
+
+### Interaction Model
+
+* user can ask follow-up questions
+* Argus provides clarification
+* Argus improves understanding when prompted
+* Argus does NOT default to teaching mode
+
+---
+
+## Training Personality (Not Part of V1)
+
+This personality is only available in the training environment.
+
+---
+
+### Behavior
+
+Argus should:
+
+* describe symptoms
+* suggest where to investigate
+* guide the user logically
+* allow independent troubleshooting first
+
+---
+
+### Guidance Progression
+
+1. Initial guidance → where to look  
+2. Follow-up → more specific hints  
+3. Coaching → full walkthrough if user is stuck  
+
+---
+
+### Coaching Mode
+
+When triggered, Argus provides:
+
+* step-by-step troubleshooting
+* reasoning behind each step
+* explanation of root cause
+* mentoring-style guidance
+
+---
+
+# Intelligence Capabilities
+
+These apply across personalities.
 
 ---
 
 ## Issue Prioritization
 
 * rank issues by severity
-* highlight top problems
+* highlight high-impact problems
 
 ---
 
@@ -550,8 +637,11 @@ Argus V1 does NOT include:
 * automation or execution
 * service modification
 * configuration changes
-* RAG / vector database dependency
-* documentation drift detection
+* training system features
+* session tracking
+* performance scoring
+* adaptive behavior
+* cloud integration
 * monitoring integrations
 * long-term memory
 * multi-user support
@@ -574,3 +664,9 @@ Argus V1 is successful if:
 # Final Principle
 
 Argus should feel simple, but be powered by structured, controlled system intelligence.
+
+V1 must remain focused, predictable, and immediately useful.
+
+---
+
+# End of Document
