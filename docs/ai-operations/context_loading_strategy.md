@@ -42,6 +42,7 @@ Provides:
 - build philosophy  
 - execution style  
 - system identity  
+- architectural guardrails  
 
 ---
 
@@ -58,13 +59,15 @@ Provides:
 
 - current capabilities  
 - system behavior  
-- existing files and structure  
+- execution model  
+- observability guarantees  
+- file structure and locations  
 
 ---
 
 ## Layer 3 – Architecture (WHEN NEEDED)
 
-Use for design or planning:
+Use for design, planning, or deep system changes:
 
 ```
 docs/architecture/neurocore_master_blueprint.md
@@ -74,24 +77,43 @@ Optional:
 
 ```
 docs/architecture/system_architecture.md
+docs/architecture/control_plane.md
+docs/architecture/tool_execution.md
 ```
 
 Provides:
 
 - system evolution plan  
 - architectural constraints  
-- future direction  
+- execution model details  
+- control plane and tool behavior  
 
 ---
 
 ## Layer 4 – On-Demand Context (ONLY WHEN REQUIRED)
 
-Provide only when requested or necessary:
+Provide only when necessary:
 
 - specific code files  
 - logs  
 - error output  
 - targeted documentation  
+
+---
+
+# Observability Awareness (CRITICAL)
+
+NeuroCore is now fully traceable.
+
+All work must preserve:
+
+- request_id continuity  
+- trace context propagation across all layers  
+- visibility into execution and decision-making  
+
+If a change risks breaking trace continuity:
+
+→ it must be treated as a critical issue  
 
 ---
 
@@ -125,6 +147,8 @@ Upload:
 Optional:
 
 - system_architecture.md  
+- control_plane.md  
+- tool_execution.md  
 
 ---
 
@@ -152,6 +176,8 @@ The assistant must:
 - ask for missing files before proceeding  
 - provide exact file paths when referencing files  
 - align all work with current system state  
+- preserve trace context in all implementations  
+- never introduce changes that break observability  
 
 ---
 

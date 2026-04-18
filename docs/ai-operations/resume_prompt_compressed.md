@@ -17,7 +17,7 @@ We are continuing development of my local AI system: **NeuroCore**
 - When documents are provided as part of context loading:
   - ingest them silently
   - do NOT analyze, summarize, or act on them
-  - wait until the user explicitly provides a Task before responding with analysis or implementation
+  - wait until the user explicitly provides a Task before responding with analysis or implementation  
 
 ---
 
@@ -27,6 +27,22 @@ We are continuing development of my local AI system: **NeuroCore**
 - NEVER provide partial edits  
 - ALL files must be in a single code block  
 - Use four backticks (````) for markdown/code files  
+
+---
+
+## Documentation Requirement
+
+All system changes must include:
+
+- Corresponding build log entry (in build-logs/)
+- Updated system_state.md if architecture or capabilities change
+- Updated architecture docs if behavior or flow changes
+- Clear explanation of:
+  - what changed
+  - where it changed
+  - why it changed
+
+No feature is considered complete without documentation alignment.
 
 ---
 
@@ -141,7 +157,7 @@ NeuroCore is:
 - a persistent daemon-based runtime  
 - a streaming, context-aware reasoning system  
 - a **control plane governed execution system**  
-- a **cognitive runtime platform**
+- a **cognitive runtime platform**  
 
 It is NOT:
 
@@ -151,7 +167,7 @@ It is NOT:
 
 ---
 
-# 🧠 PLATFORM MODEL (NEW)
+# 🧠 PLATFORM MODEL
 
 NeuroCore is the **platform**.
 
@@ -205,7 +221,7 @@ command | ai
 
 ---
 
-## Execution Layer (NEW)
+## Execution Layer
 
 - Tool-based execution system  
 - Execution Engine (single execution entry point)  
@@ -243,6 +259,34 @@ ai "confirm restart nginx"
 
 ---
 
+## Observability System (NEW)
+
+Location:
+```
+runtime/tracing.py
+```
+
+Capabilities:
+
+- structured trace events
+- global request_id per request
+- end-to-end trace continuity across all layers
+- visibility into execution and decision-making
+
+---
+
+## Observability Awareness
+
+All changes must preserve:
+
+- request_id continuity
+- trace context propagation across all layers
+- visibility into execution and decision-making
+
+Any change that breaks trace continuity is considered a critical defect.
+
+---
+
 ## Knowledge System (RAG)
 
 - Chroma vector DB (persistent)  
@@ -273,14 +317,13 @@ The system does NOT yet have:
 
 - real system command execution (tools are simulated)  
 - full policy engine  
-- observability / logging  
 - task persistence  
 - long-term memory  
 - session lifecycle management  
 
 ---
 
-# 🧩 ARGUS (NEW – NOT IMPLEMENTED)
+# 🧩 ARGUS (NOT IMPLEMENTED)
 
 Argus is the first distribution built on NeuroCore.
 
@@ -321,13 +364,6 @@ Argus MUST:
 
 ---
 
-## Current Status
-
-- defined at architecture level  
-- not yet implemented  
-
----
-
 ## Dependency on NeuroCore
 
 Argus requires:
@@ -364,12 +400,12 @@ Phase 5 – Execution & Control Architecture
 
 # 🎯 CURRENT STATUS
 
-Phase 5B – Tool Execution Layer + Safety Model  
+Phase 5H – Observability & Trace Continuity  
 Status: COMPLETE  
 
 ---
 
-# 🎯 IMMEDIATE OBJECTIVE (UPDATED)
+# 🎯 IMMEDIATE OBJECTIVE
 
 Transition from:
 
@@ -382,14 +418,15 @@ To:
 
 ---
 
-# 🎯 PRIORITY SHIFT (IMPORTANT)
+# 🎯 PRIORITY SHIFT
 
 Current development priority is:
 
 1. real read-only system tools  
-2. execution engine completion  
+2. execution engine expansion  
 3. tool standardization  
 4. safe execution enforcement  
+5. preserve full observability  
 
 ---
 
@@ -417,32 +454,29 @@ Act as a senior systems engineer:
 
 # 🧭 RESUME INSTRUCTION
 
-Start with:
+Continue with Phase 5I:
 
-Design and implement Phase 5H–5I:
-
-- real tool execution  
-- safe local system tools  
-
-Aligned with Argus V1 requirements
+- implement real read-only system tools  
+- maintain full traceability and control plane enforcement  
+- align with Argus V1 requirements  
 
 ---
 
 # 🧭 SESSION CONTINUITY
 
 ## Current Phase
-Phase 5 – Execution & Control Architecture
+Phase 5 – Execution & Control Architecture  
 
 ## Last Completed Milestone
 
-Phase 5B complete:
+Phase 5H complete:
 
-- tool execution layer implemented  
-- execution engine integrated  
-- control plane governs execution  
-- confirmation-based safety model implemented  
-- CLI integrated with execution system  
-- reasoning and execution paths separated  
+- full tracing system implemented  
+- request_id continuity across all layers  
+- control plane fully observable  
+- execution engine fully instrumented  
+- tool layer trace continuity fixed  
+- full end-to-end trace visibility verified  
 
 ## Current Focus
 
@@ -451,4 +485,4 @@ Build Argus V1 foundation
 
 ## Next Step
 
-Design safe real system command execution
+Design and implement first real read-only system tool

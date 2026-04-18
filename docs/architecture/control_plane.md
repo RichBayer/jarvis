@@ -12,6 +12,7 @@ It ensures that:
 - all actions are explicitly authorized
 - no execution bypasses system authority
 - system behavior remains controlled as capabilities expand
+- all decisions are observable and traceable
 
 ---
 
@@ -55,10 +56,12 @@ The Control Plane is responsible for:
 - detecting execution intent
 - denying or downgrading unsafe or unsupported actions
 - enforcing context boundaries (especially for piped input)
+- enforcing execution safety (confirmation model)
+- emitting traceable decision events
 
 ---
 
-# Request Model (Phase 5A)
+# Request Model
 
 All requests are converted into a structured internal form.
 
@@ -107,7 +110,7 @@ Standard conversational behavior
 Used for piped input and external data
 
 ## Execution Candidate Mode  
-Execution intent detected but not allowed
+Execution intent detected but not yet approved
 
 ## Admin Mode  
 Reserved for runtime control operations
@@ -133,7 +136,7 @@ Each request is granted a limited set of capabilities.
 
 Each request receives only the capabilities required.
 
-Execution capability is never granted in Phase 5A.
+Execution capability is tightly controlled and never implicitly granted.
 
 ---
 
@@ -159,31 +162,34 @@ Rules:
 Requests that imply action are:
 
 - classified as Execution Intent
-- placed in Execution Candidate Mode
-- NOT executed
+- routed into execution flow
+- governed by confirmation and policy enforcement
 
 They are:
 
-- denied OR
-- downgraded into advisory responses
+- blocked until confirmed (manual mode)
+- allowed only through execution engine
+- never executed directly by the model
 
 ---
 
-# Deny vs Downgrade
+# Confirmation-Based Execution
 
-## Deny  
-Used when request is invalid or disallowed
-
-## Downgrade  
-Used when request is valid but unsupported
+Execution is controlled through an explicit confirmation model.
 
 Example:
 
-Input:  
+Input:
 "restart nginx"
 
-Output:  
-instructions for manual execution
+System response:
+confirmation required
+
+Follow-up:
+"confirm restart nginx"
+
+Result:
+execution allowed through execution engine
 
 ---
 
@@ -193,9 +199,10 @@ instructions for manual execution
 2. classified by control plane  
 3. mode selected  
 4. capabilities assigned  
-5. policy applied  
-6. authorized request emitted  
-7. router executes within constraints  
+5. execution intent evaluated  
+6. confirmation enforced (if required)  
+7. authorized request emitted  
+8. downstream system executes within constraints  
 
 ---
 
@@ -238,19 +245,46 @@ The Control Plane must ensure:
 - no piped input treated as commands
 - ambiguous queries are intercepted before processing
 - all actions are observable
+- all execution decisions are traceable
 
 ---
 
-# Implementation Notes (Phase 5A)
+# Observability Integration (NEW)
+
+The control plane is fully instrumented with tracing.
+
+All major decision points emit structured trace events, including:
+
+- execution detection
+- confirmation checks
+- tool resolution
+- policy enforcement decisions
+
+These events:
+
+- share a single request_id across all system layers
+- are written to structured logs
+- provide full visibility into system behavior
+
+This allows:
+
+- verification of execution safety
+- debugging of decision logic
+- inspection of why requests were allowed or blocked
+
+---
+
+# Implementation Notes
 
 The following behaviors are now implemented:
 
 - Control Plane integrated into Runtime Manager
 - Request classification enforced before routing
+- Execution intent detected and routed through execution engine
+- Confirmation-based execution model enforced
 - Piped input isolated and treated as data only
-- Execution intent detected and downgraded
-- Ambiguous queries intercepted using raw input
-- Session memory influence controlled during validation
+- Ambiguous queries intercepted before transformation
+- Full observability across all control plane decisions
 
 Key enforcement point:
 
@@ -260,27 +294,15 @@ This prevents model-driven context fabrication.
 
 ---
 
-# Observability (Future Hook)
-
-The control plane defines key decision points:
-
-- request classification
-- mode selection
-- capability assignment
-- execution denial
-
-These will later be logged.
-
----
-
 # Outcome
 
 A single, authoritative execution path that:
 
 - prevents architectural drift
 - enables safe expansion
-- prepares for tool execution
-- enforces runtime governance
+- enforces execution safety
+- provides full observability of decisions
+- supports real tool execution
 
 ---
 
@@ -288,9 +310,10 @@ A single, authoritative execution path that:
 
 Phase 5A Design: COMPLETE  
 Phase 5A Implementation: COMPLETE  
+Phase 5H Observability Integration: COMPLETE  
 
 ---
 
 # Next Step
 
-Phase 5B – Tool Execution Layer
+Phase 5I – Real System Tools
