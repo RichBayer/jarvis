@@ -6,16 +6,16 @@
 
 This document defines:
 
-- how NeuroCore evolves
-- how major capabilities are introduced
-- what systems must exist before others
-- the order of architectural expansion
+- how NeuroCore evolves  
+- how major capabilities are introduced  
+- what systems must exist before others  
+- the correct order of architectural expansion  
 
 This is NOT:
 
-- a vision document
-- a system architecture breakdown
-- a code-level implementation guide
+- a vision document  
+- a system architecture breakdown  
+- a code-level implementation guide  
 
 This is the control document for system evolution.
 
@@ -29,16 +29,16 @@ NeuroCore is a persistent, local-first AI system designed to operate as a:
 
 It is intended to:
 
-- maintain context over time
-- reason about problems
-- take controlled actions
-- observe environmental signals
-- operate safely under defined constraints
-- recover from failure
+- maintain context over time  
+- reason about problems  
+- take controlled actions  
+- observe environmental signals  
+- operate safely under defined constraints  
+- recover from failure  
 
 ---
 
-# Platform Model (NEW)
+# Platform Model
 
 NeuroCore operates as a platform.
 
@@ -50,11 +50,11 @@ Distributions are built on top of it.
 
 NeuroCore provides:
 
-- runtime
-- control plane
-- execution system
-- reasoning system
-- memory systems
+- runtime  
+- control plane  
+- execution system  
+- reasoning system  
+- memory systems  
 
 ---
 
@@ -64,50 +64,54 @@ Distributions define how NeuroCore is used.
 
 Example:
 
-- Argus – system intelligence distribution
+- Argus – system intelligence distribution  
 
 Distributions:
 
-- do NOT modify the runtime
-- do NOT bypass the control plane
-- operate within system constraints
+- do NOT modify the runtime  
+- do NOT bypass the control plane  
+- operate strictly within system constraints  
 
 ---
 
-# Current System State (Baseline)
+# Current System State (Reality)
 
 NeuroCore currently has:
 
-- persistent daemon (UNIX socket)
-- runtime manager (central processing layer)
-- router (reasoning + query rewriting)
-- RAG-based knowledge system
-- metadata-aligned retrieval
-- session memory (short-term)
-- real-time streaming pipeline
-- CLI interface (ai command)
+- persistent daemon (UNIX socket)  
+- runtime manager (central orchestration layer)  
+- control plane (execution authority + policy enforcement)  
+- execution engine (structured tool execution)  
+- tool registry and BaseTool contract  
+- CommandRunner (real system execution layer)  
+- system_info tool (real, read-only execution)  
+- service_manager tool (simulated execution)  
+- RAG-based knowledge system  
+- session memory (short-term)  
+- streaming CLI interface (`ai`)  
+- full trace system (end-to-end observability)  
 
 At this stage, the system is:
 
-> a reasoning system with structured execution capabilities in progress
+> a controlled execution platform with real system interaction
 
 ---
 
 # Transition Point
 
-The system is now moving from:
+The system has moved from:
 
-> answering questions
+> answering questions  
 
 to:
 
-> performing controlled actions within an environment
+> performing controlled actions within an environment  
 
-This transition introduces:
+This introduces:
 
-- execution
-- control
-- safety requirements
+- execution  
+- safety constraints  
+- system responsibility  
 
 ---
 
@@ -115,16 +119,16 @@ This transition introduces:
 
 All system behavior must pass through:
 
-> Runtime Manager (control plane)
+> Runtime Manager → Control Plane
 
 Nothing:
 
-- executes
-- modifies state
-- accesses memory
-- interacts with external systems
+- executes  
+- modifies state  
+- accesses memory  
+- interacts with external systems  
 
-without passing through the runtime.
+without passing through this path.
 
 ---
 
@@ -136,91 +140,110 @@ This phase must be completed in order.
 
 ---
 
-## Phase 5A – Runtime Control Plane
-
-Status: COMPLETE
-
----
-
-## Phase 5B – Tool Interface Standard
-
-Status: COMPLETE
+## Phase 5A – Runtime Control Plane  
+Status: COMPLETE  
 
 ---
 
-## Phase 5C – Security, Policy, Authority
-
-Status: IN PROGRESS
-
----
-
-## Phase 5D – Observability & Tracing
-
-Status: NOT IMPLEMENTED
+## Phase 5B – Tool Interface Standard  
+Status: COMPLETE  
 
 ---
 
-## Phase 5E – Evaluation & Regression
+## Phase 5C – Security, Policy, Authority  
+Status: IN PROGRESS  
 
-Status: NOT IMPLEMENTED
-
----
-
-## Phase 5F – Execution Safety & Recovery
-
-Status: NOT IMPLEMENTED
+Focus:
+- execution permissions  
+- policy enforcement  
+- authority boundaries  
 
 ---
 
-## Phase 5G – Task / Workflow State Layer
+## Phase 5D – Observability & Tracing  
+Status: COMPLETE  
 
-Status: NOT IMPLEMENTED
-
----
-
-## Phase 5H – Tool Execution Layer
-
-Status: PARTIALLY IMPLEMENTED
+Includes:
+- request_id propagation  
+- structured trace events  
+- end-to-end visibility  
 
 ---
 
-## Phase 5I – Safe Local Tools
-
-Status: NOT IMPLEMENTED
-
----
-
-## Phase 5J – External Threat Defense
-
-Status: NOT IMPLEMENTED
+## Phase 5E – Evaluation & Regression  
+Status: NOT IMPLEMENTED  
 
 ---
 
-## Phase 5K – External Tools
+## Phase 5F – Execution Safety & Recovery  
+Status: NOT IMPLEMENTED  
 
-Status: NOT IMPLEMENTED
-
----
-
-## Phase 5L – Security Intelligence Pipeline
-
-Status: NOT IMPLEMENTED
-
----
-
-## Phase 5M – Memory Expansion
-
-Status: NOT IMPLEMENTED
+Will include:
+- failure handling  
+- retries  
+- execution rollback strategy  
+- timeout enforcement expansion  
 
 ---
 
-## Phase 5N – Self-Reconstruction System
-
-Status: NOT IMPLEMENTED
+## Phase 5G – Task / Workflow State Layer  
+Status: NOT IMPLEMENTED  
 
 ---
 
-# Argus V1 Integration (NEW)
+## Phase 5H – Tool Execution Layer  
+Status: COMPLETE  
+
+Includes:
+- execution engine  
+- tool registry  
+- BaseTool contract  
+- structured execution flow  
+
+---
+
+## Phase 5I – Safe Local Tools  
+Status: IN PROGRESS  
+
+Includes:
+
+- system_info (complete)  
+
+Next required tools:
+
+- process inspection  
+- network inspection  
+- disk health  
+- log analysis  
+
+---
+
+## Phase 5J – External Threat Defense  
+Status: NOT IMPLEMENTED  
+
+---
+
+## Phase 5K – External Tools  
+Status: NOT IMPLEMENTED  
+
+---
+
+## Phase 5L – Security Intelligence Pipeline  
+Status: NOT IMPLEMENTED  
+
+---
+
+## Phase 5M – Memory Expansion  
+Status: NOT IMPLEMENTED  
+
+---
+
+## Phase 5N – Self-Reconstruction System  
+Status: NOT IMPLEMENTED  
+
+---
+
+# Argus V1 Integration
 
 Argus is the first distribution built on top of NeuroCore.
 
@@ -230,17 +253,17 @@ Argus is the first distribution built on top of NeuroCore.
 
 Argus is:
 
-> a read-only system intelligence distribution
+> a read-only system intelligence distribution  
 
 It provides:
 
-- system diagnostics
-- service analysis
-- log analysis
-- network inspection
-- security awareness
-- plain-English explanations
-- executive-level summaries
+- system diagnostics  
+- service analysis  
+- log analysis  
+- network inspection  
+- security awareness  
+- plain-English explanations  
+- executive-level summaries  
 
 ---
 
@@ -248,10 +271,10 @@ It provides:
 
 Argus must:
 
-- be read-only
-- use controlled execution only
-- never bypass the control plane
-- operate without modifying system state
+- be read-only  
+- use controlled execution only  
+- never bypass the control plane  
+- never modify system state  
 
 ---
 
@@ -259,59 +282,66 @@ Argus must:
 
 Argus depends on completion of:
 
-### Phase 5H – Tool Execution Layer
+---
 
-Required:
-
-- real command execution
-- structured tool execution
+### Phase 5H – Tool Execution Layer  
+Status: COMPLETE  
 
 ---
 
-### Phase 5I – Safe Local Tools
+### Phase 5I – Safe Local Tools  
+Status: IN PROGRESS  
 
 Required:
 
-- system inspection tools
-- log analysis tools
-- network inspection tools
-- file discovery tools
+- reliable system inspection tools  
+- consistent output structure  
+- predictable execution behavior  
+
+---
+
+### Phase 5C – Security / Policy (Partial)
+
+Required:
+
+- safe execution boundaries  
+- controlled permissions  
 
 ---
 
 ## Argus Readiness Condition
 
-Argus V1 is considered ready when:
+Argus V1 is ready when:
 
-- real execution is implemented
-- core tool set is complete
-- execution is safe and predictable
-- outputs are structured and reliable
+- real execution is stable  
+- core toolset is complete  
+- outputs are consistent and readable  
+- execution is safe and predictable  
 
 ---
 
-# Development Priority Adjustment (IMPORTANT)
+# Development Priority (IMPORTANT)
 
 Until Argus V1 is ready:
 
-Development priority shifts to:
+Focus ONLY on:
 
 1. read-only system tools  
-2. execution engine completion  
+2. execution stability  
 3. tool standardization  
-4. safe execution enforcement  
+4. output quality  
 
 ---
 
-## Deferred Systems
+## Deferred Systems (INTENTIONAL)
 
-The following are intentionally delayed:
+These are delayed on purpose:
 
-- perception layer
-- home automation
-- multi-user behavior systems
-- advanced memory systems
-- external integrations
+- perception layer  
+- home automation  
+- multi-user systems  
+- advanced memory systems  
+- external integrations  
 
 ---
 
@@ -319,23 +349,22 @@ The following are intentionally delayed:
 
 All operations follow:
 
-request/event  
+request  
 → runtime manager  
 → control plane  
-→ routing  
-→ memory + knowledge  
-→ tool/model execution  
-→ response/action  
-→ logging + state update  
+→ execution or reasoning  
+→ tool / model  
+→ response  
+→ tracing  
 
 ---
 
-# System Invariants (Non-Negotiable Rules)
+# System Invariants (Non-Negotiable)
 
 ## Forbidden
 
 - bypassing the runtime  
-- raw command execution  
+- raw command execution outside tools  
 - hidden memory writes  
 - uncontrolled tool usage  
 - unlogged execution  
@@ -363,17 +392,17 @@ NeuroCore becomes:
 - secure  
 - capable of action  
 - capable of long-running work  
-- capable of self-recovery  
+- capable of recovery  
 
 ---
 
-# Argus V1 Success Criteria (NEW)
+# Argus V1 Success Criteria
 
 Argus V1 is successful when:
 
 - system issues are clearly identified  
-- troubleshooting is significantly faster  
-- outputs are understandable by non-technical users  
+- troubleshooting time is reduced  
+- outputs are understandable to non-technical users  
 - system remains safe and predictable  
 - installation is simple and reliable  
 
@@ -381,8 +410,8 @@ Argus V1 is successful when:
 
 # Final Principle
 
-NeuroCore is the platform.
+NeuroCore is the platform.  
 
-Argus is the first product built on that platform.
+Argus is the first product built on that platform.  
 
 The system must evolve without breaking this separation.

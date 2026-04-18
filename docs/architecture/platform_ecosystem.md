@@ -17,7 +17,7 @@ It establishes:
 - development progression model
 - productization boundaries
 
-This document is the **authoritative reference** for how all repositories and systems fit together.
+This document is the **authoritative reference** for how all systems fit together.
 
 ---
 
@@ -152,10 +152,10 @@ control_plane → router → knowledge → model
 
 ## Product Flow
 
-Traffic / Users  
-→ NeuroCore (entry point / platform)  
-→ Argus (distribution / product)  
-→ Homelab (credibility + validation)  
+Users  
+→ NeuroCore (platform)  
+→ Argus (distribution)  
+→ Homelab (validation + credibility)  
 
 ---
 
@@ -226,6 +226,107 @@ Scenarios are transformed into:
 - multi-system environments
 - cloud-based lab environments
 - performance-based certification systems
+
+---
+
+# Development Alignment (Critical)
+
+This document defines the ecosystem and relationships.
+
+It does NOT define the implementation order of NeuroCore.
+
+The implementation order is governed by:
+
+> NeuroCore Master Blueprint
+
+---
+
+## Current Development Position
+
+NeuroCore is currently in:
+
+Phase 5 – Execution & Control Architecture  
+
+Specifically:
+
+- Phase 5H – Tool Execution Layer → COMPLETE  
+- Phase 5I – Safe Local Tools → IN PROGRESS  
+
+---
+
+## What This Means
+
+At this stage:
+
+- NeuroCore can perform controlled execution  
+- Argus can begin limited development  
+- The homelab can be used for validation  
+
+However, the system is NOT yet ready for:
+
+- evaluation systems  
+- feedback loops  
+- structured training platforms  
+- scenario automation  
+- intelligence pipelines  
+
+---
+
+## Current Development Priority
+
+Development must focus on:
+
+- expanding read-only system tools  
+- ensuring execution reliability  
+- maintaining strict control plane enforcement  
+- preserving full observability  
+
+---
+
+## Argus Constraints (Current Phase)
+
+Argus is currently limited to:
+
+- system inspection  
+- diagnostics  
+- log analysis  
+- explanation of system state  
+
+Argus must NOT yet include:
+
+- evaluation logic  
+- scoring systems  
+- training workflows  
+- automated scenario generation  
+
+These depend on later NeuroCore phases.
+
+---
+
+## Homelab Constraints
+
+The homelab may be used for:
+
+- manual troubleshooting  
+- validating tool behavior  
+- testing real system conditions  
+
+It must NOT yet be used for:
+
+- automated training systems  
+- structured scenario pipelines  
+
+---
+
+## Guiding Rule
+
+The system must evolve in this order:
+
+NeuroCore stability  
+→ Argus capability  
+→ Training system expansion  
+
+Breaking this order creates instability and architectural drift.
 
 ---
 
@@ -336,22 +437,22 @@ The system will evolve to include feedback mechanisms.
 
 ## Loop Structure
 
-1. User interacts with system (lab or real system)  
+1. User interacts with system  
 2. Behavior is analyzed locally  
 3. Structured insights are generated  
 4. NeuroCore processes insights  
-5. System improves:  
-   - new scenarios  
-   - better diagnostics  
-   - refined intelligence  
+5. System improves:
+   - diagnostics
+   - scenarios
+   - intelligence  
 
 ---
 
-## Design Constraints
+## Constraints
 
-- raw data is NOT transmitted
-- only structured insights are used
-- system remains local-first by default
+- raw data is NOT transmitted  
+- only structured insights are used  
+- system remains local-first  
 
 ---
 
@@ -363,7 +464,7 @@ The system will evolve to include feedback mechanisms.
 
 NeuroCore
 
-- core runtime
+- runtime
 - execution system
 - reasoning engine
 
@@ -426,7 +527,7 @@ Owns:
 
 # Final Principle
 
-This ecosystem is built on a strict progression:
+This ecosystem evolves in a strict progression:
 
 Learn it manually.  
 Understand it deeply.  
