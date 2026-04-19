@@ -6,89 +6,85 @@
 
 This phase introduces the Argus tool layer on top of NeuroCore.
 
-The goal was to establish a repeatable pattern for:
+The goal here was to establish a repeatable pattern for:
 
 - consuming structured system data  
 - interpreting real system signals  
-- producing prioritized, actionable output  
-- remaining fully aligned with the existing execution pipeline  
+- producing clear, actionable output  
+- staying fully aligned with the existing execution pipeline  
 
-This marks the transition from a command execution framework to a system capable of structured interpretation.
+This is the point where NeuroCore moves from simply executing commands to actually *understanding* system state.
 
 ---
 
 ## Starting State
 
-At the start of this phase:
+Going into this phase:
 
-- NeuroCore system tools were fully implemented and operational  
-- execution flow was stable and enforced through the control plane  
-- CLI interface (`ai`) was functional  
-- system tools returned human-readable output only  
-- no structured data existed for machine interpretation  
-- no Argus layer existed  
+- system tools were fully built and working  
+- execution flow through the control plane was stable  
+- CLI (`ai`) was functional  
+- all system tools returned human-readable output  
+- no structured data existed  
+- Argus did not exist yet  
 
 Relevant locations:
 
 - `/mnt/g/ai/projects/neurocore/tools/system/`  
 - `/mnt/g/ai/projects/neurocore/tools/argus/`  
 - `/mnt/g/ai/projects/neurocore/runtime/control_plane.py`  
-- `/mnt/g/ai/projects/neurocore/tools/__init__.py`  
 
-Initial Argus tool:
+Initial tool:
 
 - `/mnt/g/ai/projects/neurocore/tools/argus/system_summary.py`  
 
 ---
 
-## Step 1 – Argus Tool Layer Design
+## Step 1 – Defining the Argus Layer
 
-Created:
+Before writing any real logic, I created:
 
 - `/mnt/g/ai/projects/neurocore/docs/design/argus_tool_layer.md`
 
-Defined:
+This locked in the rules:
 
-- Argus tools operate as a composition and interpretation layer  
-- Argus tools must not call `CommandRunner` directly  
-- Argus tools must consume system tools exclusively  
-- system tools remain responsible for data collection  
-- Argus tools are responsible for interpretation and recommendations  
+- Argus does not execute commands  
+- Argus only calls system tools  
+- system tools collect data  
+- Argus interprets it  
+
+That separation ended up being critical later.
 
 ---
 
-## Step 2 – First Argus Tool Execution
+## Step 2 – First Execution
 
-The initial implementation of `system_summary` confirmed that:
+The first run of `system_summary` was just about proving the pipeline:
 
-- the control plane correctly routed execution  
-- the execution engine invoked the Argus tool  
-- the tool registry resolved the tool correctly  
-- the Argus tool successfully called a system tool  
+- control plane → working  
+- execution engine → working  
+- tool registry → resolving correctly  
+- Argus tool → calling system tool successfully  
 
 ### Screenshot – First Execution
 
 ![First execution](../docs/screenshots/argus-system-summary/01_first_execution.png)
 
-This validated the end-to-end execution path.
+At this point, the structure was sound.
 
 ---
 
-## Step 3 – Initial Parsing Attempt
+## Step 3 – First Attempt at Parsing
 
-The next iteration attempted to extract signals from formatted output.
+Next step was trying to actually extract useful signals.
 
-Approach:
+Initial approach:
 
-- consume system_info output  
-- parse using regex  
-- extract memory, disk, and load values  
+- take formatted output from `system_info`  
+- parse with regex  
+- pull out memory, disk, and load  
 
-Result:
-
-- partial signal detection  
-- inconsistent behavior  
-- reliance on fragile formatting assumptions  
+It *kind of* worked—but not reliably.
 
 ### Screenshot – Broken Parsing
 
@@ -96,36 +92,36 @@ Result:
 
 ---
 
-## Step 4 – Controlled Parsing Failure
+## Step 4 – Confirming the Problem
 
-After tightening parsing logic:
+I tightened the parsing logic to eliminate bad matches.
 
-- false positives were eliminated  
-- signal detection remained inconsistent  
+Result:
 
-This confirmed that the issue was not parsing complexity, but data format.
+- fewer false positives  
+- but still inconsistent signal detection  
 
 ### Screenshot – No Signal Detected
 
 ![No signal detected](../docs/screenshots/argus-system-summary/03_no_signal_detected.png)
 
-Conclusion:
+At this point it was clear:
 
-System tools were returning output optimized for human readability, not machine interpretation.
+> The problem wasn’t the parsing—it was the data.
+
+System tools were returning output meant for humans, not for other code.
 
 ---
 
-## Step 5 – System Tool Refactor
+## Step 5 – Refactoring system_info
+
+This was the turning point.
 
 Updated:
 
 - `/mnt/g/ai/projects/neurocore/tools/system/system_info.py`
 
-Changes:
-
-- preserved CLI output (`message`)  
-- added structured `data` field  
-- exposed raw command outputs in a consistent format  
+Added a structured `data` field while keeping the CLI-friendly output.
 
 Example:
 
@@ -144,53 +140,53 @@ Example:
 
 ![Structured raw output](../docs/screenshots/argus-system-summary/04_system_info_structured_raw.png)
 
-This change enabled reliable machine-level interpretation.
+Now the data was usable.
 
 ---
 
-## Step 6 – Structured Parsing Implementation
+## Step 6 – Rewriting system_summary
 
-Rewrote `system_summary` to:
+With structured data available, I rewrote the tool to:
 
-- consume `result["data"]`  
-- extract values directly  
-- eliminate regex-based parsing of formatted text  
-- calculate metrics such as memory %, disk %, and load  
+- use `result["data"]` directly  
+- extract values cleanly  
+- remove regex entirely  
 
 ### Screenshot – Structured Parsing Success
 
 ![Structured parsing success](../docs/screenshots/argus-system-summary/05_structured_parsing_success.png)
 
-This marked the first reliable signal extraction.
+This was the first time the tool felt stable.
 
 ---
 
-## Step 7 – Interpretation Layer Upgrade
+## Step 7 – Making It Useful
 
-Enhanced output to include:
+Once signal extraction worked, the next step was interpretation.
 
-- severity levels (OK, WARNING, CRITICAL)  
+Added:
+
+- severity levels (OK / WARNING / CRITICAL)  
 - prioritized findings  
-- conditional recommendations  
-- improved formatting  
+- simple recommendations  
 
 ### Screenshot – Intelligent Summary
 
 ![Intelligent summary](../docs/screenshots/argus-system-summary/06_intelligent_summary.png)
 
-At this stage, the tool produced consistent and meaningful system assessments.
+Now it wasn’t just data—it was actually telling me something.
 
 ---
 
-## Step 8 – CPU Load Testing
+## Step 8 – Testing Under Load
 
-Generated CPU load using:
+To verify behavior, I generated CPU load:
 
 ```bash
 yes > /dev/null &
 ```
 
-Multiple instances were spawned to observe behavior under increasing load.
+Spawned multiple instances and watched how the tool reacted.
 
 ### Screenshot – High Load
 
@@ -198,68 +194,65 @@ Multiple instances were spawned to observe behavior under increasing load.
 
 Observed:
 
-- correct escalation from OK → WARNING → CRITICAL  
-- stable behavior under real system stress  
+- clean progression: OK → WARNING → CRITICAL  
+- no instability  
+- output stayed consistent  
 
 ---
 
-## Step 9 – Load Decay Behavior
+## Step 9 – Load Decay
 
-After terminating processes:
+After killing the processes:
 
 ```bash
 pkill yes
 ```
 
-Immediately re-evaluated system state.
+I immediately checked the system again.
 
 ### Screenshot – Load Still Elevated
 
 ![Load decay initial](../docs/screenshots/argus-system-summary/08_load_decay_initial.png)
 
-Observed:
+At first this looked wrong—but it wasn’t.
 
-- load remained elevated temporarily  
-
-Reason:
-
-Linux load average is calculated using rolling time windows (1, 5, 15 minutes).
+Linux load average doesn’t drop instantly.
 
 ---
 
-## Step 10 – Load Recovery
+## Step 10 – Recovery Behavior
 
-After a short interval, load returned to normal.
+After a short wait:
 
 ### Screenshot – Load Recovered
 
 ![Load recovered](../docs/screenshots/argus-system-summary/09_load_decay_recovered.png)
 
-The tool accurately reflected this recovery.
+Everything returned to normal exactly as expected.
 
 ---
 
-## Step 11 – Load Normalization
+## Step 11 – Final Adjustment
 
-Adjusted load evaluation to account for CPU count:
+One last refinement:
 
-- extracted CPU cores from `lscpu`  
-- normalized load per core  
-- prevented false high-severity classifications on multi-core systems  
+- normalized load against CPU core count  
+
+This prevents false “high load” readings on multi-core systems.
 
 ---
 
 ## Final Result
 
-The `system_summary` tool now:
+`system_summary` now:
 
 - consumes structured system data  
-- evaluates real system signals  
-- assigns severity levels  
-- generates actionable recommendations  
-- reflects real-world system behavior, including load decay  
+- evaluates real signals  
+- assigns meaningful severity  
+- produces actionable output  
+- behaves correctly under real conditions  
 
-Execution remains fully aligned with the existing architecture:
+Execution path remains unchanged:
 
 CLI → Control Plane → Execution Engine → Argus Tool → System Tool → OS  
 
@@ -267,15 +260,15 @@ CLI → Control Plane → Execution Engine → Argus Tool → System Tool → OS
 
 ## Key Outcome
 
-This phase establishes the Argus pattern:
+This phase established the Argus pattern:
 
-1. Argus tool is selected through normal execution flow  
-2. Argus tool calls system tools  
-3. system tools return structured data  
-4. Argus interprets system state  
-5. Argus produces diagnostic output  
+1. Argus tool is invoked  
+2. system tools are called  
+3. structured data is returned  
+4. signals are interpreted  
+5. diagnostics are produced  
 
-This represents a transition from execution-focused tooling to structured system intelligence.
+This is the shift from execution → system intelligence.
 
 ---
 
@@ -285,10 +278,10 @@ Next tool:
 
 - `process_top`
 
-Goals:
+Focus:
 
-- identify high CPU and memory processes  
-- correlate process behavior with system load  
-- provide targeted troubleshooting guidance  
+- identify heavy processes  
+- correlate with system load  
+- provide targeted troubleshooting  
 
-With the Argus pattern established, subsequent tools should be significantly faster to implement.
+With the pattern established, the next tools should move much faster.
