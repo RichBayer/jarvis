@@ -20,8 +20,12 @@ from tools.system.recent_logins import RecentLogins
 # Control tools
 from tools.system.service_manager import ServiceManager
 
+# Argus tools
+from tools.argus.system_summary import SystemSummary
+
 
 def register_tools():
+    # System tools
     registry.register(SystemInfo())
     registry.register(ProcessTop())
     registry.register(DiskUsage())
@@ -34,7 +38,11 @@ def register_tools():
     registry.register(UsersSessions())
     registry.register(RecentLogins())
 
+    # Control tools
     registry.register(ServiceManager())
+
+    # Argus tools
+    registry.register(SystemSummary())
 
 
 register_tools()

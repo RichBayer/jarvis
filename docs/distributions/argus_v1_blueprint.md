@@ -1,3 +1,4 @@
+````markdown
 # Argus V1 – Tooling & Capability Blueprint
 
 ---
@@ -6,14 +7,13 @@
 
 This document defines:
 
-* the complete Argus V1 tool set
-* capability scope and constraints
-* command-level implementation mapping
-* dependency handling model
+- the complete Argus V1 tool set  
+- capability scope and constraints  
+- command-level mapping (via system tools)  
+- dependency handling model  
+- Argus tool architecture pattern  
 
-This document ensures:
-
-Argus V1 delivers high value while remaining simple, reliable, and easy to install.
+This document ensures Argus V1 delivers high value while remaining simple, reliable, and safe.
 
 ---
 
@@ -21,14 +21,17 @@ Argus V1 delivers high value while remaining simple, reliable, and easy to insta
 
 Argus V1 is:
 
-A read-only system intelligence layer that analyzes Linux systems, identifies issues, and explains them in plain English.
+A read-only system intelligence layer built on top of NeuroCore.
+
+Argus operates entirely within the NeuroCore execution pipeline and does not introduce new execution paths.
 
 Argus V1 MUST:
 
-* use real system data
-* provide actionable insight
-* remain safe (no modification of system state)
-* require minimal installation complexity
+- use real system data  
+- consume structured system tool output (`data`)  
+- provide actionable insight  
+- remain read-only  
+- operate through controlled execution only  
 
 ---
 
@@ -38,37 +41,92 @@ Argus V1 MUST:
 
 Argus must NEVER:
 
-* modify files
-* restart services
-* change system configuration
-* execute destructive actions
+- modify files  
+- restart services  
+- change system configuration  
+- execute destructive actions  
 
 ---
 
-## 2. Local Execution Only
+## 2. Execution Boundary
 
-* no external APIs required
-* no telemetry
-* no cloud dependencies
+Argus tools:
+
+- MUST NOT call CommandRunner  
+- MUST NOT execute system commands directly  
+- MUST use system tools exclusively  
+
+All execution remains:
+
+```
+control_plane → execution_engine → system_tool → command_runner
+```
+
+Argus sits above this layer.
 
 ---
 
-## 3. Minimal Dependencies
+## 3. Structured Data Requirement (CRITICAL)
 
-* prefer built-in Linux tools
-* optional tools must degrade gracefully
-* installation must remain simple
+All Argus tools depend on system tools returning:
+
+```
+{
+  "status": "...",
+  "message": "...",
+  "data": { ... }
+}
+```
+
+Argus tools MUST:
+
+- consume `data`  
+- ignore formatted message output  
+- avoid regex-based parsing  
 
 ---
 
-## 4. Graceful Degradation
+## 4. Local Execution Only
 
-If a required binary is missing, Argus must:
+- no external APIs  
+- no telemetry  
+- no cloud dependencies  
 
-* NOT fail
-* return a structured explanation
-* suggest the required package
-* explain impact of missing capability
+---
+
+## 5. Minimal Dependencies
+
+- prefer built-in Linux tools  
+- optional tools must degrade gracefully  
+- installation must remain simple  
+
+---
+
+## 6. Graceful Degradation
+
+If a dependency is missing, Argus must:
+
+- NOT fail  
+- return structured explanation  
+- suggest required package  
+- explain impact  
+
+---
+
+# Argus Tool Architecture Pattern (CRITICAL)
+
+Every Argus tool MUST follow this pattern:
+
+1. Argus tool is invoked via execution engine  
+2. Argus tool calls one or more system tools  
+3. System tools return structured `data`  
+4. Argus tool aggregates signals  
+5. Argus tool interprets system state  
+6. Argus tool returns:
+
+   - findings  
+   - severity  
+   - recommended actions  
 
 ---
 
@@ -78,17 +136,17 @@ Argus tools are divided into:
 
 ## Tier 1 — Core Tools (Required)
 
-* must work on standard Ubuntu/Debian
-* no extra packages required
-* form the foundation of Argus
+- must work on standard Ubuntu/Debian  
+- no extra packages required  
+- form the foundation of Argus  
 
 ---
 
 ## Tier 2 — Optional Tools (Enhanced)
 
-* provide deeper insight
-* may require additional packages
-* must implement graceful fallback
+- provide deeper insight  
+- may require additional packages  
+- must implement graceful fallback  
 
 ---
 
@@ -98,535 +156,297 @@ Argus tools are divided into:
 
 ## System Overview
 
-### Tool: system_summary
+### Argus Tool: system_summary (IMPLEMENTED)
 
-Commands:
+System Tools Used:
 
-* uptime
-* free -h
-* df -h
-* cat /etc/os-release
+- system_info  
 
 Capabilities:
 
-* system health snapshot
-* CPU load (via uptime)
-* memory usage
-* disk usage
-* OS identification
+- system health snapshot  
+- CPU load analysis  
+- memory usage evaluation  
+- disk usage evaluation  
+- OS identification  
+
+Notes:
+
+- first completed Argus tool  
+- defines the reference implementation pattern  
 
 ---
 
-### Tool: process_top
+### Argus Tool: process_top (NEXT)
 
-Commands:
+System Tools Used:
 
-* ps aux --sort=-%cpu | head
-* ps aux --sort=-%mem | head
+- process_top (system tool)
 
 Capabilities:
 
-* identify high CPU processes
-* identify high memory processes
+- identify high CPU processes  
+- identify high memory processes  
+- correlate with system load  
 
 ---
 
-### Tool: disk_layout
+### Argus Tool: disk_layout
 
-Commands:
+System Tools Used:
 
-* lsblk
+- disk_layout  
 
 Capabilities:
 
-* disk structure
-* mount relationships
+- disk structure  
+- mount relationships  
 
 ---
 
 ## Service Intelligence
 
-### Tool: service_status
+### Argus Tool: service_status
 
-Command:
+System Tools Used:
 
-* systemctl status <service>
+- service_manager / systemctl wrapper  
 
 Capabilities:
 
-* active/inactive/failed
-* basic health information
+- active / inactive / failed  
+- basic health interpretation  
 
 ---
 
-### Tool: service_list
+### Argus Tool: service_list
 
-Commands:
+System Tools Used:
 
-* systemctl list-units --type=service --state=running
-* systemctl list-units --type=service --state=failed
+- system tools wrapping systemctl list  
 
 Capabilities:
 
-* discover active services
-* detect failed services
+- discover active services  
+- detect failed services  
 
 ---
 
 ## Log Intelligence
 
-### Tool: log_recent_errors
+### Argus Tool: log_recent_errors
 
-Command:
+System Tools Used:
 
-* journalctl -p err -n 50
+- system_logs  
 
 Capabilities:
 
-* recent system errors
-* high-signal issue detection
+- recent system errors  
+- high-signal issue detection  
 
 ---
 
-### Tool: log_service
+### Argus Tool: log_service
 
-Command:
+System Tools Used:
 
-* journalctl -u <service> -n 100
+- system_logs  
 
 Capabilities:
 
-* service-specific troubleshooting
+- service-specific troubleshooting  
 
 ---
 
-### Tool: kernel_log_check
+### Argus Tool: kernel_log_check
 
-Command:
+System Tools Used:
 
-* dmesg | tail
+- system_logs  
 
 Capabilities:
 
-* kernel-level issues
-* hardware/system faults
+- kernel-level issues  
+- hardware/system faults  
 
 ---
 
 ## Disk & Resource Health
 
-### Tool: disk_usage
+### Argus Tool: disk_usage
 
-Command:
+System Tools Used:
 
-* df -h
+- disk_usage  
 
 Capabilities:
 
-* disk capacity monitoring
+- disk capacity monitoring  
 
 ---
 
-### Tool: disk_usage_breakdown
+### Argus Tool: disk_usage_breakdown
 
-Command:
+System Tools Used:
 
-* du -sh /var/* 2>/dev/null | sort -hr | head
+- disk_usage  
 
 Capabilities:
 
-* identify disk consumers
+- identify disk consumers  
 
 ---
 
-### Tool: memory_usage
+### Argus Tool: memory_usage
 
-Command:
+System Tools Used:
 
-* free -h
+- memory_usage  
 
 Capabilities:
 
-* memory usage snapshot
+- memory usage analysis  
 
 ---
 
 ## Network Intelligence
 
-### Tool: network_interfaces
+### Argus Tool: network_interfaces
 
-Command:
+System Tools Used:
 
-* ip a
-
-Capabilities:
-
-* interface state
-* IP addresses
+- network_interfaces  
 
 ---
 
-### Tool: routing_check
+### Argus Tool: routing_check
 
-Command:
+System Tools Used:
 
-* ip route
-
-Capabilities:
-
-* routing configuration
-* gateway detection
+- network_interfaces  
 
 ---
 
-### Tool: listening_ports
+### Argus Tool: listening_ports
 
-Command:
+System Tools Used:
 
-* ss -tuln
-
-Capabilities:
-
-* open ports
-* listening services
+- network_connections  
 
 ---
 
-### Tool: network_connectivity
+### Argus Tool: network_connectivity
 
-Command:
+System Tools Used:
 
-* ping -c 3 8.8.8.8
-
-Capabilities:
-
-* internet connectivity
+- network_connections  
 
 ---
 
-### Tool: dns_check
+### Argus Tool: dns_check
 
-Command:
+System Tools Used:
 
-* nslookup google.com
-
-Capabilities:
-
-* DNS resolution validation
+- network_connections  
 
 ---
 
 ## Security Awareness
 
-### Tool: auth_log_scan
+### Argus Tool: auth_log_scan
 
-Command:
+System Tools Used:
 
-* journalctl -u ssh | grep "Failed password"
-
-Capabilities:
-
-* detect failed login attempts
+- system_logs  
 
 ---
 
-### Tool: sudo_activity_check
+### Argus Tool: sudo_activity_check
 
-Command:
+System Tools Used:
 
-* journalctl | grep sudo
-
-Capabilities:
-
-* privilege escalation activity
+- system_logs  
 
 ---
 
 ## File & Config Discovery
 
-### Tool: find_file
+### Argus Tool: find_file
 
-Command:
+System Tools Used:
 
-* find <path> -name "*pattern*"
-
-Capabilities:
-
-* locate files by name
+- system-level search tools  
 
 ---
 
-### Tool: find_by_content
+### Argus Tool: find_by_content
 
-Command:
+System Tools Used:
 
-* grep -R "pattern" <path>
-
-Capabilities:
-
-* locate files by contents
+- system-level search tools  
 
 ---
 
-### Tool: read_file_safe
+### Argus Tool: read_file_safe
 
-Command:
+System Tools Used:
 
-* cat <file>
+- system-level file read  
 
 Constraints:
 
-* file size limits required (future enforcement)
-
-Capabilities:
-
-* inspect configs/logs
+- file size limits required  
 
 ---
 
-### Tool: whereis_binary
+### Argus Tool: whereis_binary
 
-Command:
+System Tools Used:
 
-* whereis <binary>
-
-Capabilities:
-
-* locate executables and configs
+- system-level lookup tools  
 
 ---
 
 # Tier 2 — Optional Enhanced Tools
 
-These tools improve depth but require dependency checks.
+Same structure applies:
 
----
+- Argus tool → system tool → dependency  
 
-### Tool: io_stats
+Examples:
 
-Command:
-
-* iostat -x
-
-Dependency:
-
-* sysstat
-
-Capabilities:
-
-* disk I/O performance
-
----
-
-### Tool: memory_pressure_detail
-
-Command:
-
-* vmstat
-
-Capabilities:
-
-* deeper memory insight
-
----
-
-### Tool: fast_file_lookup
-
-Command:
-
-* locate <file>
-
-Dependency:
-
-* mlocate / plocate
-
-Capabilities:
-
-* faster file discovery
-
----
-
-### Tool: dns_deep_check
-
-Command:
-
-* dig google.com
-
-Dependency:
-
-* dnsutils
-
-Capabilities:
-
-* deeper DNS analysis
-
----
-
-### Tool: open_files_for_process
-
-Command:
-
-* lsof
-
-Capabilities:
-
-* file usage by process
-
----
-
-### Tool: disk_health_smart
-
-Command:
-
-* smartctl -H /dev/sdX
-
-Dependency:
-
-* smartmontools
-
-Capabilities:
-
-* hardware disk health
+- io_stats → system tool wrapper → iostat  
+- dns_deep_check → system tool wrapper → dig  
+- disk_health_smart → system tool wrapper → smartctl  
 
 ---
 
 # Intelligence Layer (Behavior Model)
 
-Argus intelligence is not just tools.
-
-It is how those tools are interpreted and presented.
+Argus intelligence is defined by interpretation, not just tool output.
 
 ---
 
 ## Production Personality (V1)
 
-This is the ONLY personality included in Argus V1 standalone.
-
----
-
-### Behavior
-
 Argus must:
 
-* explain what the issue is
-* state where it looked (logs, services, system state)
-* describe what it found
-* explain why the finding matters
-* recommend next steps
+- explain the issue  
+- describe where data was collected  
+- present findings clearly  
+- explain why it matters  
+- recommend next steps  
 
 ---
 
-### Output Style
+## Output Model
 
-Production Argus should provide both:
+Argus outputs include:
 
-* conceptual explanation
-* practical next steps
-
-This includes:
-
-* describing the problem clearly
-* referencing relevant system data
-* recommending how to verify or resolve the issue
-* providing commands when appropriate
-
----
-
-### Interaction Model
-
-* user can ask follow-up questions
-* Argus provides clarification
-* Argus improves understanding when prompted
-* Argus does NOT default to teaching mode
-
----
-
-## Training Personality (Not Part of V1)
-
-This personality is only available in the training environment.
-
----
-
-### Behavior
-
-Argus should:
-
-* describe symptoms
-* suggest where to investigate
-* guide the user logically
-* allow independent troubleshooting first
-
----
-
-### Guidance Progression
-
-1. Initial guidance → where to look  
-2. Follow-up → more specific hints  
-3. Coaching → full walkthrough if user is stuck  
-
----
-
-### Coaching Mode
-
-When triggered, Argus provides:
-
-* step-by-step troubleshooting
-* reasoning behind each step
-* explanation of root cause
-* mentoring-style guidance
-
----
-
-# Intelligence Capabilities
-
-These apply across personalities.
-
----
-
-## Issue Prioritization
-
-* rank issues by severity
-* highlight high-impact problems
-
----
-
-## Plain-English Explanation
-
-* translate logs and output
-* remove technical noise
-
----
-
-## Recommended Actions
-
-* suggest next steps
-* never execute changes
-
----
-
-## Executive Summary Mode
-
-Example:
-
-argus --summary
-
-Output:
-
-* simplified system health
-* non-technical explanation
-
----
-
-## Explain System Mode
-
-Example:
-
-argus explain
-
-Output:
-
-* inferred system role
-* high-level system purpose
+- findings (prioritized)  
+- severity classification  
+- recommended actions  
 
 ---
 
@@ -634,18 +454,13 @@ Output:
 
 Argus V1 does NOT include:
 
-* automation or execution
-* service modification
-* configuration changes
-* training system features
-* session tracking
-* performance scoring
-* adaptive behavior
-* cloud integration
-* monitoring integrations
-* long-term memory
-* multi-user support
-* perception / home automation features
+- automation or execution  
+- service modification  
+- configuration changes  
+- training system features  
+- long-term memory  
+- multi-user support  
+- cloud integration  
 
 ---
 
@@ -653,11 +468,11 @@ Argus V1 does NOT include:
 
 Argus V1 is successful if:
 
-* users quickly understand system issues
-* troubleshooting time decreases
-* output is trusted and clear
-* installation is simple
-* system remains safe and predictable
+- system issues are clearly identified  
+- troubleshooting time decreases  
+- output is trusted and clear  
+- installation is simple  
+- system remains safe and predictable  
 
 ---
 
@@ -665,8 +480,9 @@ Argus V1 is successful if:
 
 Argus should feel simple, but be powered by structured, controlled system intelligence.
 
-V1 must remain focused, predictable, and immediately useful.
+Argus is not a command layer.
+
+Argus is an interpretation layer built on top of a controlled execution system.
 
 ---
-
-# End of Document
+````

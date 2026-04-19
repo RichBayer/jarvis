@@ -1,3 +1,4 @@
+`````markdown
 # NeuroCore Development – Resume Prompt (Compressed)
 
 We are continuing development of my local AI system: **NeuroCore**
@@ -20,12 +21,12 @@ We are continuing development of my local AI system: **NeuroCore**
 
 At the start of EVERY new thread:
 
-1. Ask the user to upload ALL required documents
-2. Ingest ALL documents silently
-3. Do NOT analyze or act yet
-4. Wait for explicit task instruction
+1. Ask the user to upload ALL required documents  
+2. Ingest ALL documents silently  
+3. Do NOT analyze or act yet  
+4. Wait for explicit task instruction  
 
-🚨 If any required document is missing → STOP and ask for it
+🚨 If any required document is missing → STOP and ask for it  
 
 ---
 
@@ -99,20 +100,23 @@ Purpose:
 - defines expected outputs and scope  
 - prevents building incorrect or duplicate tools  
 
-🚨 These are REQUIRED before implementing ANY Argus tools
+🚨 REQUIRED before implementing ANY Argus tools  
 
 ---
 
-## 🔹 6. (OPTIONAL) CURRENT BUILD CONTEXT
+## 🔹 6. CURRENT BUILD CONTEXT (REQUIRED)
 
-(Optional)
+7. latest build log:
 
-- latest build log (e.g. build-logs/020_*.md)
+```
+/mnt/g/ai/projects/neurocore/build-logs/021_argus_tool_layer_initial.md
+```
 
 Purpose:
 
-- understand recent changes  
-- maintain continuity  
+- reflects real system evolution  
+- prevents re-solving already solved problems  
+- ensures continuity into tool expansion phase  
 
 ---
 
@@ -144,7 +148,7 @@ Before starting ANY build phase:
 ## 1. Create Design File
 
 ```
-docs/design/<feature>.md
+/mnt/g/ai/projects/neurocore/docs/design/<feature>.md
 ```
 
 Must define:
@@ -159,7 +163,7 @@ Must define:
 ## 2. Create Screenshot Directory
 
 ```
-docs/screenshots/<feature-name>/
+/mnt/g/ai/projects/neurocore/docs/screenshots/<feature-name>/
 ```
 
 ---
@@ -169,9 +173,9 @@ docs/screenshots/<feature-name>/
 Before running commands:
 
 ```
-01_name.png
-02_name.png
-03_name.png
+01_name.png  
+02_name.png  
+03_name.png  
 ```
 
 ---
@@ -194,7 +198,7 @@ Do NOT reconstruct later.
 Location:
 
 ```
-build-logs/
+/mnt/g/ai/projects/neurocore/build-logs/
 ```
 
 Rules:
@@ -202,6 +206,7 @@ Rules:
 - Must reflect REAL events  
 - Must embed screenshots inline  
 - Must read naturally  
+- Must follow existing style  
 
 ---
 
@@ -256,7 +261,7 @@ NeuroCore has TWO tool layers:
 Location:
 
 ```
-tools/system/
+/mnt/g/ai/projects/neurocore/tools/system/
 ```
 
 Purpose:
@@ -271,28 +276,40 @@ Rules:
 - one tool = one capability  
 - no aggregation  
 - no interpretation  
+- MUST return structured output:
+
+```
+{
+  "status": "...",
+  "message": "...",
+  "data": { ... }
+}
+```
 
 ---
 
-## 2. Argus Tool Layer (CURRENT PHASE)
+## 2. Argus Tool Layer (ACTIVE PHASE)
 
 Location:
 
 ```
-tools/argus/
+/mnt/g/ai/projects/neurocore/tools/argus/
 ```
 
 Purpose:
 
 - compose system tools  
 - aggregate multiple signals  
-- produce structured outputs  
+- interpret system state  
+- produce structured diagnostic output  
 
 Rules:
 
-- MUST NOT call CommandRunner directly  
-- MUST use system tools  
-- MUST remain read-only  
+- MUST NOT call CommandRunner  
+- MUST use system tools only  
+- MUST consume structured `data`  
+- MUST NOT parse formatted message output  
+- MUST follow established system_summary pattern  
 
 ---
 
@@ -303,6 +320,9 @@ Rules:
 - Execution engine  
 - Tool registry + BaseTool contract  
 - CommandRunner (real system execution)  
+- Structured system data (system_info)  
+- Argus interpretation layer (system_summary implemented)  
+- Full observability + tracing  
 
 System tools implemented:
 
@@ -317,24 +337,35 @@ System tools implemented:
 - system_logs  
 - users_sessions  
 - recent_logins  
-- service_manager (simulated)  
+- service_manager  
 
-- Full observability + tracing  
+Argus tools implemented:
+
+- system_summary  
 
 ---
 
 # 🎯 CURRENT PHASE
 
-Phase 6 – Argus Tool Layer
+Phase 6 – Argus Tool Expansion
 
 ---
 
 # 🎯 CURRENT FOCUS
 
-- Build Argus tool layer  
+- Expand Argus tool layer  
 - Follow tool manifest EXACTLY  
-- Compose system-level insights  
+- Reuse established system_summary pattern  
 - Maintain strict execution boundaries  
+- Avoid architectural drift  
+
+---
+
+# 🎯 NEXT TASKS
+
+- Implement `process_top` (Argus version)  
+- Continue manifest-driven tool development  
+- Expand diagnostic capabilities  
 
 ---
 
@@ -353,6 +384,7 @@ Act as a senior systems engineer:
 
 Continue with:
 
-- Argus tool layer implementation  
+- Argus tool layer expansion  
 - manifest-driven tool development  
 - strict control plane enforcement  
+`````

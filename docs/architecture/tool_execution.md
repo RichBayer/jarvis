@@ -1,3 +1,4 @@
+````markdown
 # NeuroCore – Tool Execution Architecture
 
 ---
@@ -8,12 +9,14 @@ The Tool Execution layer is responsible for performing controlled system actions
 
 It ensures that:
 
-- all execution flows through a single controlled path
-- no component executes system actions directly outside approved layers
-- execution is validated, authorized, and observable
-- system safety is enforced at all times
+- all execution flows through a single controlled path  
+- no component executes system actions directly outside approved layers  
+- execution is validated, authorized, and observable  
+- system safety is enforced at all times  
 
-At this stage, this layer is no longer theoretical. NeuroCore actively executes real system commands through controlled system tools, and the architecture is now being aligned to support the future Argus composition layer without breaking existing execution boundaries.
+At this stage, this layer is fully implemented and actively executing real system commands through controlled system tools.
+
+It has also been extended to support the Argus composition layer without breaking execution boundaries.
 
 ---
 
@@ -23,11 +26,11 @@ All execution must pass through the execution engine.
 
 No tool is called directly by:
 
-- the router
-- the model
-- the CLI / ACLI
-- any external input
-- any component outside the approved execution path
+- the router  
+- the model  
+- the CLI / ACLI  
+- any external input  
+- any component outside the approved execution path  
 
 Execution flow is strictly enforced.
 
@@ -42,8 +45,6 @@ daemon → runtime_manager → control_plane → system
 ```
 
 No component bypasses the control plane.
-
-For execution requests, the execution path begins only after the control plane authorizes the request.
 
 ---
 
@@ -65,7 +66,9 @@ client
 → client
 ```
 
-If the selected tool is a real system execution tool, the path extends to:
+---
+
+## Real System Execution Path
 
 ```text
 client
@@ -84,7 +87,25 @@ client
 → client
 ```
 
-This is the active real execution path in the current system.
+---
+
+## Argus Composition Execution Path (ACTIVE)
+
+```text
+client
+→ daemon
+→ runtime_manager
+→ control_plane
+→ execution_engine
+→ argus_tool
+→ system_tool(s)
+→ command_runner (inside system tools)
+→ argus_tool
+→ execution_engine
+→ runtime_manager
+→ daemon
+→ client
+```
 
 ---
 
@@ -92,14 +113,14 @@ This is the active real execution path in the current system.
 
 The Tool Execution layer consists of:
 
-- Execution Engine (orchestration)
-- Tool Registry (tool discovery and availability)
-- BaseTool contract (standard interface)
-- System Tool Layer (real execution primitives)
-- Argus Tool Layer (future composed intelligence layer)
-- CommandRunner (direct operating system execution boundary)
+- Execution Engine (orchestration)  
+- Tool Registry (tool discovery)  
+- BaseTool contract (standard interface)  
+- System Tool Layer (execution primitives)  
+- Argus Tool Layer (composition and interpretation)  
+- CommandRunner (OS execution boundary)  
 
-These layers do not have the same responsibilities and must remain clearly separated.
+Each layer has distinct responsibilities and must remain separated.
 
 ---
 
@@ -113,21 +134,18 @@ tools/execution_engine.py
 
 Responsibilities:
 
-- receive authorized execution requests from the control plane
-- resolve the correct tool from the registry
-- validate tool input
-- invoke tool execution
-- return structured results
-- propagate trace context
+- receive authorized execution requests from the control plane  
+- resolve tools from the registry  
+- validate input  
+- invoke tool execution  
+- return structured results  
+- propagate trace context  
 
-The execution engine is the only component allowed to invoke top-level tools in response to a user request.
+Notes:
 
-Important:
-
-- the execution engine is an entry orchestration layer
-- it dispatches the selected tool for the request
-- it is not a recursive dispatcher
-- tools do not re-enter the execution engine during internal composition
+- the execution engine dispatches the top-level tool  
+- it does NOT recursively dispatch internal tool calls  
+- Argus tools call system tools directly without re-entering the engine  
 
 ---
 
@@ -141,12 +159,9 @@ tools/tool_registry.py
 
 Responsibilities:
 
-- maintain the list of available tools
-- resolve tools by name
-- enforce controlled tool availability
-- provide a single registry surface for the execution layer
-
-The registry is the authoritative map of what tools exist and can be selected by the execution engine.
+- maintain tool availability  
+- resolve tools by name  
+- enforce a single controlled registry  
 
 ---
 
@@ -160,27 +175,17 @@ tools/base_tool.py
 
 Defines:
 
-- tool identity
-- input schema
-- validation logic
-- execution behavior
-- result structure
+- tool identity  
+- input schema  
+- validation logic  
+- execution behavior  
+- result structure  
 
 All tools must inherit from BaseTool.
-
-The BaseTool contract standardizes how tools are invoked and how results are returned through the execution layer.
 
 ---
 
 # Tool Interface
-
-Tools receive the full execution request, not just a bare input payload.
-
-## Deprecated Model
-
-```text
-tool.execute(input)
-```
 
 ## Current Model
 
@@ -188,13 +193,15 @@ tool.execute(input)
 tool.execute(request)
 ```
 
-This ensures that tools receive consistent structure and trace context.
+Tools receive:
+
+- full request object  
+- validated input  
+- trace context  
 
 ---
 
-# Request Structure Passed to Tools
-
-Tools receive a structured request such as:
+# Request Structure
 
 ```json
 {
@@ -208,15 +215,11 @@ Tools receive a structured request such as:
 }
 ```
 
-The exact payload may evolve, but tools must continue to rely on the structured request model rather than ad hoc positional input.
-
 ---
 
 # Tool Layer Separation
 
-NeuroCore now has two distinct tool layers.
-
-They serve different roles and must not be mixed conceptually.
+NeuroCore has two distinct tool layers.
 
 ---
 
@@ -230,40 +233,28 @@ tools/system/
 
 Purpose:
 
-- perform focused, read-only system execution
-- gather raw system signals
-- return structured results for downstream use
+- perform focused system execution  
+- gather raw system signals  
+- expose structured system state  
 
-System tools are the execution primitives of the platform.
+Rules:
 
-They are responsible for:
+- uses CommandRunner  
+- one tool = one capability  
+- no aggregation  
+- no interpretation  
 
-- calling CommandRunner when real system access is required
-- returning structured output
-- exposing real system state safely
-- remaining narrow in scope
+System tools MUST:
 
-System tools must not:
+- return structured output:
 
-- interpret system behavior at a high level
-- aggregate multiple system domains into advisory conclusions
-- act like Argus intelligence tools
-- bypass CommandRunner and shell out directly by other means
-
-Examples in the current system include:
-
-- system_info
-- process_top
-- disk_usage
-- memory_usage
-- disk_layout
-- network_interfaces
-- network_connections
-- uptime_load
-- system_logs
-- users_sessions
-- recent_logins
-- service_manager (simulated/manual pattern reference)
+```json
+{
+  "status": "...",
+  "message": "...",
+  "data": { ... }
+}
+```
 
 ---
 
@@ -277,33 +268,17 @@ tools/argus/
 
 Purpose:
 
-- compose multiple system-level signals
-- aggregate results from system tools
-- interpret findings
-- produce structured, human-meaningful diagnostic output
+- compose multiple system tools  
+- aggregate signals  
+- interpret system state  
+- produce diagnostic output  
 
-Argus tools are not raw execution primitives.
+Rules:
 
-They are the intelligence composition layer for the Argus distribution.
-
-Argus tools must:
-
-- use system tools as their system data source
-- remain read-only
-- interpret and explain findings
-- produce structured outputs appropriate for Argus behavior
-
-Argus tools must not:
-
-- call CommandRunner directly
-- execute subprocess commands directly
-- bypass system tools for system access
-- behave like unmanaged execution code
-
-This preserves the platform/distribution boundary:
-
-- NeuroCore = execution platform
-- Argus = intelligence distribution built on top of the platform
+- MUST NOT call CommandRunner  
+- MUST use system tools  
+- MUST consume structured `data`  
+- MUST NOT parse formatted message output  
 
 ---
 
@@ -315,305 +290,112 @@ Location:
 tools/system/command_runner.py
 ```
 
-This is the only layer that directly interfaces with the operating system for real command execution.
-
 Responsibilities:
 
-- execute subprocess commands
-- enforce timeout limits
-- capture stdout
-- capture stderr
-- capture return codes
+- execute subprocess commands  
+- enforce timeouts  
+- capture stdout, stderr, return codes  
 
-Important:
+Notes:
 
-- tools do not call subprocess directly
-- real command execution is isolated here
-- CommandRunner is part of the system tool layer boundary, not the Argus layer
-
-This keeps real execution centralized, predictable, auditable, and safe.
+- only system tools interact with CommandRunner  
+- Argus tools never interact with it  
 
 ---
 
-# Current Real Execution Model
+# Current Execution Model
 
-The active execution model implemented in NeuroCore today is:
-
-```text
-control_plane → execution_engine → system_tool → command_runner
-```
-
-This is the proven execution pattern established during the real system tool build phases.
-
-Key characteristics:
-
-- control plane decides whether execution is allowed
-- execution engine selects and invokes the tool
-- the system tool performs scoped execution work
-- CommandRunner performs the real operating system call
-- results return back up the same controlled path
-
-This is the current source-of-truth execution pattern for real tool execution.
-
----
-
-# Argus Composition Model
-
-The Argus layer extends the execution architecture without changing the top-level execution boundary.
-
-The intended Argus composition path is:
+The active execution model is:
 
 ```text
-control_plane → execution_engine → argus_tool
-→ system_tool(s)
-→ command_runner (only inside system tools)
-→ argus_tool
-→ execution_engine
+control_plane → execution_engine → argus_tool (if applicable) → system_tool → command_runner
 ```
-
-Important clarification:
-
-- the execution engine dispatches the top-level Argus tool for the request
-- the Argus tool may call one or more system tools directly as internal composition primitives
-- those system tools remain the only layer allowed to use CommandRunner
-- Argus tools do not route back through the execution engine for each internal system-tool call
-
-This preserves clear orchestration boundaries while avoiding nested dispatch behavior.
 
 ---
 
 # Why the Separation Matters
 
-Without strict layer separation:
+Strict separation ensures:
 
-- raw execution and reasoning become mixed together
-- system access becomes harder to audit
-- Argus could accidentally bypass platform safety
-- tools become harder to reason about and maintain
-
-With strict separation:
-
-- system tools remain stable execution primitives
-- Argus tools remain intelligence/composition primitives
-- safety boundaries stay explicit
-- platform behavior remains predictable as capabilities grow
+- execution remains controlled and auditable  
+- system access remains predictable  
+- Argus cannot bypass platform safety  
+- reasoning and execution responsibilities remain distinct  
 
 ---
 
 # Tool Responsibilities
 
-## System Tool Responsibilities
+## System Tools
 
-Each system tool must:
-
-- validate input using the BaseTool contract
-- extract required data from `request["input"]`
-- use CommandRunner for real command execution when needed
-- emit trace events using the provided trace context
-- return structured output
-- stay narrow and capability-specific
-
-System tools must not:
-
-- generate new request IDs
-- bypass the execution engine for top-level requests
-- call subprocess directly outside CommandRunner
-- perform high-level diagnosis or recommendation logic intended for Argus
-- become broad multi-domain intelligence tools
+- perform execution  
+- return structured system data  
+- remain narrow in scope  
+- do not interpret  
 
 ---
 
-## Argus Tool Responsibilities
+## Argus Tools
 
-Each Argus tool must:
-
-- validate input using the BaseTool contract
-- use system tools as its data source
-- aggregate signals across relevant domains
-- interpret results into meaningful findings
-- return structured, grounded output suitable for Argus responses
-- preserve trace continuity across composed tool usage
-
-Argus tools must not:
-
-- generate new request IDs
-- call CommandRunner directly
-- execute subprocess commands directly
-- modify system state
-- bypass system tools for operating system access
+- consume system tool data  
+- aggregate signals  
+- interpret findings  
+- produce recommendations  
 
 ---
 
 # Output Model
 
-The two tool layers return different classes of value.
-
 ## System Tools
 
-System tools return structured system signals.
+Return:
 
-They may format results for readability, but their role is still execution and signal retrieval, not broad interpretation.
+- raw system signals  
+- structured data  
 
-Examples:
-
-- process listings
-- disk usage views
-- network state
-- log output
-- uptime data
-- session visibility
+---
 
 ## Argus Tools
 
-Argus tools return structured interpreted outputs.
+Return:
 
-They are responsible for:
-
-- combining relevant system signals
-- identifying what matters
-- explaining findings in plain language
-- recommending next steps without executing them
-
-This is where system capability becomes Argus intelligence.
+- interpreted findings  
+- severity classification  
+- recommended actions  
 
 ---
 
 # Execution Modes
 
-Each tool defines an execution mode.
-
-## auto
-
-- executes immediately
-- used for safe, read-only operations
-
-## manual
-
-- requires confirmation before execution
-
-## dry-run
-
-- advisory only
-- no real execution
-
-Current system emphasis is on safe read-only execution, with manual confirmation retained for higher-risk patterns such as the simulated service manager behavior.
-
----
-
-# Confirmation Model
-
-For manual tools:
-
-1. user issues command
-2. control plane detects execution intent
-3. execution is blocked pending confirmation
-4. confirmation is required
-5. user confirms
-6. execution engine proceeds
-
-The confirmation system remains part of the control plane authority model and is not delegated to tools themselves.
+- `auto` → immediate execution  
+- `manual` → requires confirmation  
+- `dry-run` → advisory only  
 
 ---
 
 # Safety Model
 
-The execution system enforces:
+The system enforces:
 
-- no execution without control plane approval
-- no direct execution from the router
-- no direct execution from the model
-- no unmanaged direct execution from CLI or ACLI
-- no bypass of confirmation model for manual tools
-- strict tool validation before execution
-- strict separation between execution primitives and intelligence composition
-
-Additionally:
-
-- real system execution is restricted to the system tool layer
-- Argus remains read-only and interpretive
-- execution behavior is explicit and auditable
+- no execution without control plane approval  
+- no direct execution from router or model  
+- no CLI bypass  
+- strict tool validation  
+- CommandRunner isolation  
+- Argus read-only enforcement  
 
 ---
 
 # Observability Integration
 
-Execution is fully traceable.
+Execution is fully traceable across:
 
-Each step emits structured trace events across the execution path.
+- execution engine  
+- argus tools  
+- system tools  
+- command runner  
 
-This includes:
-
-- execution detection
-- tool resolution
-- validation
-- execution start
-- execution completion
-
-For composed Argus behavior, trace continuity must extend across:
-
-- top-level Argus tool invocation
-- internal system tool calls
-- CommandRunner usage inside system tools
-
-All events must remain tied to the same request lifecycle.
-
----
-
-# Example Execution Trace – Current System Tool Path
-
-```text
-runtime_manager  → execution detected
-control_plane    → execution allowed
-execution_engine → execution started
-execution_engine → tool resolved
-execution_engine → validation passed
-system_tool      → tool invoked
-command_runner   → system command executed
-execution_engine → execution completed
-```
-
-This reflects the current active real execution pattern.
-
----
-
-# Example Execution Trace – Future Argus Composition Path
-
-```text
-runtime_manager  → execution detected
-control_plane    → execution allowed
-execution_engine → argus tool resolved
-execution_engine → argus tool invoked
-argus_tool       → system tool requested
-system_tool      → command execution requested
-command_runner   → system command executed
-system_tool      → structured result returned
-argus_tool       → findings aggregated and interpreted
-execution_engine → execution completed
-```
-
-This extends the current model without changing the top-level execution boundary.
-
----
-
-# Relationship to CLI and ACLI
-
-The CLI and ACLI are interface layers.
-
-They may:
-
-- accept user requests
-- frame requests correctly
-- send requests into the NeuroCore runtime
-- present results to the user
-
-They may not:
-
-- execute system commands directly
-- bypass the control plane
-- bypass the execution engine
-- create alternate execution paths
-
-This preserves the same execution architecture across both the NeuroCore platform interface and the Argus distribution interface.
+All operations share a single request trace.
 
 ---
 
@@ -625,30 +407,26 @@ BaseTool Contract: COMPLETE
 System Tool Layer: ACTIVE  
 CommandRunner: ACTIVE  
 Real System Execution: ACTIVE  
-Argus Tool Layer: NOT YET IMPLEMENTED  
-Argus Composition Boundary: ARCHITECTURALLY DEFINED
+Argus Tool Layer: ACTIVE (system_summary implemented)  
 
 ---
 
 # Outcome
 
-The Tool Execution architecture now provides:
+The execution architecture now supports:
 
-- controlled top-level execution flow
-- strict safety enforcement
-- standardized tool contracts
-- isolated real operating system execution
-- traceable end-to-end execution behavior
-- a clear separation between platform execution tools and Argus intelligence tools
-
-This keeps the current NeuroCore execution system accurate to reality while establishing the correct architectural boundary for Argus growth.
+- controlled system execution  
+- structured system data  
+- an interpretation layer (Argus)  
+- strict safety boundaries  
+- full observability  
 
 ---
 
 # Next Step
 
-- keep expanding and stabilizing the system tool layer as needed
-- implement the Argus tool layer on top of system tools
-- maintain strict read-only enforcement for Argus
-- preserve CommandRunner isolation inside the system tool layer
-- keep control plane authority intact as capabilities expand
+- expand Argus tool layer  
+- implement process_top (Argus version)  
+- continue manifest-driven development  
+- maintain strict execution boundaries  
+````

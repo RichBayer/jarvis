@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Dict
+from typing import Dict, Any
 
 from runtime.tracing import trace_event, trace_context_from_request
 from tools.base_tool import BaseTool, ToolValidationError
@@ -37,7 +37,7 @@ class SystemInfo(BaseTool):
                 f"Invalid target '{target}'. Valid targets: {self.VALID_TARGETS}"
             )
 
-    def execute(self, request: Dict[str, Dict]) -> Dict[str, str]:
+    def execute(self, request: Dict[str, Dict]) -> Dict[str, Any]:
         ctx = trace_context_from_request(request)
         tool_input = request["input"]
 
@@ -58,19 +58,19 @@ class SystemInfo(BaseTool):
         )
 
         if target == "system":
-            result = self._system_summary(ctx)
+            raw_data = self._system_summary()
         elif target == "cpu":
-            result = self._cpu_info()
+            raw_data = self._cpu_info()
         elif target == "memory":
-            result = self._memory_info()
+            raw_data = self._memory_info()
         elif target == "disk":
-            result = self._disk_info()
+            raw_data = self._disk_info()
         elif target == "os":
-            result = self._os_info()
+            raw_data = self._os_info()
         elif target == "uptime":
-            result = self._uptime()
+            raw_data = self._uptime()
         elif target == "hostname":
-            result = self._hostname()
+            raw_data = self._hostname()
         else:
             raise ToolValidationError(f"Unsupported target: {target}")
 
@@ -81,16 +81,18 @@ class SystemInfo(BaseTool):
             status="success"
         )
 
-        return self.build_result(
-            status="success",
-            message=self._format_output(target, result)
-        )
+        return {
+            "status": "success",
+            "tool": self.name,
+            "message": self._format_output(target, raw_data),
+            "data": raw_data  # 🔥 NEW: structured data
+        }
 
     # -------------------------
-    # FORMAT OUTPUT
+    # FORMAT OUTPUT (UNCHANGED)
     # -------------------------
 
-    def _format_output(self, target: str, data: Dict[str, str]) -> str:
+    def _format_output(self, target: str, data: Dict[str, Any]) -> str:
         lines = [f"{target.capitalize()} Information\n"]
 
         for key, value in data.items():
@@ -104,34 +106,46 @@ class SystemInfo(BaseTool):
 
     def _hostname(self):
         r = CommandRunner.run(["hostname"])
-        return {"hostname": r["stdout"]}
+        return {
+            "hostname": r["stdout"]
+        }
 
     def _uptime(self):
-        r = CommandRunner.run(["uptime", "-p"])
-        return {"uptime": r["stdout"]}
+        r = CommandRunner.run(["uptime"])
+        return {
+            "raw": r["stdout"]
+        }
 
     def _os_info(self):
         r = CommandRunner.run(["cat", "/etc/os-release"])
-        return {"os": r["stdout"]}
+        return {
+            "raw": r["stdout"]
+        }
 
     def _cpu_info(self):
         r = CommandRunner.run(["lscpu"])
-        return {"cpu": r["stdout"]}
+        return {
+            "raw": r["stdout"]
+        }
 
     def _memory_info(self):
-        r = CommandRunner.run(["free", "-h"])
-        return {"memory": r["stdout"]}
+        r = CommandRunner.run(["free", "-m"])
+        return {
+            "raw": r["stdout"]
+        }
 
     def _disk_info(self):
         r = CommandRunner.run(["df", "-h", "/"])
-        return {"disk": r["stdout"]}
-
-    def _system_summary(self, ctx):
         return {
-            "hostname": self._hostname()["hostname"],
-            "uptime": self._uptime()["uptime"],
-            "os": self._os_info()["os"],
-            "cpu": self._cpu_info()["cpu"],
-            "memory": self._memory_info()["memory"],
-            "disk": self._disk_info()["disk"],
+            "raw": r["stdout"]
+        }
+
+    def _system_summary(self):
+        return {
+            "hostname": self._hostname(),
+            "uptime": self._uptime(),
+            "os": self._os_info(),
+            "cpu": self._cpu_info(),
+            "memory": self._memory_info(),
+            "disk": self._disk_info(),
         }

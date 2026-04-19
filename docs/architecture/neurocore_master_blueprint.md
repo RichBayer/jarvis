@@ -1,3 +1,4 @@
+```markdown
 # NeuroCore – Master Blueprint
 
 ---
@@ -84,8 +85,9 @@ NeuroCore currently has:
 - execution engine (structured tool execution)  
 - tool registry and BaseTool contract  
 - CommandRunner (real system execution layer)  
-- system_info tool (real, read-only execution)  
-- service_manager tool (simulated execution)  
+- full system tool layer (read-only system inspection tools)  
+- structured system data (system_info returns `data`)  
+- Argus tool layer (system_summary implemented)  
 - RAG-based knowledge system  
 - session memory (short-term)  
 - streaming CLI interface (`ai`)  
@@ -93,7 +95,7 @@ NeuroCore currently has:
 
 At this stage, the system is:
 
-> a controlled execution platform with real system interaction
+> a controlled execution platform with structured system intelligence
 
 ---
 
@@ -105,11 +107,12 @@ The system has moved from:
 
 to:
 
-> performing controlled actions within an environment  
+> performing controlled actions and interpreting real system state  
 
 This introduces:
 
 - execution  
+- interpretation  
 - safety constraints  
 - system responsibility  
 
@@ -203,42 +206,59 @@ Includes:
 ---
 
 ## Phase 5I – Safe Local Tools  
+Status: COMPLETE  
+
+Includes:
+
+- full system inspection tool set  
+- consistent execution behavior  
+- standardized tool contracts  
+
+---
+
+## Phase 5J – Argus Tool Layer (NEW PHASE)  
 Status: IN PROGRESS  
 
 Includes:
 
-- system_info (complete)  
+- composition tools built on system tools  
+- structured data consumption  
+- signal aggregation  
+- system state interpretation  
+- diagnostic output generation  
 
-Next required tools:
+Current implementation:
 
-- process inspection  
-- network inspection  
-- disk health  
-- log analysis  
+- system_summary (complete)  
+
+Next:
+
+- process_top (Argus version)  
+- additional diagnostic tools  
 
 ---
 
-## Phase 5J – External Threat Defense  
+## Phase 5K – External Threat Defense  
 Status: NOT IMPLEMENTED  
 
 ---
 
-## Phase 5K – External Tools  
+## Phase 5L – External Tools  
 Status: NOT IMPLEMENTED  
 
 ---
 
-## Phase 5L – Security Intelligence Pipeline  
+## Phase 5M – Security Intelligence Pipeline  
 Status: NOT IMPLEMENTED  
 
 ---
 
-## Phase 5M – Memory Expansion  
+## Phase 5N – Memory Expansion  
 Status: NOT IMPLEMENTED  
 
 ---
 
-## Phase 5N – Self-Reconstruction System  
+## Phase 5O – Self-Reconstruction System  
 Status: NOT IMPLEMENTED  
 
 ---
@@ -290,13 +310,12 @@ Status: COMPLETE
 ---
 
 ### Phase 5I – Safe Local Tools  
+Status: COMPLETE  
+
+---
+
+### Phase 5J – Argus Tool Layer  
 Status: IN PROGRESS  
-
-Required:
-
-- reliable system inspection tools  
-- consistent output structure  
-- predictable execution behavior  
 
 ---
 
@@ -313,10 +332,10 @@ Required:
 
 Argus V1 is ready when:
 
-- real execution is stable  
-- core toolset is complete  
-- outputs are consistent and readable  
-- execution is safe and predictable  
+- Argus tool layer is complete  
+- diagnostic tools are consistent and reliable  
+- outputs are clear and actionable  
+- execution remains safe and predictable  
 
 ---
 
@@ -326,10 +345,11 @@ Until Argus V1 is ready:
 
 Focus ONLY on:
 
-1. read-only system tools  
-2. execution stability  
-3. tool standardization  
-4. output quality  
+1. Argus tool layer expansion  
+2. system tool stability  
+3. structured data consistency  
+4. diagnostic output quality  
+5. pattern reuse (system_summary → all tools)  
 
 ---
 
@@ -391,6 +411,7 @@ NeuroCore becomes:
 - observable  
 - secure  
 - capable of action  
+- capable of interpretation  
 - capable of long-running work  
 - capable of recovery  
 
@@ -415,3 +436,4 @@ NeuroCore is the platform.
 Argus is the first product built on that platform.  
 
 The system must evolve without breaking this separation.
+```

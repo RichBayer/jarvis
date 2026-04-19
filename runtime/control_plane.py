@@ -28,7 +28,9 @@ class ControlPlane:
         "start", "stop", "restart", "status",
         "info", "processes", "disk", "memory",
         "layout", "network", "connections",
-        "uptime", "logs", "users", "logins"
+        "uptime", "logs", "users", "logins",
+        # Argus keywords
+        "summary"
     }
 
     CONFIRM_PREFIX = "confirm "
@@ -119,6 +121,15 @@ class ControlPlane:
 
         action = words[0] if len(words) > 0 else ""
 
+        # -------------------------
+        # ARGUS TOOL MAPPING (NEW)
+        # -------------------------
+        if action == "summary":
+            return {"tool": "system_summary", "input": {}}
+
+        # -------------------------
+        # SYSTEM TOOL MAPPING
+        # -------------------------
         if action == "logins":
             return {"tool": "recent_logins", "input": {}}
         if action == "users":
@@ -140,8 +151,9 @@ class ControlPlane:
         if action == "processes":
             return {"tool": "process_top", "input": {}}
         if action == "info":
-            return {"tool": "system_info", "input": {}}
+            return {"tool": "system_info", "input": {"target": "system"}}
 
+        # fallback
         return {
             "tool": "service_manager",
             "input": {}

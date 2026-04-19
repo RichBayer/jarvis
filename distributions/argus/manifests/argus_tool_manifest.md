@@ -1,363 +1,439 @@
+````markdown
 # Argus V1 – Tool Manifest
 
 ---
 
 # Purpose
 
-This document defines the executable tool layer for Argus V1.
+This document defines the executable Argus tool layer for V1.
 
 It maps:
 
-- tool names → system commands
-- tool types → core vs optional
-- dependencies → required binaries
-- behavior → execution + fallback rules
+- Argus tools → system tools  
+- system tools → system commands  
+- tool tiers → core vs optional  
+- dependencies → required binaries  
+- behavior → execution + fallback rules  
+
+This document is the **build checklist** for Argus tool expansion.
 
 ---
 
-# Tool Execution Model
+# Execution Model (CRITICAL)
 
-All tools must:
+Argus tools DO NOT execute commands.
 
-1. Execute through the execution engine
-2. Be registered in the tool registry
-3. Return structured output (no raw dumps)
-4. Respect read-only constraints
-5. Support graceful failure if dependencies are missing
+All execution follows:
 
----
-
-# Tool Metadata Standard
-
-Each tool should define:
-
-- name
-- category
-- command
-- arguments
-- required_binary
-- dependency_package (if applicable)
-- tier (core / optional)
-- description
-- failure_mode
+```
+control_plane
+→ execution_engine
+→ argus_tool
+→ system_tool(s)
+→ command_runner
+→ operating system
+```
 
 ---
 
-# Tier 1 — Core Tools
+# Tool Layer Separation
+
+## System Tools
+
+- perform execution  
+- call CommandRunner  
+- return structured data  
+
+## Argus Tools
+
+- compose system tools  
+- aggregate signals  
+- interpret system state  
+- return findings and recommendations  
 
 ---
 
-## system_summary
+# Structured Output Requirement
 
-- category: system
-- commands:
-  - uptime
-  - free -h
-  - df -h
-  - cat /etc/os-release
-- required_binary: coreutils
-- tier: core
+All system tools must return:
+
+```
+{
+  "status": "...",
+  "message": "...",
+  "data": { ... }
+}
+```
+
+Argus tools MUST:
+
+- consume `data`  
+- NOT parse formatted message output  
+- NOT rely on string matching  
 
 ---
 
-## process_top
+# Argus Tool Pattern (MANDATORY)
 
-- category: system
-- commands:
-  - ps aux --sort=-%cpu | head
-  - ps aux --sort=-%mem | head
-- required_binary: ps
-- tier: core
+Every Argus tool must:
+
+1. be invoked via execution engine  
+2. call one or more system tools  
+3. extract structured data  
+4. evaluate system signals  
+5. assign severity (if applicable)  
+6. return:
+   - findings  
+   - severity  
+   - recommended actions  
+
+---
+
+# Tool Classification
+
+## Tier 1 — Core Tools
+
+- must work on standard Ubuntu/Debian  
+- no additional dependencies  
+- required for Argus V1  
+
+---
+
+## Tier 2 — Optional Tools
+
+- provide deeper insight  
+- may require additional packages  
+- must implement graceful fallback  
+
+---
+
+# Tier 1 — Core Tool Set
+
+---
+
+## system_summary (IMPLEMENTED)
+
+Argus Tool
+
+System Tools Used:
+
+- system_info  
+
+Capabilities:
+
+- system health overview  
+- CPU load interpretation  
+- memory usage analysis  
+- disk usage analysis  
+- OS identification  
+
+Notes:
+
+- first completed Argus tool  
+- defines the reference pattern  
+
+---
+
+## process_top (NEXT)
+
+Argus Tool
+
+System Tools Used:
+
+- process_top  
+
+Capabilities:
+
+- identify high CPU processes  
+- identify high memory processes  
+- correlate with system load  
 
 ---
 
 ## disk_layout
 
-- category: system
-- commands:
-  - lsblk
-- required_binary: lsblk
-- tier: core
+Argus Tool
+
+System Tools Used:
+
+- disk_layout  
 
 ---
 
 ## service_status
 
-- category: service
-- commands:
-  - systemctl status <service>
-- required_binary: systemctl
-- tier: core
+Argus Tool
+
+System Tools Used:
+
+- service_manager / systemctl wrapper  
 
 ---
 
 ## service_list
 
-- category: service
-- commands:
-  - systemctl list-units --type=service --state=running
-  - systemctl list-units --type=service --state=failed
-- required_binary: systemctl
-- tier: core
+Argus Tool
+
+System Tools Used:
+
+- system tools wrapping systemctl list  
 
 ---
 
 ## log_recent_errors
 
-- category: logs
-- commands:
-  - journalctl -p err -n 50
-- required_binary: journalctl
-- tier: core
+Argus Tool
+
+System Tools Used:
+
+- system_logs  
 
 ---
 
 ## log_service
 
-- category: logs
-- commands:
-  - journalctl -u <service> -n 100
-- required_binary: journalctl
-- tier: core
+Argus Tool
+
+System Tools Used:
+
+- system_logs  
 
 ---
 
 ## kernel_log_check
 
-- category: logs
-- commands:
-  - dmesg | tail
-- required_binary: dmesg
-- tier: core
+Argus Tool
+
+System Tools Used:
+
+- system_logs  
 
 ---
 
 ## disk_usage
 
-- category: disk
-- commands:
-  - df -h
-- required_binary: df
-- tier: core
+Argus Tool
+
+System Tools Used:
+
+- disk_usage  
 
 ---
 
 ## disk_usage_breakdown
 
-- category: disk
-- commands:
-  - du -sh /var/* 2>/dev/null | sort -hr | head
-- required_binary: du
-- tier: core
+Argus Tool
+
+System Tools Used:
+
+- disk_usage  
 
 ---
 
 ## memory_usage
 
-- category: system
-- commands:
-  - free -h
-- required_binary: free
-- tier: core
+Argus Tool
+
+System Tools Used:
+
+- memory_usage  
 
 ---
 
 ## network_interfaces
 
-- category: network
-- commands:
-  - ip a
-- required_binary: ip
-- tier: core
+Argus Tool
+
+System Tools Used:
+
+- network_interfaces  
 
 ---
 
 ## routing_check
 
-- category: network
-- commands:
-  - ip route
-- required_binary: ip
-- tier: core
+Argus Tool
+
+System Tools Used:
+
+- network_interfaces  
 
 ---
 
 ## listening_ports
 
-- category: network
-- commands:
-  - ss -tuln
-- required_binary: ss
-- tier: core
+Argus Tool
+
+System Tools Used:
+
+- network_connections  
 
 ---
 
 ## network_connectivity
 
-- category: network
-- commands:
-  - ping -c 3 8.8.8.8
-- required_binary: ping
-- tier: core
+Argus Tool
+
+System Tools Used:
+
+- network_connections  
 
 ---
 
 ## dns_check
 
-- category: network
-- commands:
-  - nslookup google.com
-- required_binary: nslookup
-- tier: core
+Argus Tool
+
+System Tools Used:
+
+- network_connections  
 
 ---
 
 ## auth_log_scan
 
-- category: security
-- commands:
-  - journalctl -u ssh | grep "Failed password"
-- required_binary: journalctl
-- tier: core
+Argus Tool
+
+System Tools Used:
+
+- system_logs  
 
 ---
 
 ## sudo_activity_check
 
-- category: security
-- commands:
-  - journalctl | grep sudo
-- required_binary: journalctl
-- tier: core
+Argus Tool
+
+System Tools Used:
+
+- system_logs  
 
 ---
 
 ## find_file
 
-- category: file
-- commands:
-  - find <path> -name "*pattern*"
-- required_binary: find
-- tier: core
+Argus Tool
+
+System Tools Used:
+
+- system-level search tools  
 
 ---
 
 ## find_by_content
 
-- category: file
-- commands:
-  - grep -R "pattern" <path>
-- required_binary: grep
-- tier: core
+Argus Tool
+
+System Tools Used:
+
+- system-level search tools  
 
 ---
 
 ## read_file_safe
 
-- category: file
-- commands:
-  - cat <file>
-- required_binary: cat
-- tier: core
+Argus Tool
+
+System Tools Used:
+
+- system-level file read  
+
+Constraints:
+
+- file size limits required  
 
 ---
 
 ## whereis_binary
 
-- category: file
-- commands:
-  - whereis <binary>
-- required_binary: whereis
-- tier: core
+Argus Tool
+
+System Tools Used:
+
+- system-level lookup tools  
 
 ---
 
 # Tier 2 — Optional Tools
 
+Same structure applies:
+
+Argus Tool → System Tool → Command → Dependency
+
 ---
 
 ## io_stats
 
-- category: performance
-- commands:
-  - iostat -x
-- required_binary: iostat
-- dependency_package: sysstat
-- tier: optional
+System Tool → iostat  
+Dependency → sysstat  
 
 ---
 
 ## memory_pressure_detail
 
-- category: performance
-- commands:
-  - vmstat
-- required_binary: vmstat
-- tier: optional
+System Tool → vmstat  
 
 ---
 
 ## fast_file_lookup
 
-- category: file
-- commands:
-  - locate <file>
-- required_binary: locate
-- dependency_package: mlocate or plocate
-- tier: optional
+System Tool → locate  
+Dependency → mlocate / plocate  
 
 ---
 
 ## dns_deep_check
 
-- category: network
-- commands:
-  - dig google.com
-- required_binary: dig
-- dependency_package: dnsutils
-- tier: optional
+System Tool → dig  
+Dependency → dnsutils  
 
 ---
 
 ## open_files_for_process
 
-- category: system
-- commands:
-  - lsof
-- required_binary: lsof
-- tier: optional
+System Tool → lsof  
 
 ---
 
 ## disk_health_smart
 
-- category: hardware
-- commands:
-  - smartctl -H /dev/sdX
-- required_binary: smartctl
-- dependency_package: smartmontools
-- tier: optional
+System Tool → smartctl  
+Dependency → smartmontools  
 
 ---
 
 # Failure Handling Standard
 
-If required_binary is missing, return:
+If a dependency is missing, return:
 
-- status: unavailable
-- reason: missing dependency
-- package: suggested install package
-- impact: what analysis cannot be performed
+```
+status: unavailable
+reason: missing dependency
+package: suggested install package
+impact: capability limitation
+```
+
+---
+
+# Build Rules (CRITICAL)
+
+- implement ONE Argus tool at a time  
+- follow system_summary pattern exactly  
+- do NOT introduce new execution paths  
+- do NOT call CommandRunner from Argus  
+- do NOT duplicate system tool logic  
+- reuse system tools  
 
 ---
 
 # Final Rule
 
-Tools must provide:
+Argus must:
 
-- structured output
-- no direct system modification
-- safe execution
-- predictable behavior
+- provide structured interpretation  
+- never expose raw command output  
+- remain read-only  
+- operate within controlled execution  
 
-Argus must never expose raw command output without interpretation.
+Argus is an interpretation layer, not an execution layer.
+````

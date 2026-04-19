@@ -1,3 +1,4 @@
+````markdown
 # NeuroCore System State
 
 ## Overview
@@ -6,7 +7,11 @@ NeuroCore is a local-first AI system designed to provide structured reasoning, c
 
 The system runs as a persistent daemon and processes every request through a clearly defined and enforced execution pipeline.
 
-At this point, NeuroCore is no longer just routing logic—it now executes real system commands through a controlled tool layer.
+At this stage, NeuroCore supports:
+
+- real system execution through system tools  
+- structured data output for machine interpretation  
+- an Argus tool layer for system-level reasoning and diagnostics  
 
 ---
 
@@ -19,7 +24,7 @@ CLI
 → Daemon
 → Runtime Manager
 → Control Plane
-→ (Execution Engine → Tool → OS)
+→ (Execution Engine → Argus Tool → System Tool → CommandRunner → OS)
    OR
 → (Router → Knowledge → Model)
 ```
@@ -44,9 +49,9 @@ Capabilities:
 
 Notes:
 
-- CLI is intentionally simple
-- Responsible only for input + output formatting
-- Does not contain execution logic
+- CLI is intentionally simple  
+- Responsible only for input + output formatting  
+- Does not contain execution logic  
 
 ---
 
@@ -67,8 +72,8 @@ Responsibilities:
 
 Notes:
 
-- The daemon is the transport layer between CLI and system
-- Improper serialization here breaks the entire pipeline
+- Transport layer between CLI and system  
+- Improper serialization here breaks the entire pipeline  
 
 ---
 
@@ -81,15 +86,15 @@ runtime/runtime_manager.py
 
 Responsibilities:
 
-- Entry point for all requests
-- Execution vs reasoning path selection
-- Request normalization for downstream components
-- Response formatting for CLI compatibility
+- Entry point for all requests  
+- Execution vs reasoning path selection  
+- Request normalization for downstream components  
+- Response formatting for CLI compatibility  
 
 Notes:
 
-- Maintains clean separation between execution and reasoning paths
-- Ensures consistent output structure
+- Maintains separation between execution and reasoning paths  
+- Ensures consistent output structure  
 
 ---
 
@@ -102,16 +107,16 @@ runtime/control_plane.py
 
 Responsibilities:
 
-- Request classification (execution vs reasoning)
-- Execution keyword detection (e.g. `info`, `processes`, `disk`, `memory`, etc.)
-- Policy enforcement
-- Confirmation handling (when required)
-- Tool selection and validation
+- Request classification (execution vs reasoning)  
+- Execution keyword detection (e.g. `info`, `processes`, `disk`, `memory`, `summary`)  
+- Policy enforcement  
+- Confirmation handling (when required)  
+- Tool selection and validation  
 
 Notes:
 
-- This is the authority layer of the system
-- No execution occurs without passing through the control plane
+- Authority layer of the system  
+- No execution occurs without passing through the control plane  
 
 ---
 
@@ -124,15 +129,15 @@ tools/execution_engine.py
 
 Responsibilities:
 
-- Tool lookup via registry
-- Input validation
-- Execution orchestration
-- Full trace propagation to tools
+- Tool lookup via registry  
+- Input validation  
+- Execution orchestration  
+- Full trace propagation to tools  
 
 Notes:
 
-- Execution engine does not execute commands directly
-- Delegates execution to tools
+- Does not execute commands directly  
+- Delegates execution to tools  
 
 ---
 
@@ -142,11 +147,35 @@ Locations:
 ```
 tools/base_tool.py
 tools/system/
+tools/argus/
 ```
 
-#### Current Tools
+NeuroCore now has **two distinct tool layers**.
 
-- `service_manager` (simulated)
+---
+
+## System Tool Layer
+
+Location:
+```
+tools/system/
+```
+
+Purpose:
+
+- direct system interaction  
+- raw signal collection  
+- read-only operations  
+
+Rules:
+
+- uses `CommandRunner`  
+- one tool = one capability  
+- no aggregation  
+- no interpretation  
+
+### System Tools
+
 - `system_info`
 - `process_top`
 - `disk_usage`
@@ -158,15 +187,53 @@ tools/system/
 - `system_logs`
 - `users_sessions`
 - `recent_logins`
+- `service_manager` (simulated)
 
-#### Capabilities
+---
 
-- Structured input validation
-- Execution mode handling:
-  - `auto` (no confirmation, read-only)
-  - `manual` (requires confirmation)
-  - `dry-run` (future)
-- Full trace context access
+## Argus Tool Layer
+
+Location:
+```
+tools/argus/
+```
+
+Purpose:
+
+- compose system tools  
+- aggregate multiple signals  
+- interpret system state  
+- produce diagnostic output  
+
+Rules:
+
+- MUST NOT call `CommandRunner`  
+- MUST use system tools only  
+- MUST consume structured `data`  
+- MUST NOT parse formatted message output  
+
+### Implemented Argus Tools
+
+- `system_summary`
+
+---
+
+### Tool Output Contract (CRITICAL)
+
+All system tools now return:
+
+```
+{
+  "status": "...",
+  "message": "...",
+  "data": { ... }
+}
+```
+
+- `message` → human-readable output (CLI)  
+- `data` → structured output for Argus  
+
+This enables reliable machine-level interpretation.
 
 ---
 
@@ -179,17 +246,17 @@ tools/system/command_runner.py
 
 Responsibilities:
 
-- Safe subprocess execution
-- Timeout enforcement (10s default)
+- Safe subprocess execution  
+- Timeout enforcement (10s default)  
 - Capture of:
-  - stdout
-  - stderr
-  - return codes
+  - stdout  
+  - stderr  
+  - return codes  
 
 Notes:
 
-- This is the direct interface to the operating system
-- All real system interaction flows through this layer
+- Direct interface to the operating system  
+- All real execution flows through this layer  
 
 ---
 
@@ -197,16 +264,16 @@ Notes:
 
 Components:
 
-- Router (`jarvis_router.py`)
-- RAG system (`query_knowledge.py`)
-- Session memory (`session_memory.py`)
+- Router  
+- RAG system  
+- Session memory  
 
 Responsibilities:
 
-- Natural language interpretation
-- Query rewriting
-- Knowledge retrieval
-- Response generation (LLM path)
+- Natural language interpretation  
+- Query rewriting  
+- Knowledge retrieval  
+- LLM-based response generation  
 
 ---
 
@@ -219,23 +286,21 @@ runtime/tracing.py
 
 Capabilities:
 
-- Structured trace events
-- Global `request_id` per request
-- End-to-end trace continuity across all layers
+- Structured trace events  
+- Global `request_id` per request  
+- End-to-end trace continuity  
 
 ---
 
 ## Trace Flow
 
-Each request generates a unique `request_id` and flows through:
-
 ```
 runtime_manager
 → control_plane
-→ execution_engine (if execution)
-→ tool
-→ command_runner (if real execution)
-→ back through system
+→ execution_engine
+→ tool (argus/system)
+→ command_runner (if execution)
+→ return path
 ```
 
 All components share the same trace context.
@@ -249,7 +314,8 @@ All components share the same trace context.
 ```
 control_plane
 → execution_engine
-→ tool
+→ argus_tool (if applicable)
+→ system_tool
 → command_runner
 → OS
 ```
@@ -267,12 +333,12 @@ control_plane
 
 ## Safety Model
 
-- Execution requires control plane approval
+- All execution requires control plane approval  
 - Tools operate in defined execution modes:
-  - `auto` (safe read-only operations)
-  - `manual` (requires confirmation)
-- Real system execution is constrained through tool definitions
-- No component can bypass the control plane
+  - `auto` (safe read-only)  
+  - `manual` (confirmation required)  
+- Argus tools cannot execute commands directly  
+- No component can bypass the control plane  
 
 ---
 
@@ -280,24 +346,15 @@ control_plane
 
 NeuroCore now supports:
 
-- Persistent daemon architecture
-- Streaming and structured responses
-- CLI + piped input support (`| ai`)
-- RAG-based reasoning
-- Session memory with query rewriting
-- Control-plane enforced execution
-- Tool-based execution framework
-- Real system command execution across multiple domains:
-  - process inspection
-  - memory usage
-  - disk usage and layout
-  - network interfaces and connections
-  - system logs
-  - uptime and load
-  - user session visibility
-- JSON-based daemon response model
-- CLI-side JSON parsing and formatting
-- Full system observability and tracing
+- Persistent daemon architecture  
+- CLI + piped input support  
+- Structured and streaming responses  
+- Control-plane enforced execution  
+- Tool-based execution framework  
+- Real system command execution across multiple domains  
+- Structured system data (system_info)  
+- Argus diagnostic layer (system_summary)  
+- Full observability and tracing  
 
 ---
 
@@ -317,17 +374,19 @@ No component bypasses the control plane.
 
 NeuroCore is now:
 
-- Executing real system commands across multiple system domains
-- Fully observable end-to-end
-- Deterministic in execution flow
-- Structurally stable for expansion
+- executing real system commands across multiple domains  
+- exposing structured system state  
+- supporting an interpretation layer (Argus)  
+- fully observable end-to-end  
+- stable for further expansion  
 
 ---
 
 ## Next Phase
 
-- Introduce Argus tool layer (composed tools)
-- Aggregate system signals into structured outputs
-- Improve output formatting for usability
-- Introduce intelligent tool selection (natural language → tool mapping)
-- Maintain strict control plane enforcement as capabilities grow
+- Expand Argus tool layer  
+- Implement `process_top` (Argus version)  
+- Follow manifest-driven development  
+- Extend diagnostic capabilities  
+- Maintain strict control plane enforcement  
+````
