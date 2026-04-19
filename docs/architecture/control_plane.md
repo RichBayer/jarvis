@@ -1,4 +1,3 @@
-````markdown
 # NeuroCore – Control Plane Architecture
 
 ---
@@ -340,4 +339,3 @@ Observability Integration: COMPLETE
 - Continue Argus tool layer expansion  
 - Maintain strict execution boundaries  
 - Ensure all new tools comply with control plane enforcement  
-````

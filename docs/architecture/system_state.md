@@ -1,4 +1,3 @@
-````markdown
 # NeuroCore System State
 
 ## Overview
@@ -389,4 +388,3 @@ NeuroCore is now:
 - Follow manifest-driven development  
 - Extend diagnostic capabilities  
 - Maintain strict control plane enforcement  
-````

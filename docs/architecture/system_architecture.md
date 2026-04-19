@@ -1,4 +1,3 @@
-````markdown
 # NeuroCore – System Architecture
 
 ---
@@ -420,4 +419,3 @@ There is only ONE runtime.
 Distributions must never create parallel systems.
 
 All intelligence, execution, and control must remain centralized.
-````

@@ -1,4 +1,3 @@
-```markdown
 # NeuroCore – Master Blueprint
 
 ---
@@ -436,4 +435,3 @@ NeuroCore is the platform.
 Argus is the first product built on that platform.  
 
 The system must evolve without breaking this separation.
-```

@@ -1,4 +1,3 @@
-````markdown
 # Argus V1 – Tooling & Capability Blueprint
 
 ---
@@ -483,6 +482,3 @@ Argus should feel simple, but be powered by structured, controlled system intell
 Argus is not a command layer.
 
 Argus is an interpretation layer built on top of a controlled execution system.
-
----
-````

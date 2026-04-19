@@ -1,4 +1,3 @@
-````markdown
 # NeuroCore – Tool Execution Architecture
 
 ---
@@ -429,4 +428,3 @@ The execution architecture now supports:
 - implement process_top (Argus version)  
 - continue manifest-driven development  
 - maintain strict execution boundaries  
-````
