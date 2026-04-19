@@ -1,4 +1,3 @@
-````markdown
 # Argus V1 – Tool Manifest
 
 ---
@@ -436,4 +435,3 @@ Argus must:
 - operate within controlled execution  
 
 Argus is an interpretation layer, not an execution layer.
-````
