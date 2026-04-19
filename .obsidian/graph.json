@@ -1,0 +1,58 @@
+{
+  "collapse-filter": false,
+  "search": "",
+  "showTags": false,
+  "showAttachments": false,
+  "hideUnresolved": false,
+  "showOrphans": false,
+  "collapse-color-groups": false,
+  "colorGroups": [
+    {
+      "query": "path:docs/architecture  ",
+      "color": {
+        "a": 1,
+        "rgb": 8721428
+      }
+    },
+    {
+      "query": "path:runtime",
+      "color": {
+        "a": 1,
+        "rgb": 859107
+      }
+    },
+    {
+      "query": "argus",
+      "color": {
+        "a": 1,
+        "rgb": 4986213
+      }
+    },
+    {
+      "query": "path:build-logs",
+      "color": {
+        "a": 1,
+        "rgb": 1886748
+      }
+    },
+    {
+      "query": "knowledge",
+      "color": {
+        "a": 1,
+        "rgb": 13099019
+      }
+    }
+  ],
+  "collapse-display": false,
+  "showArrow": false,
+  "textFadeMultiplier": -0.6,
+  "nodeSizeMultiplier": 0.993229166666667,
+  "lineSizeMultiplier": 1.0953125,
+  "collapse-forces": false,
+  "centerStrength": 0.854166666666667,
+  "repelStrength": 9.58333333333333,
+  "linkStrength": 0.666666666666667,
+  "linkDistance": 30,
+  "scale": 0.713275462622436,
+  "close": false
+}

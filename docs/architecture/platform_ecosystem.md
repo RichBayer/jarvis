@@ -1,4 +1,3 @@
-````markdown
 # NeuroCore – Platform Ecosystem
 
 ---
@@ -333,4 +332,3 @@ Argus is the product layer.
 Homelab is the validation environment.  
 
 Each layer must evolve independently without breaking system boundaries.
-````
