@@ -1,219 +1,254 @@
 # NeuroCore
 
-> A local-first cognitive runtime platform for **controlled system intelligence**  
-> designed to operate on real systems — not simulate them.
+*A local-first cognitive runtime platform for controlled system intelligence.*
 
 ---
 
-## ⚡ What is NeuroCore?
+## ⚡ This isn’t another AI tool.
 
-NeuroCore is not another AI wrapper.
+Most AI tools sit outside your system and guess.
 
-It’s a **real runtime system** built to analyze, reason about, and interact with live environments in a controlled and observable way.
+NeuroCore lives **inside your system**.
 
-Instead of generating answers in isolation, NeuroCore works inside a structured pipeline where every request is:
+It sees what’s actually happening.  
+It learns over time.  
+It becomes part of your environment.
 
-- understood  
-- validated  
-- routed  
-- and handled intentionally  
+This isn’t a chatbot you open and close.
 
-This is not a demo project.
-
-This is the foundation for building **trustworthy system intelligence**.
+This is a system that’s always there.
 
 ---
 
-## 🧠 Why This Exists
+## 🧠 So what is NeuroCore, really?
 
-Most AI tools today are impressive—but they share the same limitation:
+At its core, NeuroCore is a **persistent AI system running on your own machine**.
 
-They don’t actually *understand the system they’re talking about*.
+Think of it as a long-running brain that sits directly on your system —  
+your Linux environment, your files, your data, your workflows.
 
-They:
+Not in the cloud.  
+Not disconnected.  
+Right there with you.
 
-- generate text  
-- infer patterns  
-- and operate without real system awareness  
+Over time, it builds context:
 
-NeuroCore was built to close that gap.
+- what’s on your system  
+- how things are configured  
+- what you’ve worked on  
+- what problems you’ve solved  
+- what matters to you  
 
-It exists to create a system that:
-
-- works with real data  
-- enforces safe execution  
-- separates reasoning from action  
-- and behaves predictably under control  
-
----
-
-## 🔥 What Makes This Different
-
-NeuroCore isn’t trying to be smarter.
-
-It’s trying to be **more correct, more controlled, and more useful**.
-
-- **Persistent Runtime**  
-  → Not stateless chat — it maintains context and structure  
-
-- **Control Plane Enforcement**  
-  → Every action is validated before it happens  
-
-- **Tool-Based Execution**  
-  → Interacts with real systems through controlled interfaces  
-
-- **RAG Grounding**  
-  → Responses are tied to actual data, not just probability  
-
-- **Local-First Design**  
-  → Runs where your system is — no cloud dependency required  
+It doesn’t forget.  
+It doesn’t reset every session.  
+It doesn’t disappear when the terminal closes.
 
 ---
 
-## 🚀 Meet Argus (Built on NeuroCore)
+And it’s not limited to just “answering questions.”
 
-Argus is the first real distribution built on top of NeuroCore.
+NeuroCore is designed to grow into a system that can:
 
-> A read-only system intelligence layer for Linux environments
+- understand and diagnose your Linux environment  
+- track and organize your knowledge  
+- monitor system behavior  
+- scrape and process information from the web  
+- assist with development and troubleshooting  
+- and eventually interact with your physical environment  
 
-It’s designed to feel like a **senior administrator sitting next to you**, helping you understand what’s happening without taking control away.
+This is your **personal AI system**.
 
-Argus can:
-
-- analyze system state  
-- interpret logs  
-- identify issues  
-- explain problems clearly  
-- guide troubleshooting  
-
-And it does all of that while remaining:
-
-- safe  
-- observable  
-- and fully controlled  
-
-No hidden execution. No guesswork.
+Not a product.  
+Not a service.  
+A system that evolves with you.
 
 ---
 
-## 🖥 Example
+Once you have a system like that…
 
-```bash
-argus diagnose nginx
-```
+you can start building **powerful tools on top of it**.
 
-Instead of dumping logs or vague suggestions, Argus gives you:
+---
+
+## ⚙️ Enter Argus (ACLI)
+
+Argus ACLI is the first real tool built on NeuroCore.
+
+It’s designed for people doing real work:
+
+- Linux admins  
+- homelab builders  
+- small teams managing infrastructure  
+- SMBs without full-time system experts  
+
+If that’s you, then you already know how this goes.
+
+Something breaks.
+
+A service goes down.  
+Logs are full of noise.  
+Systems behave unpredictably.  
+
+And you’re stuck asking:
+
+> “What the hell is actually wrong?”
+
+---
+
+Argus ACLI cuts straight through that.
+
+Instead of dumping raw logs or vague guesses, it gives you:
 
 - what’s wrong  
 - where it found it  
 - why it matters  
 - what to check next  
 
-It doesn’t replace your understanding—it builds it.
+Clear. Direct. Actionable.
 
 ---
 
-## 🧭 Choose Your Path
+Because the faster you reach root cause:
 
-Different people come here for different reasons.
+- the less time you spend digging  
+- the less downtime your systems suffer  
+- the less money is lost  
+- and the more confident you become  
 
-👉 [Full Documentation Index](./docs/README.md)
+Argus doesn’t replace you.
 
-Start where it makes sense for you:
+It makes you faster.
 
 ---
 
-### 👀 Just Exploring?
+## 🧪 Now take it further — Argus Lab
 
-- 👉 [Platform Vision](./docs/architecture/platform_vision.md)  
+Understanding a system is one thing.
+
+Fixing it under pressure is something else entirely.
+
+---
+
+Argus Lab is a **realistic training environment** built to develop that skill.
+
+You’re working inside a system that behaves like a real environment:
+
+- multiple Linux servers  
+- real users and permissions  
+- real services  
+- real logs  
+- real networking  
+
+And then…
+
+things start breaking.
+
+---
+
+Failures are introduced into the system:
+
+- nginx goes down  
+- disk fills up  
+- permissions break  
+- services misbehave  
+
+You’re given a ticket — just like in a real job.
+
+No instructions.  
+No walkthrough.  
+
+You have to figure it out.
+
+---
+
+Argus is still there — but now as a **mentor**, not a solution engine.
+
+It helps you:
+
+- interpret logs  
+- understand system behavior  
+- think through the problem  
+
+But it won’t hand you the answer.
+
+Because the goal isn’t solving the issue.
+
+The goal is building real skill.
+
+---
+
+## 🚀 Where do you want to go next?
+
+---
+
+### 🧠 Start with the vision
+
+This gives you the full picture of how everything fits together:
+
+👉 **[NeuroCore Vision](./docs/architecture/neurocore_vision.md)** — the platform (the brain)  
+👉 **[Argus ACLI Vision](./docs/vision/argus_acli_vision.md)** — the tool you actually use  
+👉 **[Argus Lab Vision](./docs/vision/argus_lab_vision.md)** — the training system  
+
+---
+
+### 🖥 See what’s real right now
+
+👉 **[System State](./docs/architecture/system_state.md)**
+
+---
+
+### ⚙️ Go deeper (how it works)
+
 - 👉 [System Architecture](./docs/architecture/system_architecture.md)  
-
----
-
-### 🛠 Want to See How It Actually Works?
-
 - 👉 [Control Plane](./docs/architecture/control_plane.md)  
 - 👉 [Tool Execution System](./docs/architecture/tool_execution.md)  
-- 👉 [System State](./docs/architecture/system_state.md)  
 
 ---
 
-### 🧪 Interested in Real-World Training?
+### 📚 Explore everything
 
-A dedicated homelab system:
-
-- simulates real failures  
-- enables real troubleshooting  
-- validates system intelligence  
+👉 **[Documentation Index](./docs/README.md)**
 
 ---
 
-### 📚 Want the Full Build History?
-
-- 👉 [Build Logs](./build-logs/)  
-
----
-
-## 🧱 Architecture (Simplified)
-
-```
-User → CLI → Daemon → Runtime → Control Plane
-                         ↓
-        ┌─────────────────────────────┐
-        │                             │
-   Execution Path                Reasoning Path
-        │                             │
-   Tools / System             RAG → Model
-```
-
-Everything flows through the control plane.
-
----
-
-## ⚙️ Current Capabilities
-
-- persistent daemon runtime  
-- streaming CLI interface  
-- piped input support (`| ai`)  
-- RAG-based knowledge system  
-- session-aware query handling  
-- control-plane enforced execution  
-- tool-based execution system  
-- confirmation-based safety model  
-
----
-
-## 🧩 System Ecosystem
+## 🧩 The Big Picture
 
 | Layer | System | Role |
 |------|--------|------|
-| Platform | NeuroCore | runtime + control |
-| Distribution | Argus | system intelligence |
-| Training | Homelab | validation + skill development |
+| Platform | NeuroCore | the brain |
+| Product | Argus ACLI | system intelligence |
+| Training | Argus Lab | real-world skill |
 
 ---
 
-## 🚧 Status
+## 🚧 Current Status
 
-- Core runtime → operational  
-- Architecture → defined  
-- Argus (V1) → in development  
-- Training system → planned  
+- NeuroCore → operational  
+- Argus ACLI → in development  
+- Argus Lab → planned  
+
+This is being built — right now.
 
 ---
 
 ## 💡 Final Thought
 
-Most systems try to simulate intelligence.
+Most tools try to give you answers.
 
-NeuroCore is built to operate inside real systems—  
-safely, predictably, and with full control.
+NeuroCore is built to help you understand your system.
+
+And once you have that…
+
+you’re no longer guessing.
 
 ---
 
-## ⭐ If This Interests You
+## ⭐ If this clicks with you
 
-Star the repo and follow development.
+Star the repo.  
+Follow the build.  
+
+This is just getting started.
 
 ---
 
