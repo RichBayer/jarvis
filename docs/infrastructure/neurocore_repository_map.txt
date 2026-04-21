@@ -1,19 +1,34 @@
-NeuroCore Repository Map
+# NeuroCore Repository Map
 
 ---
 
-ROOT
+# ROOT
 
 .
 ├── .gitignore
 ├── README.md
-
+├── NeuroCore_Map.md
 ├── bootstrap/
-│   └── (environment setup scripts – future use)
+├── diagrams/
 
 ---
 
-BUILD LOGS (PROJECT HISTORY)
+# OBSIDIAN (LOCAL AUTHORING ENVIRONMENT)
+
+├── .obsidian/
+│   ├── app.json
+│   ├── appearance.json
+│   ├── core-plugins.json
+│   ├── graph.json
+│   ├── workspace.json
+│   └── themes/
+│       └── Obsidian Nord/
+│           ├── manifest.json
+│           └── theme.css
+
+---
+
+# BUILD LOGS (PROJECT HISTORY)
 
 ├── build-logs/
 │   ├── 000_foundation.md
@@ -35,11 +50,13 @@ BUILD LOGS (PROJECT HISTORY)
 │   ├── 016_runtime_control_plane_enforcement.md
 │   ├── 017_execution_layer_and_control_integration.md
 │   ├── 018_observability_and_tracing.md
-│   └── 019_real_tool_execution_and_system_info.md
+│   ├── 019_real_tool_execution_and_system_info.md
+│   ├── 020_neurocore_system_tool_expansion.md
+│   └── 021_argus_tool_layer_initial.md
 
 ---
 
-DISTRIBUTIONS (FUTURE PRODUCTIZATION)
+# DISTRIBUTIONS (ARGUS LAYER)
 
 ├── distributions/
 │   └── argus/
@@ -50,147 +67,139 @@ DISTRIBUTIONS (FUTURE PRODUCTIZATION)
 
 ---
 
-DOCUMENTATION
+# DOCUMENTATION
 
 ├── docs/
-
+│
 │   ├── README.md
-
+│
+│   ├── vision/
+│   │   ├── argus_cli_vision.md
+│   │   └── argus_lab_vision.md
+│
 │   ├── ai-operations/
 │   │   ├── context_loading_strategy.md
-│   │   └── resume_prompt_compressed.md   ← PRIMARY resume doc
-
+│   │   └── resume_prompt_compressed.md
+│
 │   ├── ai-stack/
-│   │   └── (AI stack planning + components)
-
-│   ├── architecture/                    ← CORE SYSTEM DESIGN
+│
+│   ├── architecture/
 │   │   ├── control_plane.md
 │   │   ├── evaluation_framework.md
 │   │   ├── neurocore_master_blueprint.md
 │   │   ├── neurocore_vision.md
 │   │   ├── observability.md
 │   │   ├── platform_ecosystem.md
-│   │   ├── platform_vision.md
 │   │   ├── security_policy.md
 │   │   ├── system_architecture.md
-│   │   ├── system_state.md              ← UPDATED (real execution layer)
+│   │   ├── system_state.md
 │   │   ├── task_engine.md
-│   │   └── tool_execution.md            ← UPDATED (CommandRunner + real tools)
-
+│   │   ├── tool_execution.md
+│   │   └── tool_pattern.md
+│
 │   ├── design/
-│   │   └── phase_5i_real_execution.md   ← design doc for this phase
-
+│   │   ├── argus_tool_layer.md
+│   │   ├── phase_5i_real_execution.md
+│   │   └── phase_5j_argus_core_tool_expansion.md
+│
 │   ├── distributions/
 │   │   ├── argus/
 │   │   │   └── acli_spec.md
 │   │   └── argus_v1_blueprint.md
-
+│
 │   ├── hardware/
 │   │   └── home_ai_hardware.md
-
+│
 │   ├── infrastructure/
-│   │   ├── neurocore_repository_map.txt   ← THIS FILE
-│   │   ├── neurocore_system_map.txt       ← DATA FLOW MAP
+│   │   ├── home_infrastructure.md
 │   │   ├── home_system_map.md
-│   │   └── home_infrastructure.md
-
+│   │   ├── neurocore_repository_map.txt
+│   │   └── neurocore_system_map.txt
+│
 │   ├── network/
-│   │   └── (network-related docs)
-
+│
 │   ├── screenshots/
-
-│   │   ├── system-info-tool/             ← Phase 5I (NEW)
-│   │   │   ├── 01_command_runner_test.png
-│   │   │   ├── 02_system_info_incorrect_reasoning.png
-│   │   │   ├── 03_system_info_missing_fields.png
-│   │   │   ├── 04_cli_output_format_broken.png
-│   │   │   ├── 05_execution_response_format_broken.png
-│   │   │   ├── 06_system_info_json_output.png
-│   │   │   ├── 07_system_info_clean_cli_output.png
-│   │   │   ├── 08_system_info_full_output.png
-│   │   │   └── 09_system_info_final_polished.png
-
-│   │   ├── execution-layer/              ← Phase 5B
-│   │   ├── runtime-control-plane/        ← Phase 5A
-│   │   ├── observability-tracing/
-│   │   ├── runtime/
-│   │   ├── runtime-behavior/
+│   │   ├── argus-core-tools/
+│   │   ├── argus-system-summary/
+│   │   ├── argus-tools/
+│   │   ├── backups/
+│   │   ├── daemon/
+│   │   ├── execution-layer/
 │   │   ├── interface/
 │   │   ├── knowledge/
 │   │   ├── logic/
+│   │   ├── observability-tracing/
 │   │   ├── rag/
-│   │   ├── daemon/
-│   │   └── backups/
-
+│   │   ├── runtime/
+│   │   ├── runtime-behavior/
+│   │   ├── runtime-control-plane/
+│   │   └── system-info-tool/
+│
 │   ├── neurocore_development_notebook.md
-
 │   ├── security/
-│   ├── vision/
 │   └── voice/
 
 ---
 
-RUNTIME (CORE EXECUTION ENGINE)
+# RUNTIME (CORE SYSTEM)
 
 ├── runtime/
-│   ├── neurocore_daemon.py     ← persistent daemon (JSON response boundary)
-│   ├── runtime_manager.py      ← orchestration + response normalization
-│   ├── control_plane.py        ← request classification + policy layer
-│   ├── tracing.py              ← observability system
-│   └── __init__.py
+│   ├── __init__.py
+│   ├── control_plane.py
+│   ├── neurocore_daemon.py
+│   ├── runtime_manager.py
+│   └── tracing.py
 
 ---
 
-LOGIC + INTERFACE
+# LOGIC + INTERFACE
 
 ├── scripts/
-│   ├── ai_cli.py               ← CLI (JSON parsing + formatting)
-│   ├── jarvis_router.py        ← reasoning + routing layer
-│   ├── query_knowledge.py      ← RAG system
-│   ├── session_memory.py       ← session memory
+│   ├── __init__.py
+│   ├── ai_cli.py
 │   ├── index_knowledge.py
-│   └── __init__.py
+│   ├── jarvis_router.py
+│   ├── query_knowledge.py
+│   └── session_memory.py
 
 ---
 
-TOOLS (EXECUTION LAYER)
+# TOOLS (EXECUTION LAYER)
 
 ├── tools/
-│   ├── __init__.py             ← tool registration
-│   ├── base_tool.py            ← tool contract
-│   ├── execution_engine.py     ← execution orchestration
-│   ├── tool_registry.py        ← tool lookup
+│   ├── __init__.py
+│   ├── base_tool.py
+│   ├── execution_engine.py
+│   ├── tool_registry.py
+│
+│   ├── argus/
+│   │   └── system_summary.py
+│
 │   └── system/
-│       ├── command_runner.py   ← system command execution (NEW)
-│       ├── system_info.py      ← real system info tool (NEW)
-│       └── service_manager.py  ← simulated service control
+│       ├── command_runner.py
+│       ├── disk_layout.py
+│       ├── disk_usage.py
+│       ├── memory_usage.py
+│       ├── network_connections.py
+│       ├── network_interfaces.py
+│       ├── process_top.py
+│       ├── recent_logins.py
+│       ├── service_manager.py
+│       ├── system_info.py
+│       ├── system_logs.py
+│       ├── uptime_load.py
+│       └── users_sessions.py
 
 ---
 
-IGNORED / RUNTIME ARTIFACTS
+# SUMMARY
 
-- __pycache__/ directories (not part of architecture)
-
----
-
-CURRENT SYSTEM CHARACTERISTICS
-
-- Persistent daemon architecture
-- Streaming + structured JSON responses
-- CLI + piped input support (`| ai`)
-- RAG with metadata filtering
-- Query rewriting + session memory
-- Control plane enforced execution model
-- Tool-based execution system
-- Execution intent detection
-- Real system command execution via CommandRunner (NEW)
-- Auto-execution for safe read-only tools (NEW)
-- CLI JSON parsing and output formatting (NEW)
-- Full system observability and trace propagation
+- 49 directories  
+- 182 files  
 
 ---
 
-SYSTEM INVARIANT
+# SYSTEM INVARIANT
 
 All execution flows through:
 
