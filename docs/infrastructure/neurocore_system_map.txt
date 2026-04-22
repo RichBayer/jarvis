@@ -1,4 +1,4 @@
-NeuroCore System Map (Updated with Distribution Layer)
+# NeuroCore System Map (Updated with Distribution Layer)
 
 ---
 
@@ -20,6 +20,21 @@ ROOT:
 │   ├── personalities
 │   ├── profiles
 │   └── system_state.md
+
+---
+
+# REPOSITORY LOCATION
+
+NeuroCore repository:
+
+ /mnt/g/ai/projects/neurocore
+
+This is the source of truth for:
+
+- runtime implementation  
+- tool execution layer  
+- interface logic  
+- documentation and build logs  
 
 ---
 
@@ -89,6 +104,21 @@ control_plane → execution_engine → tool
 
 ---
 
+### Physical Implementation Mapping
+
+Execution and runtime components are implemented inside the NeuroCore repository:
+
+/mnt/g/ai/projects/neurocore/runtime/
+/mnt/g/ai/projects/neurocore/tools/
+
+System tools:
+/mnt/g/ai/projects/neurocore/tools/system/
+
+Argus tools:
+/mnt/g/ai/projects/neurocore/tools/argus/
+
+---
+
 ## 5. Logic Layer
 
 Responsible for reasoning and routing.
@@ -114,6 +144,11 @@ Components:
 - embedding model
 - retrieval system
 
+Location (filesystem context):
+
+/mnt/g/ai/memory/chroma/
+/mnt/g/ai/memory/knowledge/
+
 ---
 
 ## 7. Model Layer
@@ -121,6 +156,10 @@ Components:
 LLM runtime:
 
 - Ollama (local models)
+
+Location:
+
+/mnt/g/ai/models/
 
 ---
 
@@ -196,7 +235,7 @@ Argus is:
 # DESIGN PRINCIPLE
 
 NeuroCore = Core Cognitive System  
-Argus = Controlled System Intelligence Interface
+Argus = Controlled System Intelligence Interface  
 
 ---
 

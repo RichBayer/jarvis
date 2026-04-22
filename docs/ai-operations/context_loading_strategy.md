@@ -1,216 +1,279 @@
-# NeuroCore – Context Loading Strategy
+# NeuroCore – Context Loading Strategy (AI Control Document)
 
 ---
 
 # Purpose
 
-This document defines how to efficiently provide context to ChatGPT when working on NeuroCore.
+This document defines how the assistant must reconstruct session behavior and context handling when generating or updating the resume prompt.
 
-The goal is to:
+This document exists to:
 
-- maintain accurate system awareness  
-- avoid unnecessary context overload  
-- ensure high-quality, system-specific responses  
-- enable fast and consistent development  
+- prevent behavioral drift across sessions  
+- enforce consistent context handling  
+- eliminate unsafe assumptions  
+- ensure reproducible session startup behavior  
 
----
+This is a **control document for the assistant**, not a user guide.
 
-# Core Principle
-
-Provide **only the minimum context required** for the task.
-
-Too little context → incorrect assumptions  
-Too much context → slower, less precise responses  
+All resume prompts must align with this document.
 
 ---
 
-# Context Layers
+# Core Operating Model
 
-All sessions should use a layered approach:
+The user provides a **baseline set of documents**, not perfect context.
 
----
+The assistant is responsible for:
 
-## Layer 1 – Behavior (ALWAYS REQUIRED)
+- analyzing repository structure  
+- determining system state and development phase  
+- identifying the next logical task  
+- requesting additional context when required  
+- refusing to proceed if context is insufficient  
 
-```
-docs/ai-operations/resume_prompt_compressed.md
-```
-
-Provides:
-
-- rules of operation  
-- build philosophy  
-- execution style  
-- system identity  
-- architectural guardrails  
+The user is NOT responsible for catching assistant mistakes.
 
 ---
 
-## Layer 2 – System Awareness (DEFAULT)
+# Standard Session Baseline
 
-Use for most work (build, changes, analysis):
+Assume the user will typically provide:
 
-```
-docs/architecture/system_state.md
-docs/infrastructure/neurocore_repository_map.txt
-```
+- docs/ai-operations/resume_prompt_compressed.md  
+- docs/architecture/system_state.md  
+- docs/infrastructure/neurocore_repository_map.txt  
 
-Provides:
+This is the default starting point.
 
-- current capabilities  
-- system behavior  
-- execution model  
-- observability guarantees  
-- file structure and locations  
+The assistant must operate correctly from this baseline.
 
 ---
 
-## Layer 3 – Architecture (WHEN NEEDED)
+# Mandatory Assistant Behavior
 
-Use for design, planning, or deep system changes:
+The assistant MUST:
 
-```
-docs/architecture/neurocore_master_blueprint.md
-```
+1. Analyze the repository map to understand:
+   - file structure  
+   - available documentation  
+   - valid file paths  
 
-Optional:
+2. Use system_state to understand:
+   - current capabilities  
+   - system maturity  
+   - execution model  
 
-```
-docs/architecture/system_architecture.md
-docs/architecture/control_plane.md
-docs/architecture/tool_execution.md
-```
+3. Determine:
+   - current development phase  
+   - next logical task or phase  
 
-Provides:
+4. Identify missing context BEFORE execution  
 
-- system evolution plan  
-- architectural constraints  
-- execution model details  
-- control plane and tool behavior  
+If required context is missing:
+
+→ STOP  
+→ request specific files  
+→ DO NOT guess  
 
 ---
 
-## Layer 4 – On-Demand Context (ONLY WHEN REQUIRED)
+# Context Classification Rule (CRITICAL)
 
-Provide only when necessary:
+All context must be treated as one of:
 
-- specific code files  
+## Static Context
+- architecture  
+- system design  
+- repository structure  
+
+## Runtime State
 - logs  
-- error output  
-- targeted documentation  
+- system output  
+- execution results  
+
+## Task Intent
+- what is being built or modified  
+
+These are NOT interchangeable.
+
+If runtime state is not explicitly provided:
+
+→ it is UNKNOWN  
+→ it must NOT be inferred  
 
 ---
 
-# Observability Awareness (CRITICAL)
+# Runtime State Rule
 
-NeuroCore is now fully traceable.
+Runtime state must ONLY originate from:
 
-All work must preserve:
+- system tools  
+- logs  
+- real execution output  
+
+It must NEVER be:
+
+- assumed  
+- reconstructed  
+- inferred from documentation  
+
+Static documentation does NOT represent live system state.
+
+---
+
+# Execution Safety Requirements
+
+Before ANY implementation, the assistant MUST:
+
+- validate all file paths against the repository map  
+- confirm file existence  
+- identify the system layer being modified:
+  - interface  
+  - runtime  
+  - control plane  
+  - tool layer (system or argus)  
+
+If ANY of the above is unclear:
+
+→ STOP  
+→ request clarification  
+
+No implementation may proceed under uncertainty.
+
+---
+
+# Observability Enforcement
+
+All changes must preserve:
 
 - request_id continuity  
-- trace context propagation across all layers  
-- visibility into execution and decision-making  
+- trace propagation  
+- full execution visibility  
 
-If a change risks breaking trace continuity:
+Any change that risks breaking observability:
 
-→ it must be treated as a critical issue  
-
----
-
-# Standard Session Types
+→ must be treated as a critical failure  
 
 ---
 
-## Build / Implementation (Most Common)
+# Automatic Task Progression
 
-Upload:
+The assistant MUST:
 
-- resume_prompt_compressed.md  
-- system_state.md  
-- neurocore_repository_map.txt  
+- determine the next logical task  
+- propose the next phase or step  
+- align with system architecture and build progression  
 
-Then provide:
+The assistant must NOT default to asking:
 
-```
-Task: <what needs to be built>
-```
+→ “what do you want to do next?”
 
----
+Only ask when:
 
-## Architecture / Design
-
-Upload:
-
-- resume_prompt_compressed.md  
-- neurocore_master_blueprint.md  
-
-Optional:
-
-- system_architecture.md  
-- control_plane.md  
-- tool_execution.md  
+- multiple valid paths exist  
+- direction is ambiguous  
 
 ---
 
-## Debugging
+# Session Initialization Protocol (CRITICAL)
 
-Upload:
+At the start of EVERY new session:
 
-- resume_prompt_compressed.md  
-- system_state.md  
+The assistant MUST:
 
-Then provide:
+- treat the session as having ZERO prior context  
+- ignore any memory or inference from previous threads  
 
-- error output  
-- logs  
-- relevant files  
+During context loading:
 
----
+- ALL documents must be ingested silently  
+- NO analysis  
+- NO summarization  
+- NO task inference  
 
-# Assistant Behavior Expectations
+The assistant MUST WAIT until:
 
-The assistant must:
+→ the user explicitly signals ingestion is complete  
 
-- NOT assume files exist without confirmation  
-- use repository map for file awareness  
-- ask for missing files before proceeding  
-- provide exact file paths when referencing files  
-- align all work with current system state  
-- preserve trace context in all implementations  
-- never introduce changes that break observability  
+Only then may processing begin.
 
----
+This rule exists to prevent:
 
-# What NOT to Upload by Default
-
-Avoid sending:
-
-- full repository dumps  
-- screenshots  
-- build logs  
-- vision documents  
-- unrelated documentation  
-
-These should only be provided when specifically needed.
+- context bleed  
+- premature reasoning  
+- inconsistent session startup behavior  
 
 ---
 
-# Guiding Rule
+# Session Integrity Enforcement
 
-If a file is not provided:
+If the session becomes:
 
-→ it should be treated as unknown  
+- inconsistent  
+- assumption-heavy  
+- misaligned with system state  
 
-→ not guessed  
+The assistant MUST recommend:
+
+→ stopping the session  
+→ restarting with clean context  
+
+The assistant must NOT continue degraded sessions.
 
 ---
 
-# Long-Term Goal
+# Unknown Context Rule (STRICT)
 
-NeuroCore should eventually:
+If any required information is missing:
 
-- load its own system state  
-- reason over its own architecture  
-- operate without external prompting  
+→ it is UNKNOWN  
+→ it must NOT be guessed  
+→ it must be explicitly requested  
 
-This strategy is a temporary bridge toward that capability.
+---
+
+# Responsibility Model
+
+## User
+
+- provides baseline context  
+- provides real runtime data when needed  
+- restarts sessions when required  
+
+## Assistant
+
+- determines task progression  
+- validates all operations  
+- enforces system safety  
+- requests missing context  
+- prevents incorrect assumptions  
+
+The assistant is responsible for correctness.
+
+---
+
+# Resume Prompt Alignment Requirement
+
+When generating or updating a resume prompt, the assistant MUST ensure:
+
+- all rules in this document are preserved  
+- no behavioral safeguards are omitted  
+- session initialization protocol is enforced  
+- execution safety rules are enforced  
+- context handling rules are enforced  
+
+If any rule is missing:
+
+→ the resume prompt is INVALID  
+
+---
+
+# Long-Term Objective
+
+NeuroCore should evolve toward:
+
+- self-loading context  
+- self-determined task progression  
+- autonomous system awareness  
+
+This document ensures consistent behavior during that transition.
