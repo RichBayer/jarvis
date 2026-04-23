@@ -1,263 +1,190 @@
-# NeuroCore
-
-*A local-first cognitive runtime platform for controlled system intelligence.*
+# NeuroCore Documentation Index
 
 ---
 
-## ⚡ This isn’t another AI tool.
+## 📖 Overview
 
-Most AI tools sit outside your system and guess.
+This directory contains the complete documentation for the NeuroCore system.
 
-NeuroCore lives **inside your system**.
+The documentation is organized to reflect how the system is actually built and used:
 
-It sees what’s actually happening.  
-It learns over time.  
-It becomes part of your environment.
-
-This isn’t a chatbot you open and close.
-
-This is a system that’s always there.
-
----
-
-## 🧠 So what is NeuroCore, really?
-
-At its core, NeuroCore is a **persistent AI system running on your own machine**.
-
-Think of it as a long-running brain that sits directly on your system —  
-your Linux environment, your files, your data, your workflows.
-
-Not in the cloud.  
-Not disconnected.  
-Right there with you.
-
-Over time, it builds context:
-
-- what’s on your system  
-- how things are configured  
-- what you’ve worked on  
-- what problems you’ve solved  
-- what matters to you  
-
-It doesn’t forget.  
-It doesn’t reset every session.  
-It doesn’t disappear when the terminal closes.
+- Vision (what and why)
+- Architecture (how it works)
+- Execution & Core Systems (how it behaves)
+- Distributions (user-facing systems)
+- Infrastructure (environment and layout)
+- Development & Operations
+- Build History (full evolution of the system)
 
 ---
 
-And it’s not limited to just “answering questions.”
+## 🧠 Vision (Start Here)
 
-NeuroCore is designed to grow into a system that can:
+If you're new, start here to understand the system at a high level.
 
-- understand and diagnose your Linux environment  
-- track and organize your knowledge  
-- monitor system behavior  
-- scrape and process information from the web  
-- assist with development and troubleshooting  
-- and eventually interact with your physical environment  
-
-This is your **personal AI system**.
-
-Not a product.  
-Not a service.  
-A system that evolves with you.
+- 👉 [NeuroCore Vision](./architecture/neurocore_vision.md)
+- 👉 [Argus ACLI Vision](./vision/argus_acli_vision.md)
+- 👉 [Argus Lab Vision](./vision/argus_lab_vision.md)
 
 ---
 
-Once you have a system like that…
+## 🏗 Core Architecture
 
-you can start building **powerful tools on top of it**.
+Defines how NeuroCore is structured and how all components interact.
 
----
-
-## ⚙️ Enter Argus (ACLI)
-
-Argus ACLI is the first real tool built on NeuroCore.
-
-It’s designed for people doing real work:
-
-- Linux admins  
-- homelab builders  
-- small teams managing infrastructure  
-- SMBs without full-time system experts  
-
-If that’s you, then you already know how this goes.
-
-Something breaks.
-
-A service goes down.  
-Logs are full of noise.  
-Systems behave unpredictably.  
-
-And you’re stuck asking:
-
-> “What the hell is actually wrong?”
+- 👉 [System Architecture](./architecture/system_architecture.md)
+- 👉 [Platform Ecosystem](./architecture/platform_ecosystem.md)
+- 👉 [System State](./architecture/system_state.md)
 
 ---
 
-Argus ACLI cuts straight through that.
+## ⚙️ Execution & Core Systems
 
-Instead of dumping raw logs or vague guesses, it gives you:
+Detailed breakdown of how the system operates internally.
 
-- what’s wrong  
-- where it found it  
-- why it matters  
-- what to check next  
-
-Clear. Direct. Actionable.
-
----
-
-Because the faster you reach root cause:
-
-- the less time you spend digging  
-- the less downtime your systems suffer  
-- the less money is lost  
-- and the more confident you become  
-
-Argus doesn’t replace you.
-
-It makes you faster.
+- 👉 [Control Plane](./architecture/control_plane.md)
+- 👉 [Tool Execution System](./architecture/tool_execution.md)
+- 👉 [Task Engine](./architecture/task_engine.md)
+- 👉 [Observability](./architecture/observability.md)
+- 👉 [Evaluation Framework](./architecture/evaluation_framework.md)
+- 👉 [Security Policy](./architecture/security_policy.md)
 
 ---
 
-## 🧪 Now take it further — Argus Lab
+## 🧩 Distributions (Argus)
 
-Understanding a system is one thing.
+User-facing systems built on top of NeuroCore.
 
-Fixing it under pressure is something else entirely.
-
----
-
-Argus Lab is a **realistic training environment** built to develop that skill.
-
-You’re working inside a system that behaves like a real environment:
-
-- multiple Linux servers  
-- real users and permissions  
-- real services  
-- real logs  
-- real networking  
-
-And then…
-
-things start breaking.
+- 👉 [Argus V1 Blueprint](./distributions/argus_v1_blueprint.md)
+- 👉 [Argus ACLI Specification](./distributions/argus/acli_spec.md)
 
 ---
 
-Failures are introduced into the system:
+## 🏠 Infrastructure & Environment
 
-- nginx goes down  
-- disk fills up  
-- permissions break  
-- services misbehave  
+System layout, infrastructure design, and environment mapping.
 
-You’re given a ticket — just like in a real job.
-
-No instructions.  
-No walkthrough.  
-
-You have to figure it out.
+- 👉 [Repository Map](./infrastructure/neurocore_repository_map.txt)
+- 👉 [System Map](./infrastructure/neurocore_system_map.txt)
+- 👉 [Home System Map](./infrastructure/home_system_map.md)
+- 👉 [Home Infrastructure](./infrastructure/home_infrastructure.md)
 
 ---
 
-Argus is still there — but now as a **mentor**, not a solution engine.
+## 🤖 AI Operations (Control Documents)
 
-It helps you:
+How the AI system is operated, resumed, and constrained across sessions.
 
-- interpret logs  
-- understand system behavior  
-- think through the problem  
-
-But it won’t hand you the answer.
-
-Because the goal isn’t solving the issue.
-
-The goal is building real skill.
+- 👉 [Resume Prompt (Primary)](./ai-operations/resume_prompt_compressed.md)
+- 👉 [Context Loading Strategy](./ai-operations/context_loading_strategy.md)
+- 👉 [Mid-Phase Reset Protocol](./ai-operations/mid_phase_reset_protocol.md)
+- 👉 [Documentation Closeout Protocol](./ai-operations/documentation_closeout_protocol.md)
 
 ---
 
-## 🚀 Where do you want to go next?
+## 🧪 Design Documents
+
+In-progress and phase-specific design work.
+
+- 👉 [Phase 5I – Real Execution](./design/phase_5i_real_execution.md)
 
 ---
 
-### 🧠 Start with the vision
+## 🖥 Hardware & Physical System
 
-This gives you the full picture of how everything fits together:
+Physical infrastructure and hardware planning.
 
-👉 **[NeuroCore Vision](./docs/architecture/neurocore_vision.md)** — the platform (the brain)  
-👉 **[Argus ACLI Vision](./docs/vision/argus_acli_vision.md)** — the tool you actually use  
-👉 **[Argus Lab Vision](./docs/vision/argus_lab_vision.md)** — the training system  
+- 👉 [Home AI Hardware](./hardware/home_ai_hardware.md)
 
 ---
 
-### 🖥 See what’s real right now
+## 🧪 Build Logs (Full Development History)
 
-👉 **[System State](./docs/architecture/system_state.md)**
+Complete system evolution from initial build to current state.
 
----
-
-### ⚙️ Go deeper (how it works)
-
-- 👉 [System Architecture](./docs/architecture/system_architecture.md)  
-- 👉 [Control Plane](./docs/architecture/control_plane.md)  
-- 👉 [Tool Execution System](./docs/architecture/tool_execution.md)  
+👉 [Build Logs Directory](../build-logs/)
 
 ---
 
-### 📚 Explore everything
+### 📂 All Build Logs
 
-👉 **[Documentation Index](./docs/README.md)**
-
----
-
-## 🧩 The Big Picture
-
-| Layer | System | Role |
-|------|--------|------|
-| Platform | NeuroCore | the brain |
-| Product | Argus ACLI | system intelligence |
-| Training | Argus Lab | real-world skill |
-
----
-
-## 🚧 Current Status
-
-- NeuroCore → operational  
-- Argus ACLI → in development  
-- Argus Lab → planned  
-
-This is being built — right now.
-
----
-
-## 💡 Final Thought
-
-Most tools try to give you answers.
-
-NeuroCore is built to help you understand your system.
-
-And once you have that…
-
-you’re no longer guessing.
+- 👉 [000 – Foundation](../build-logs/000_foundation.md)
+- 👉 [001 – Runtime Stack](../build-logs/001_runtime_stack.md)
+- 👉 [002 – Interface Layer](../build-logs/002_interface_layer.md)
+- 👉 [003 – Knowledge Layer](../build-logs/003_knowledge_layer.md)
+- 👉 [004 – Knowledge Retrieval](../build-logs/004_knowledge_retrieval.md)
+- 👉 [005 – Logic Layer Router](../build-logs/005_logic_layer_router.md)
+- 👉 [006 – RAG Reasoning Integration](../build-logs/006_rag_reasoning_integration.md)
+- 👉 [007 – Backup and Rebuild Foundations](../build-logs/007_backup_and_rebuild_foundations.md)
+- 👉 [008 – Runtime Performance and API Migration](../build-logs/008_runtime_performance_and_api_migration.md)
+- 👉 [009 – Daemon Foundation](../build-logs/009_neurocore_daemon_foundation.md)
+- 👉 [010 – Runtime Integration](../build-logs/010_runtime_integration.md)
+- 👉 [011 – CLI Interface Layer](../build-logs/011_cli_interface_layer.md)
+- 👉 [012 – Streaming Pipeline and CLI Behavior](../build-logs/012_streaming_pipeline_and_cli_behavior.md)
+- 👉 [013 – RAG Metadata and Grounding](../build-logs/013_rag_metadata_and_grounding.md)
+- 👉 [014 – Session Memory and Query Rewriting](../build-logs/014_session_memory_query_rewriting_and_knowledge_correction.md)
+- 👉 [015 – CLI Piped Input Ingestion](../build-logs/015_cli_piped_input_ingestion.md)
+- 👉 [016 – Runtime Control Plane Enforcement](../build-logs/016_runtime_control_plane_enforcement.md)
+- 👉 [017 – Execution Layer and Control Integration](../build-logs/017_execution_layer_and_control_integration.md)
+- 👉 [018 – Observability and Tracing](../build-logs/018_observability_and_tracing.md)
+- 👉 [019 – Real Tool Execution and System Info](../build-logs/019_real_tool_execution_and_system_info.md)
 
 ---
 
-## ⭐ If this clicks with you
+### ⭐ Suggested Starting Points
 
-Star the repo.  
-Follow the build.  
+If you don’t want to read everything:
 
-This is just getting started.
+- 👉 000 – Foundation  
+- 👉 009 – Daemon Foundation  
+- 👉 012 – Streaming Pipeline  
+- 👉 016 – Control Plane Enforcement  
+- 👉 017 – Execution Layer Integration  
+- 👉 019 – Real Tool Execution  
+
+These represent major system milestones.
 
 ---
 
-## 👤 Author
+## 🧭 How to Navigate
 
-Richard Bayer
+### If you're new:
+- Start with **NeuroCore Vision**
+- Then read **Argus ACLI Vision**
+- Then **Argus Lab Vision**
+- Then check **System State**
 
 ---
 
-## 📄 License
+### If you're technical:
+- Start with **System Architecture**
+- Then **Control Plane**
+- Then **Tool Execution System**
+- Then explore **Build Logs**
 
-TBD
+---
+
+### If you're interested in using the system:
+- Read **Argus ACLI Vision**
+- Then **Argus Blueprint**
+- Then explore architecture as needed
+
+---
+
+## 💡 Final Note
+
+This repository reflects a real system under active development.
+
+Documentation is:
+
+- structured  
+- layered  
+- aligned with actual system behavior  
+
+This is not theoretical.
+
+This is a working platform being built in real time.
+
+---
+
+# End of Document
