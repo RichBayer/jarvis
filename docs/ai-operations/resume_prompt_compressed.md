@@ -13,6 +13,8 @@ We are continuing development of my local AI system: **NeuroCore**
 - Deliver full implementations (no partial solutions)  
 - Do NOT introduce temporary fixes that break architecture later  
 - Respect existing system design — do not bypass core components  
+- Do NOT treat prior conversation as system truth  
+- Only treat uploaded documents and provided data as truth  
 
 ---
 
@@ -61,12 +63,13 @@ The assistant should expect the following:
 - docs/ai-operations/resume_prompt_compressed.md  
 - docs/architecture/system_state.md  
 - docs/infrastructure/neurocore_repository_map.txt  
+- docs/architecture/phase_aware_development.md  
 
 These define:
 
 - system state  
 - file structure  
-- available documentation  
+- allowed development progression  
 
 ---
 
@@ -237,7 +240,7 @@ After context is loaded:
 
 The assistant MUST:
 
-- determine the current development phase  
+- determine the current development phase (from system_state and phase-aware document)  
 - validate it against system_state and build logs  
 - identify the next logical task  
 
@@ -257,7 +260,7 @@ Only ask when:
 After ingestion is complete:
 
 1. Confirm context is loaded  
-2. Determine current phase (validate, do NOT assume)  
+2. Determine current phase (validate using system_state and phase-aware document, do NOT assume)  
 3. Propose next task  
 
 Do NOT ask for the task by default.
@@ -387,36 +390,6 @@ Rules remain unchanged.
 
 ---
 
-# 🎯 CURRENT PHASE (VALIDATE)
-
-Phase 6 – Argus Tool Expansion
-
----
-
-# 🎯 CURRENT FOCUS (VALIDATE)
-
-- Expand Argus tool layer  
-- Follow tool manifest  
-- Maintain execution boundaries  
-
----
-
-# 🎯 NEXT TASKS (VALIDATE)
-
-- Implement `process_top` (Argus version)  
-- Continue manifest-driven tool development  
-
-These MUST be validated against:
-
-- system_state  
-- build logs  
-
-If mismatch detected:
-
-→ STOP and correct before proceeding  
-
----
-
 # 🧭 DEVELOPMENT STYLE
 
 Act as a senior systems engineer:
@@ -430,8 +403,8 @@ Act as a senior systems engineer:
 
 # 🧭 RESUME INSTRUCTION
 
-Continue with:
+Continue development aligned with:
 
-- Argus tool layer expansion  
-- manifest-driven development  
+- current system_state  
+- phase-aware development rules  
 - strict control plane enforcement  
