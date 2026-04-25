@@ -52,7 +52,7 @@ def normalize_request(message):
         "type": "query",
         "user": message.get("user", "richard"),
         "mode": mode,
-        "stream": message.get("stream", False),
+        "stream": True,  # force unified handling
         "source": source,
         "trace": trace,
         "data": {
@@ -99,20 +99,8 @@ def main():
 
             normalized = normalize_request(message)
 
-            if normalized.get("stream") is True:
-                # 🔥 FIX: send full JSON response, not iteration
-                response = runtime.handle_stream_request(normalized)
-                conn.sendall(json.dumps(response).encode())
-                conn.shutdown(socket.SHUT_WR)
-                continue
-
-            result = runtime.handle_request(normalized)
-
-            response = {
-                "status": "success",
-                "response": result,
-                "error": None
-            }
+            # ✅ unified execution path
+            response = runtime.handle_stream_request(normalized)
 
             conn.sendall(json.dumps(response).encode())
             conn.shutdown(socket.SHUT_WR)
@@ -121,7 +109,8 @@ def main():
             error = {
                 "status": "error",
                 "response": None,
-                "error": str(e)
+                "error": str(e),
+                "data": {}
             }
             try:
                 conn.sendall(json.dumps(error).encode())

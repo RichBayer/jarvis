@@ -1,5 +1,3 @@
-# /mnt/g/ai/projects/neurocore/runtime/runtime_manager.py
-
 from __future__ import annotations
 
 from typing import Any, Dict
@@ -37,18 +35,22 @@ class RuntimeManager:
             if status == "success":
                 response = result.get("output", "")
                 error = None
+                data = result.get("data", {})
 
             elif status == "confirmation_required":
                 response = result.get("output", "")
                 error = None
+                data = result.get("data", {})
 
             elif status == "pass_through":
                 response = result.get("query", "")
                 error = None
+                data = {}
 
             else:
                 response = None
                 error = result.get("message", "Unknown error")
+                data = {}
 
             trace_event(
                 event="stream_response_built",
@@ -61,6 +63,7 @@ class RuntimeManager:
                 "status": status,
                 "response": response,
                 "error": error,
+                "data": data,
             }
 
         except Exception as e:
@@ -76,6 +79,7 @@ class RuntimeManager:
                 "status": "error",
                 "response": None,
                 "error": str(e),
+                "data": {},
             }
 
     # -------------------------
@@ -138,29 +142,32 @@ class RuntimeManager:
 
     def _format_execution_result(self, result: Dict[str, Any]) -> Dict[str, Any]:
         status = result.get("status")
+        data = result.get("data", {})
 
         if status == "confirmation_required":
-            confirm_cmd = result.get("data", {}).get("confirm_command", "")
+            confirm_cmd = data.get("confirm_command", "")
             return {
                 "status": "confirmation_required",
-                "output": f"[CONFIRM] {result.get('message')}\nRun: {confirm_cmd}"
+                "output": f"[CONFIRM] {result.get('message')}\nRun: {confirm_cmd}",
+                "data": data
             }
 
         if status == "error":
             return {
                 "status": "error",
                 "message": result.get("message", "Execution failed"),
+                "data": data
             }
 
         if status == "policy_denied":
             return {
                 "status": "error",
                 "message": result.get("message", "Denied"),
+                "data": data
             }
 
         # SUCCESS CASE
         message = result.get("message", "")
-        data = result.get("data", {})
 
         action = data.get("action")
         service = data.get("service")
@@ -168,10 +175,12 @@ class RuntimeManager:
         if action and service:
             return {
                 "status": "success",
-                "output": f"[OK] {action.upper()} '{service}' → {message}"
+                "output": f"[OK] {action.upper()} '{service}' → {message}",
+                "data": data
             }
 
         return {
             "status": "success",
-            "output": f"[OK] {message}"
+            "output": f"[OK] {message}",
+            "data": data
         }

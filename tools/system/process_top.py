@@ -1,6 +1,8 @@
+# /mnt/g/ai/projects/neurocore/tools/system/process_top.py
+
 from __future__ import annotations
 
-from typing import Dict, List
+from typing import Dict, List, Any
 
 from runtime.tracing import trace_event, trace_context_from_request
 from tools.base_tool import BaseTool
@@ -20,7 +22,7 @@ class ProcessTop(BaseTool):
     def validate_input(self, tool_input: Dict[str, str]) -> None:
         return
 
-    def execute(self, request: Dict[str, Dict]) -> Dict[str, Dict]:
+    def execute(self, request: Dict[str, Dict]) -> Dict[str, Any]:
         ctx = trace_context_from_request(request)
 
         trace_event(
@@ -32,15 +34,15 @@ class ProcessTop(BaseTool):
         cpu_result = CommandRunner.run(["ps", "aux", "--sort=-%cpu"])
         mem_result = CommandRunner.run(["ps", "aux", "--sort=-%mem"])
 
-        cpu_lines = cpu_result["stdout"].splitlines()
-        mem_lines = mem_result["stdout"].splitlines()
+        cpu_parsed = self._parse_ps_output(cpu_result.get("stdout", ""))
+        mem_parsed = self._parse_ps_output(mem_result.get("stdout", ""))
 
         data = {
-            "cpu_top": cpu_lines[:6],
-            "memory_top": mem_lines[:6],
+            "cpu_top": cpu_parsed[:5],
+            "memory_top": mem_parsed[:5],
             "raw": {
-                "cpu": cpu_lines,
-                "memory": mem_lines
+                "cpu": cpu_result,
+                "memory": mem_result
             }
         }
 
@@ -58,3 +60,43 @@ class ProcessTop(BaseTool):
             message=message,
             data=data
         )
+
+    # -------------------------
+    # PARSER
+    # -------------------------
+
+    def _parse_ps_output(self, output: str) -> List[Dict[str, Any]]:
+        lines = output.splitlines()
+
+        if not lines:
+            return []
+
+        header = lines[0]
+        rows = lines[1:]
+
+        parsed = []
+
+        for row in rows:
+            parts = row.split(None, 10)
+
+            if len(parts) < 11:
+                continue
+
+            try:
+                parsed.append({
+                    "user": parts[0],
+                    "pid": int(parts[1]),
+                    "cpu_percent": float(parts[2]),
+                    "mem_percent": float(parts[3]),
+                    "vsz": int(parts[4]),
+                    "rss": int(parts[5]),
+                    "tty": parts[6],
+                    "stat": parts[7],
+                    "start": parts[8],
+                    "time": parts[9],
+                    "command": parts[10]
+                })
+            except Exception:
+                continue
+
+        return parsed

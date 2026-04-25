@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Dict
+from typing import Dict, Any, List
 
 from runtime.tracing import trace_event, trace_context_from_request
 from tools.base_tool import BaseTool
@@ -22,15 +22,14 @@ class DiskUsage(BaseTool):
     def validate_input(self, tool_input: Dict[str, str]) -> None:
         return
 
-    def execute(self, request: Dict[str, Dict]) -> Dict[str, Dict]:
+    def execute(self, request: Dict[str, Dict]) -> Dict[str, Any]:
         ctx = trace_context_from_request(request)
-        tool_input = request["input"]
 
         trace_event(
             event="tool_invoked",
             context=ctx,
             component="disk_usage",
-            details={"input": tool_input}
+            details={"input": request.get("input", {})}
         )
 
         trace_event(
@@ -40,19 +39,14 @@ class DiskUsage(BaseTool):
         )
 
         result = CommandRunner.run(["df", "-h"])
-        lines = result["stdout"].splitlines()
+        parsed = self._parse_df_output(result.get("stdout", ""))
 
         data = {
-            "filesystems": lines,
-            "raw": {
-                "stdout": result.get("stdout", ""),
-                "stderr": result.get("stderr", ""),
-                "returncode": result.get("returncode"),
-            }
+            "filesystems": parsed,
+            "raw": result
         }
 
-        output = ["Disk Usage\n"]
-        output.extend(lines)
+        message = "Disk usage collected"
 
         trace_event(
             event="disk_usage_execution_completed",
@@ -63,6 +57,39 @@ class DiskUsage(BaseTool):
 
         return self.build_result(
             status="success",
-            message="\n".join(output),
+            message=message,
             data=data
         )
+
+    # -------------------------
+    # PARSER
+    # -------------------------
+
+    def _parse_df_output(self, output: str) -> List[Dict[str, Any]]:
+        lines = output.splitlines()
+
+        if len(lines) < 2:
+            return []
+
+        rows = lines[1:]
+        parsed = []
+
+        for row in rows:
+            parts = row.split()
+
+            if len(parts) < 6:
+                continue
+
+            try:
+                parsed.append({
+                    "filesystem": parts[0],
+                    "size": parts[1],
+                    "used": parts[2],
+                    "available": parts[3],
+                    "use_percent": parts[4],
+                    "mounted_on": parts[5]
+                })
+            except Exception:
+                continue
+
+        return parsed
