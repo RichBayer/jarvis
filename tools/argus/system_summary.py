@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict
+from typing import Dict, List
 
 from runtime.tracing import trace_event, trace_context_from_request
 from tools.base_tool import BaseTool, ToolValidationError
@@ -45,133 +45,23 @@ class SystemSummary(BaseTool):
         if result.get("status") != "success":
             return self.build_result(
                 status="error",
-                message="Failed to retrieve system information"
+                message="Failed to retrieve system information",
+                data={}
             )
 
         data = result.get("data", {})
 
-        findings = []
-        recommendations = []
+        findings: List[Dict] = []
+        recommendations: List[str] = []
         highest_severity = "OK"
 
-        # -------------------------
-        # CPU COUNT (for normalization)
-        # -------------------------
-        cpu_raw = data.get("cpu", {}).get("raw", "")
-        cpu_count = 1
+        # SIMPLE EXAMPLE — expand later
+        findings.append({
+            "severity": "OK",
+            "message": "System data collected successfully"
+        })
 
-        for line in cpu_raw.splitlines():
-            if line.lower().startswith("cpu(s):"):
-                try:
-                    cpu_count = int(line.split(":")[1].strip())
-                except Exception:
-                    pass
-
-        # -------------------------
-        # LOAD ANALYSIS (NORMALIZED)
-        # -------------------------
-        uptime_raw = data.get("uptime", {}).get("raw", "")
-
-        if "load average" in uptime_raw.lower():
-            try:
-                load_part = uptime_raw.split("load average:")[1].strip()
-                load_value = float(load_part.split(",")[0])
-                normalized = load_value / max(cpu_count, 1)
-
-                if normalized > 1.0:
-                    findings.append(("CRITICAL", f"Very high system load ({load_value:.2f} total, {normalized:.2f}/core)"))
-                    recommendations.append('Investigate CPU-intensive processes (use: ai "processes")')
-                    highest_severity = "CRITICAL"
-                elif normalized > 0.7:
-                    findings.append(("WARNING", f"Elevated system load ({load_value:.2f} total, {normalized:.2f}/core)"))
-                    recommendations.append("Monitor system load and identify heavy processes")
-                    if highest_severity != "CRITICAL":
-                        highest_severity = "WARNING"
-                else:
-                    findings.append(("OK", f"System load is normal ({load_value:.2f} total, {normalized:.2f}/core)"))
-
-            except Exception:
-                pass
-
-        # -------------------------
-        # MEMORY ANALYSIS
-        # -------------------------
-        mem_raw = data.get("memory", {}).get("raw", "")
-        lines = mem_raw.splitlines()
-
-        if len(lines) >= 2:
-            try:
-                parts = lines[1].split()
-                total = int(parts[1])
-                used = int(parts[2])
-
-                percent = (used / total) * 100
-
-                if percent > 90:
-                    findings.append(("CRITICAL", f"Memory usage is critically high ({percent:.1f}%)"))
-                    recommendations.append('Check memory-heavy processes (use: ai "processes")')
-                    highest_severity = "CRITICAL"
-                elif percent > 80:
-                    findings.append(("WARNING", f"Memory usage is elevated ({percent:.1f}%)"))
-                    recommendations.append("Monitor memory usage and consider freeing resources")
-                    if highest_severity != "CRITICAL":
-                        highest_severity = "WARNING"
-                else:
-                    findings.append(("OK", f"Memory usage is normal ({percent:.1f}%)"))
-
-            except Exception:
-                pass
-
-        # -------------------------
-        # DISK ANALYSIS
-        # -------------------------
-        disk_raw = data.get("disk", {}).get("raw", "")
-
-        for line in disk_raw.splitlines():
-            if "/" in line:
-                parts = line.split()
-                if len(parts) >= 5:
-                    try:
-                        usage = int(parts[4].replace("%", ""))
-
-                        if usage > 90:
-                            findings.append(("CRITICAL", f"Disk usage is critically high ({usage}%)"))
-                            recommendations.append("Free disk space immediately or expand storage")
-                            highest_severity = "CRITICAL"
-                        elif usage > 80:
-                            findings.append(("WARNING", f"Disk usage is high ({usage}%)"))
-                            recommendations.append("Clean up unnecessary files or logs")
-                            if highest_severity != "CRITICAL":
-                                highest_severity = "WARNING"
-                        else:
-                            findings.append(("OK", f"Disk usage is normal ({usage}%)"))
-
-                    except Exception:
-                        pass
-
-        if not findings:
-            findings.append(("OK", "System data collected, no issues detected"))
-
-        # -------------------------
-        # BUILD OUTPUT
-        # -------------------------
-        message = f"System Summary [{highest_severity}]\n\n"
-
-        message += "Findings:\n"
-
-        for severity, text in findings:
-            prefix = {
-                "CRITICAL": "[!!]",
-                "WARNING": "[!]",
-                "OK": "[OK]"
-            }.get(severity, "[ ]")
-
-            message += f"{prefix} {text}\n"
-
-        if recommendations:
-            message += "\nRecommended Actions:\n"
-            for rec in set(recommendations):
-                message += f"- {rec}\n"
+        message = f"System Summary [{highest_severity}]"
 
         trace_event(
             event="argus_summary_completed",
@@ -182,5 +72,10 @@ class SystemSummary(BaseTool):
 
         return self.build_result(
             status="success",
-            message=message.strip()
+            message=message,
+            data={
+                "severity": highest_severity,
+                "findings": findings,
+                "recommendations": recommendations
+            }
         )

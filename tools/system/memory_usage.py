@@ -1,5 +1,3 @@
-# /mnt/g/ai/projects/neurocore/tools/system/memory_usage.py
-
 from __future__ import annotations
 
 from typing import Dict
@@ -22,16 +20,8 @@ class MemoryUsage(BaseTool):
     def validate_input(self, tool_input: Dict[str, str]) -> None:
         return
 
-    def execute(self, request: Dict[str, Dict]) -> Dict[str, str]:
+    def execute(self, request: Dict[str, Dict]) -> Dict[str, Dict]:
         ctx = trace_context_from_request(request)
-        tool_input = request["input"]
-
-        trace_event(
-            event="tool_invoked",
-            context=ctx,
-            component="memory_usage",
-            details={"input": tool_input}
-        )
 
         trace_event(
             event="memory_usage_collection_started",
@@ -40,18 +30,17 @@ class MemoryUsage(BaseTool):
         )
 
         result = CommandRunner.run(["free", "-h"])
+        lines = result["stdout"].splitlines()
 
-        output = ["Memory Usage\n"]
-        output.extend(result["stdout"].splitlines())
+        data = {
+            "memory_table": lines,
+            "raw": lines
+        }
 
-        trace_event(
-            event="memory_usage_execution_completed",
-            context=ctx,
-            component="memory_usage",
-            status="success"
-        )
+        message = "Memory usage collected"
 
         return self.build_result(
             status="success",
-            message="\n".join(output)
+            message=message,
+            data=data
         )

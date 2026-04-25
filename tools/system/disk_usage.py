@@ -22,7 +22,7 @@ class DiskUsage(BaseTool):
     def validate_input(self, tool_input: Dict[str, str]) -> None:
         return
 
-    def execute(self, request: Dict[str, Dict]) -> Dict[str, str]:
+    def execute(self, request: Dict[str, Dict]) -> Dict[str, Dict]:
         ctx = trace_context_from_request(request)
         tool_input = request["input"]
 
@@ -40,9 +40,19 @@ class DiskUsage(BaseTool):
         )
 
         result = CommandRunner.run(["df", "-h"])
+        lines = result["stdout"].splitlines()
+
+        data = {
+            "filesystems": lines,
+            "raw": {
+                "stdout": result.get("stdout", ""),
+                "stderr": result.get("stderr", ""),
+                "returncode": result.get("returncode"),
+            }
+        }
 
         output = ["Disk Usage\n"]
-        output.extend(result["stdout"].splitlines())
+        output.extend(lines)
 
         trace_event(
             event="disk_usage_execution_completed",
@@ -53,5 +63,6 @@ class DiskUsage(BaseTool):
 
         return self.build_result(
             status="success",
-            message="\n".join(output)
+            message="\n".join(output),
+            data=data
         )

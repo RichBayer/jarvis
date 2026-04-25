@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict
 
 
 class ToolValidationError(Exception):
@@ -15,12 +15,6 @@ class ToolExecutionError(Exception):
 
 
 class BaseTool(ABC):
-    """
-    Base contract for all tools.
-
-    Tools receive the full request object during execution.
-    """
-
     name: str = ""
     description: str = ""
     input_schema: Dict[str, Any] = {}
@@ -64,8 +58,8 @@ class BaseTool(ABC):
             raise ToolValidationError("Input must be a dict")
 
         required = self.input_schema.get("required", [])
-
         missing = [f for f in required if f not in request["input"]]
+
         if missing:
             raise ToolValidationError(f"Missing fields: {missing}")
 
@@ -77,31 +71,27 @@ class BaseTool(ABC):
 
     @abstractmethod
     def execute(self, request: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Execute the tool using the full request object.
-
-        The request includes:
-        - "tool": tool name
-        - "input": validated input data
-        - "trace": tracing context (if present)
-
-        Tools are responsible for extracting request["input"].
-        """
         pass
 
     def build_result(
         self,
         status: str,
         message: str,
-        data: Optional[Dict[str, Any]] = None,
+        data: Dict[str, Any],
     ) -> Dict[str, Any]:
-        result = {
+        """
+        ENFORCED CONTRACT:
+        - data is REQUIRED
+        - message is for humans
+        - data is for machines
+        """
+
+        if not isinstance(data, dict):
+            raise ToolExecutionError("Tool must return structured data dict")
+
+        return {
             "status": status,
             "tool": self.name,
             "message": message,
+            "data": data,
         }
-
-        if data:
-            result["data"] = data
-
-        return result

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict
+from typing import Dict, List
 
 from runtime.tracing import trace_event, trace_context_from_request
 from tools.base_tool import BaseTool
@@ -20,16 +20,8 @@ class ProcessTop(BaseTool):
     def validate_input(self, tool_input: Dict[str, str]) -> None:
         return
 
-    def execute(self, request: Dict[str, Dict]) -> Dict[str, str]:
+    def execute(self, request: Dict[str, Dict]) -> Dict[str, Dict]:
         ctx = trace_context_from_request(request)
-        tool_input = request["input"]
-
-        trace_event(
-            event="tool_invoked",
-            context=ctx,
-            component="process_top",
-            details={"input": tool_input}
-        )
 
         trace_event(
             event="process_top_collection_started",
@@ -40,16 +32,19 @@ class ProcessTop(BaseTool):
         cpu_result = CommandRunner.run(["ps", "aux", "--sort=-%cpu"])
         mem_result = CommandRunner.run(["ps", "aux", "--sort=-%mem"])
 
-        cpu_lines = cpu_result["stdout"].splitlines()[:6]
-        mem_lines = mem_result["stdout"].splitlines()[:6]
+        cpu_lines = cpu_result["stdout"].splitlines()
+        mem_lines = mem_result["stdout"].splitlines()
 
-        output = ["Top Processes\n"]
+        data = {
+            "cpu_top": cpu_lines[:6],
+            "memory_top": mem_lines[:6],
+            "raw": {
+                "cpu": cpu_lines,
+                "memory": mem_lines
+            }
+        }
 
-        output.append("Top CPU Processes:\n")
-        output.extend(cpu_lines)
-
-        output.append("\nTop Memory Processes:\n")
-        output.extend(mem_lines)
+        message = "Top Processes (CPU & Memory)"
 
         trace_event(
             event="process_top_execution_completed",
@@ -60,5 +55,6 @@ class ProcessTop(BaseTool):
 
         return self.build_result(
             status="success",
-            message="\n".join(output)
+            message=message,
+            data=data
         )
