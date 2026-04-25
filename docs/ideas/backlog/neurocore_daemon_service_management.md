@@ -2,18 +2,6 @@
 
 ---
 
-## Notes
-
-This should be implemented during:
-
-Phase 6 – Distribution Layer
-
-This MUST follow phase-aware development rules.
-
-NOT during current tool expansion phase (Phase 5J).
-
----
-
 ## Metadata
 
 - Status: Backlog  
@@ -79,9 +67,3 @@ User experience:
 
 ```bash
 acli "summary"
-
----
-
-## Constraints
-
-- MUST NOT introduce alternative execution paths outside daemon → control plane → execution engine flow
