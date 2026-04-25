@@ -1,5 +1,3 @@
-# /mnt/g/ai/projects/neurocore/runtime/control_plane.py
-
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -122,10 +120,31 @@ class ControlPlane:
         action = words[0] if len(words) > 0 else ""
 
         # -------------------------
-        # ARGUS TOOL MAPPING (NEW)
+        # ARGUS TOOL MAPPING
         # -------------------------
         if action == "summary":
             return {"tool": "system_summary", "input": {}}
+
+        if action == "processes":
+            return {"tool": "process_top_analysis", "input": {}}
+
+        if action == "memory":
+            return {"tool": "memory_analysis", "input": {}}
+
+        if action == "disk":
+            return {"tool": "disk_analysis", "input": {}}
+
+        if action == "network":
+            return {"tool": "network_analysis", "input": {}}
+
+        if action == "connections":
+            return {"tool": "connections_analysis", "input": {}}
+
+        if action == "uptime":
+            return {"tool": "uptime_analysis", "input": {}}
+
+        if action == "logs":
+            return {"tool": "logs_analysis", "input": {}}
 
         # -------------------------
         # SYSTEM TOOL MAPPING
@@ -134,22 +153,8 @@ class ControlPlane:
             return {"tool": "recent_logins", "input": {}}
         if action == "users":
             return {"tool": "users_sessions", "input": {}}
-        if action == "logs":
-            return {"tool": "system_logs", "input": {}}
-        if action == "uptime":
-            return {"tool": "uptime_load", "input": {}}
-        if action == "connections":
-            return {"tool": "network_connections", "input": {}}
-        if action == "network":
-            return {"tool": "network_interfaces", "input": {}}
         if action == "layout":
             return {"tool": "disk_layout", "input": {}}
-        if action == "memory":
-            return {"tool": "memory_usage", "input": {}}
-        if action == "disk":
-            return {"tool": "disk_usage", "input": {}}
-        if action == "processes":
-            return {"tool": "process_top", "input": {}}
         if action == "info":
             return {"tool": "system_info", "input": {"target": "system"}}
 

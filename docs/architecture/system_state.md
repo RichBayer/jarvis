@@ -214,6 +214,13 @@ Rules:
 ### Implemented Argus Tools
 
 - `system_summary`
+- `process_top_analysis`
+- `memory_analysis`
+- `disk_analysis`
+- `network_analysis`
+- `connections_analysis`
+- `uptime_analysis`
+- `logs_analysis`
 
 ---
 
@@ -352,7 +359,8 @@ NeuroCore now supports:
 - Tool-based execution framework  
 - Real system command execution across multiple domains  
 - **Guaranteed structured system data across all system tools**  
-- Argus diagnostic layer (system_summary)  
+- **Full Argus diagnostic layer across core system domains**
+- **Deterministic system interpretation (severity + findings + recommendations)**
 - Full observability and tracing  
 
 ---
@@ -375,7 +383,7 @@ NeuroCore is now:
 
 - executing real system commands across multiple domains  
 - exposing structured system state  
-- supporting an interpretation layer (Argus)  
+- supporting a full diagnostic interpretation layer (Argus)  
 - fully observable end-to-end  
 - stable for further expansion  
 
@@ -383,8 +391,7 @@ NeuroCore is now:
 
 ## Next Phase
 
-- Expand Argus tool layer  
-- Implement `process_top` (Argus version)  
-- Follow manifest-driven development  
-- Extend diagnostic capabilities  
+- Expand Argus tool intelligence (deeper reasoning, multi-signal correlation)  
+- Continue manifest-driven tool development  
+- Begin shaping Argus ACLI user experience layer  
 - Maintain strict control plane enforcement  

@@ -133,7 +133,7 @@ Notes:
 
 ---
 
-## process_top (NEXT)
+## process_top_analysis (IMPLEMENTED)
 
 Argus Tool
 
@@ -145,7 +145,109 @@ Capabilities:
 
 - identify high CPU processes  
 - identify high memory processes  
-- correlate with system load  
+
+---
+
+## memory_analysis (IMPLEMENTED)
+
+Argus Tool
+
+System Tools Used:
+
+- memory_usage  
+
+Capabilities:
+
+- evaluate memory usage  
+- detect memory pressure  
+
+---
+
+## disk_analysis (IMPLEMENTED)
+
+Argus Tool
+
+System Tools Used:
+
+- disk_usage  
+
+Capabilities:
+
+- detect high disk usage  
+- evaluate filesystem capacity  
+
+---
+
+## network_analysis (IMPLEMENTED)
+
+Argus Tool
+
+System Tools Used:
+
+- network_interfaces  
+
+Capabilities:
+
+- evaluate interface state  
+- detect inactive or abnormal interfaces  
+
+---
+
+## connections_analysis (IMPLEMENTED)
+
+Argus Tool
+
+System Tools Used:
+
+- network_connections  
+
+Capabilities:
+
+- evaluate connection volume  
+- detect abnormal connection counts  
+
+---
+
+## uptime_analysis (IMPLEMENTED)
+
+Argus Tool
+
+System Tools Used:
+
+- uptime_load  
+
+Capabilities:
+
+- evaluate system load  
+- detect high load conditions  
+
+---
+
+## logs_analysis (IMPLEMENTED)
+
+Argus Tool
+
+System Tools Used:
+
+- system_logs  
+
+Capabilities:
+
+- detect errors and warnings in logs  
+
+---
+
+## process_top (LEGACY / REPLACED)
+
+Argus Tool
+
+System Tools Used:
+
+- process_top  
+
+Notes:
+
+- replaced by process_top_analysis  
 
 ---
 

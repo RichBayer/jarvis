@@ -2,96 +2,120 @@
 
 ## What We’re Actually Doing
 
-Right now I am NOT building Argus.
+At the start of this phase, I was NOT building Argus.
 
-I am expanding NeuroCore so that Argus can exist later.
+I was expanding NeuroCore so that Argus could exist later.
 
-This phase is about adding real, safe system tools that can:
+That changed during this phase.
 
-- gather system data
-- run real commands
-- return structured output
+By the end of this phase, I am now building the first real version of Argus.
 
-All under full control of the control plane.
+This phase became:
+
+- building the Argus diagnostic layer  
+- defining how system data is interpreted  
+- establishing the pattern Argus will use going forward  
 
 ---
 
 ## Why This Matters
 
-Argus is going to be a system intelligence layer.
+Argus is a system intelligence layer.
 
-But it can’t exist without data.
+Before this phase, NeuroCore could:
 
-So before Argus can explain anything, NeuroCore has to be able to:
+- inspect the system  
+- gather logs  
+- check services  
+- return structured data  
 
-- inspect the system
-- gather logs
-- check services
-- look at resources
-- return that data in a structured way
+But it could not explain anything.
 
-That’s what this phase is.
+After this phase, the system can:
 
-We are building the foundation Argus will stand on.
+- interpret system data  
+- assign severity  
+- identify issues  
+- return findings and recommendations  
+
+This is the difference between:
+
+- a system that shows data  
+- and a system that understands it  
 
 ---
 
 ## What We ARE Doing
 
-- Adding real system tools (read-only)
-- Running them through CommandRunner
-- Keeping everything inside the execution engine
-- Making sure the control plane governs everything
-- Returning clean structured output
+- Building Argus tools that sit on top of system tools  
+- Using structured system data as input  
+- Applying deterministic interpretation logic  
+- Returning:
+  - severity  
+  - findings  
+  - recommendations  
+
+- Keeping everything inside the execution engine  
+- Keeping full control plane enforcement  
 
 ---
 
 ## What We are NOT Doing
 
-- Not building Argus behavior
-- Not building explanations
-- Not building intelligence
-- Not building training features
-- Not building evaluation systems
+- Not using LLM-based reasoning for diagnostics  
+- Not introducing non-deterministic behavior  
+- Not bypassing system tools  
+- Not bypassing control plane  
 
-Those come later.
+Argus in this phase is:
+
+- rule-based  
+- deterministic  
+- consistent  
 
 ---
 
 ## How This Fits the System
 
 NeuroCore:
-- gaining more capability (tools)
+- provides system tools (data layer)
 
 Argus:
-- will use these tools later
+- now exists as a diagnostic layer on top of those tools
 
 Homelab:
-- not part of this phase
+- still not part of this phase
+
+This introduces a clear separation:
+
+- system tools → collect data  
+- Argus tools → interpret data  
 
 ---
 
 ## Architecture Impact
 
-Nothing new is being invented here.
+No new execution path was introduced.
 
-We are just expanding this path:
+We extended this path:
 
-control_plane → execution_engine → tool → command_runner → OS
+control_plane → execution_engine → argus_tool → system_tool → command_runner → OS
 
-We are adding more tools to this system.
+Argus tools:
 
-That’s it.
+- do NOT execute commands  
+- do NOT call CommandRunner  
+- only consume system tool output  
 
 ---
 
 ## Rules I Cannot Break
 
-- ALL execution goes through control plane
-- ALL tools must be read-only
-- NO direct subprocess calls outside CommandRunner
-- NO bypassing execution engine
-- NO shortcuts that break architecture later
+- ALL execution goes through control plane  
+- ALL tools must be read-only  
+- NO direct subprocess calls outside CommandRunner  
+- NO bypassing execution engine  
+- NO shortcuts that break architecture later  
 
 ---
 
@@ -99,17 +123,20 @@ That’s it.
 
 When this phase is done:
 
-- I can run multiple real tools safely
-- everything is observable
-- output is structured and usable later
-- nothing breaks the architecture
+- I can run system diagnostics, not just system commands  
+- output is structured AND interpreted  
+- severity is consistent across tools  
+- findings and recommendations are generated  
+- architecture remains intact  
 
 ---
 
 ## Bottom Line
 
-This phase is not about intelligence.
+This phase started as capability expansion.
 
-It’s about capability.
+It ended as the first real implementation of Argus.
 
-I’m building the system that Argus will use later.
+NeuroCore no longer just gathers system data.
+
+It now understands what it is looking at.

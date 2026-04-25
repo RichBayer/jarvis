@@ -9,7 +9,9 @@
 ├── README.md
 ├── NeuroCore_Map.md
 ├── .gitignore
+├── .obsidian/
 ├── bootstrap/
+├── diagrams/
 
 ---
 
@@ -41,6 +43,7 @@ build-logs/
 ├── 021_argus_tool_layer_initial.md
 ├── 022_structured_tool_contract.md
 ├── 023_system_tool_structuring_and_normalization.md
+├── 024_argus_tool_layer_foundation_and_expansion.md
 
 ---
 
@@ -88,6 +91,7 @@ docs/
 
 ### DESIGN
 ├── design/
+│   ├── argus_system_summary_v1.md
 │   ├── argus_tool_layer.md
 │   ├── phase_5i_real_execution.md
 │   └── phase_5j_argus_core_tool_expansion.md
@@ -106,26 +110,44 @@ docs/
 │   ├── neurocore_repository_map.txt
 │   └── neurocore_system_map.txt
 
+### ADDITIONAL DOC DOMAINS
+├── ai-stack/
+├── hardware/
+│   └── home_ai_hardware.md
+├── ideas/
+│   └── backlog/
+├── network/
+├── security/
+├── vision/
+│   ├── argus_acli_vision.md
+│   └── argus_lab_vision.md
+├── voice/
+├── neurocore_development_notebook.md
+
 ---
 
 ## SCREENSHOTS
 
 docs/screenshots/
 
+├── argus-core-tools/
+├── argus-system-summary/
+├── argus-tool-expansion/
+├── argus-tools/
+├── backups/
+├── daemon/
+├── execution-layer/
+├── interface/
+├── knowledge/
+├── logic/
+├── observability-tracing/
+├── rag/
+├── runtime/
+├── runtime-behavior/
+├── runtime-control-plane/
 ├── structured-tool-contract/
+├── system-info-tool/
 ├── system-tool-structuring/
-│   ├── 01_memory_usage_before_raw.png
-│   ├── 02_memory_usage_cli_output_before.png
-│   ├── 03_runtime_manager_function_context.png
-│   ├── 04_runtime_manager_drops_data_return.png
-│   ├── 05_daemon_calls_missing_handle_request.png
-│   ├── 06_runtime_manager_preserves_data_after.png
-│   ├── 07_memory_usage_full_pipeline_verified.png
-│   ├── 08_disk_usage_structured_output.png
-│   ├── 09_network_interfaces_structured_output.png
-│   ├── 10_network_connections_structured_output.png
-│   ├── 11_users_sessions_structured_output.png
-│   └── 12_uptime_load_structured_output.png
 
 ---
 
@@ -133,10 +155,11 @@ docs/screenshots/
 
 runtime/
 
+├── __init__.py
 ├── control_plane.py
 ├── neurocore_daemon.py
 ├── runtime_manager.py
-└── tracing.py
+├── tracing.py
 
 ---
 
@@ -144,6 +167,7 @@ runtime/
 
 scripts/
 
+├── __init__.py
 ├── ai_cli.py
 ├── index_knowledge.py
 ├── jarvis_router.py
@@ -156,15 +180,24 @@ scripts/
 
 tools/
 
+├── __init__.py
 ├── base_tool.py
 ├── execution_engine.py
 ├── tool_registry.py
 
-### ARGUS
+### ARGUS TOOL LAYER
 ├── argus/
-│   └── system_summary.py
+│   ├── __init__.py
+│   ├── system_summary.py
+│   ├── process_top.py
+│   ├── memory_analysis.py
+│   ├── disk_analysis.py
+│   ├── network_analysis.py
+│   ├── connections_analysis.py
+│   ├── uptime_analysis.py
+│   └── logs_analysis.py
 
-### SYSTEM TOOLS
+### SYSTEM TOOL LAYER
 ├── system/
 │   ├── command_runner.py
 │   ├── disk_layout.py
@@ -184,7 +217,9 @@ tools/
 
 ## NOTES
 
-- Repository map reflects current build state after Phase 5J system tool structuring
-- Screenshots are organized by feature / phase for build log traceability
-- All system tools now conform to structured output contract
-- Runtime and daemon layers enforce full data propagation
+- Repository map reflects current state after Phase 5J Argus tool expansion
+- Argus tool layer now contains full diagnostic suite across system domains
+- Screenshots are organized by feature and phase for build log traceability
+- All system tools conform to structured output contract
+- Argus tools consume structured data and produce deterministic diagnostics
+- Runtime and daemon layers enforce full data propagation and trace continuity

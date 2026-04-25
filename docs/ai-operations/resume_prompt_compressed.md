@@ -390,6 +390,45 @@ Rules remain unchanged.
 
 ---
 
+# 🧭 CURRENT SYSTEM STATE (UPDATED)
+
+Phase 5J is COMPLETE.
+
+The system now includes:
+
+- full structured system tool layer  
+- enforced structured output contract  
+- **Argus diagnostic layer (implemented)**  
+- deterministic system interpretation  
+- severity + findings + recommendations across core domains  
+
+Argus is no longer conceptual.
+
+It is now a working diagnostic layer.
+
+---
+
+# 🧭 NEXT PHASE DIRECTION
+
+Next phase focus:
+
+## Argus ACLI User Experience Layer
+
+Goals:
+
+- improve CLI output readability  
+- structure findings clearly  
+- group results by severity  
+- refine human-readable summaries  
+- make outputs feel like a real tool, not raw data  
+
+Secondary direction (after UX):
+
+- multi-signal diagnostics (combine tools)  
+- smarter detection patterns  
+
+---
+
 # 🧭 DEVELOPMENT STYLE
 
 Act as a senior systems engineer:
@@ -408,3 +447,4 @@ Continue development aligned with:
 - current system_state  
 - phase-aware development rules  
 - strict control plane enforcement  
+- Argus diagnostic layer expansion and refinement  
