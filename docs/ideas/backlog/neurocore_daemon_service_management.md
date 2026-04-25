@@ -12,6 +12,18 @@
 
 ---
 
+## Phase Placement (CRITICAL)
+
+This should be implemented during:
+
+**Phase 6 – Distribution Layer**
+
+This MUST follow phase-aware development rules.
+
+NOT during current tool expansion phase (**Phase 5J**).
+
+---
+
 ## Summary
 
 Implement system-level service management for the NeuroCore daemon so that it:
@@ -67,3 +79,18 @@ User experience:
 
 ```bash
 acli "summary"
+```
+
+works immediately after login or system boot.
+
+---
+
+## Constraints
+
+- MUST NOT introduce alternative execution paths outside daemon → runtime_manager → control_plane → execution_engine flow  
+
+---
+
+## Notes
+
+This idea aligns with distribution and runtime packaging requirements and should be implemented only after the tool layer and system contracts are stable.
