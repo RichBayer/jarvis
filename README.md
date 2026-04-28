@@ -1,5 +1,7 @@
 # NeuroCore
 
+### Argus (ACLI) — Reduce downtime and understand your system faster
+
 Reduce downtime. Fix issues faster.  
 Understand what’s actually happening on your system.
 
