@@ -1,190 +1,272 @@
-# NeuroCore Documentation Index
+# NeuroCore
+
+Reduce downtime. Fix issues faster.  
+Understand what’s actually happening on your system.
+
+NeuroCore is built to shorten the time between:
+
+something breaking…  
+and you knowing exactly why.
 
 ---
 
-## 📖 Overview
+## What is this?
 
-This directory contains the complete documentation for the NeuroCore system.
+I built this because I got tired of two things.
 
-The documentation is organized to reflect how the system is actually built and used:
+System tools give you raw data with no explanation.  
+AI tools can talk all day but don’t actually understand your system.
 
-- Vision (what and why)
-- Architecture (how it works)
-- Execution & Core Systems (how it behaves)
-- Distributions (user-facing systems)
-- Infrastructure (environment and layout)
-- Development & Operations
-- Build History (full evolution of the system)
+NeuroCore is my answer to that.
 
----
+At its core, this system takes real, structured data from your machine and feeds it into a controlled intelligence layer that explains what’s actually going on.
 
-## 🧠 Vision (Start Here)
+Not guesses. Not generic advice.
 
-If you're new, start here to understand the system at a high level.
+It sees your system — CPU, memory, disk, network — and interprets it in context.
 
-- 👉 [NeuroCore Vision](/docs/architecture/neurocore_vision.md)
-- 👉 [Argus ACLI Vision](/docs/vision/argus_acli_vision.md)
-- 👉 [Argus Lab Vision](/docs/vision/argus_lab_vision.md)
+Sitting on top of that is Argus, a CLI interface that makes it usable.
 
----
+You ask something simple like:
 
-## 🏗 Core Architecture
+    ai "summary"
 
-Defines how NeuroCore is structured and how all components interact.
-
-- 👉 [System Architecture](/docs/architecture/system_architecture.md)
-- 👉 [Platform Ecosystem](/docs/architecture/platform_ecosystem.md)
-- 👉 [System State](/docs/architecture/system_state.md)
+…and instead of digging through commands and logs, you get a clear answer about your system state and what to do next.
 
 ---
 
-## ⚙️ Execution & Core Systems
+## Built for real systems
 
-Detailed breakdown of how the system operates internally.
+This runs locally on your machine.
 
-- 👉 [Control Plane](/docs/architecture/control_plane.md)
-- 👉 [Tool Execution System](/docs/architecture/tool_execution.md)
-- 👉 [Task Engine](/docs/architecture/task_engine.md)
-- 👉 [Observability](/docs/architecture/observability.md)
-- 👉 [Evaluation Framework](/docs/architecture/evaluation_framework.md)
-- 👉 [Security Policy](/docs/architecture/security_policy.md)
+No cloud.  
+No sending logs or system data anywhere.  
+No pasting sensitive output into a chatbot.
 
----
+Everything Argus sees comes directly from your system — and every action is controlled.
 
-## 🧩 Distributions (Argus)
-
-User-facing systems built on top of NeuroCore.
-
-- 👉 [Argus V1 Blueprint](/docs/distributions/argus_v1_blueprint.md)
-- 👉 [Argus ACLI Specification](/docs/distributions/argus/acli_spec.md)
+This isn’t an AI running wild on your machine. It’s a structured, controlled way to understand it.
 
 ---
 
-## 🏠 Infrastructure & Environment
+## What does it feel like to use?
 
-System layout, infrastructure design, and environment mapping.
+You run:
 
-- 👉 [Repository Map](/docs/infrastructure/neurocore_repository_map.txt)
-- 👉 [System Map](/docs/infrastructure/neurocore_system_map.txt)
-- 👉 [Home System Map](/docs/infrastructure/home_system_map.md)
-- 👉 [Home Infrastructure](/docs/infrastructure/home_infrastructure.md)
+    ai "summary"
 
----
+On a healthy system:
 
-## 🤖 AI Operations (Control Documents)
+System Summary
 
-How the AI system is operated, resumed, and constrained across sessions.
+Severity: OK
 
-- 👉 [Resume Prompt (Primary)](/docs/ai-operations/resume_prompt_compressed.md)
-- 👉 [Context Loading Strategy](/docs/ai-operations/context_loading_strategy.md)
-- 👉 [Mid-Phase Reset Protocol](/docs/ai-operations/mid_phase_reset_protocol.md)
-- 👉 [Documentation Closeout Protocol](/docs/ai-operations/documentation_closeout_protocol.md)
+Findings:  
+All system data sources returned successfully  
+
+Recommendations:  
+None  
 
 ---
 
-## 🧪 Design Documents
+Now here’s what happens when things go sideways.
 
-In-progress and phase-specific design work.
+I pushed the system under load using a simple stress test. Argus picked it up immediately:
 
-- 👉 [Phase 5I – Real Execution](/docs/design/phase_5i_real_execution.md)
+System Summary [CRITICAL]
 
----
+Findings:  
+Very high system load (4.13)  
+Memory usage is normal  
+Disk usage is normal  
 
-## 🖥 Hardware & Physical System
-
-Physical infrastructure and hardware planning.
-
-- 👉 [Home AI Hardware](/docs/hardware/home_ai_hardware.md)
-
----
-
-## 🧪 Build Logs (Full Development History)
-
-Complete system evolution from initial build to current state.
-
-👉 [Build Logs Directory](/build-logs/)
+Recommended Actions:  
+Investigate CPU-intensive processes (use: ai "processes")
 
 ---
 
-### 📂 All Build Logs
+Then I stopped the load.
 
-- 👉 [000 – Foundation](/build-logs/000_foundation.md)
-- 👉 [001 – Runtime Stack](/build-logs/001_runtime_stack.md)
-- 👉 [002 – Interface Layer](/build-logs/002_interface_layer.md)
-- 👉 [003 – Knowledge Layer](/build-logs/003_knowledge_layer.md)
-- 👉 [004 – Knowledge Retrieval](/build-logs/004_knowledge_retrieval.md)
-- 👉 [005 – Logic Layer Router](/build-logs/005_logic_layer_router.md)
-- 👉 [006 – RAG Reasoning Integration](/build-logs/006_rag_reasoning_integration.md)
-- 👉 [007 – Backup and Rebuild Foundations](/build-logs/007_backup_and_rebuild_foundations.md)
-- 👉 [008 – Runtime Performance and API Migration](/build-logs/008_runtime_performance_and_api_migration.md)
-- 👉 [009 – Daemon Foundation](/build-logs/009_neurocore_daemon_foundation.md)
-- 👉 [010 – Runtime Integration](/build-logs/010_runtime_integration.md)
-- 👉 [011 – CLI Interface Layer](/build-logs/011_cli_interface_layer.md)
-- 👉 [012 – Streaming Pipeline and CLI Behavior](/build-logs/012_streaming_pipeline_and_cli_behavior.md)
-- 👉 [013 – RAG Metadata and Grounding](/build-logs/013_rag_metadata_and_grounding.md)
-- 👉 [014 – Session Memory and Query Rewriting](/build-logs/014_session_memory_query_rewriting_and_knowledge_correction.md)
-- 👉 [015 – CLI Piped Input Ingestion](/build-logs/015_cli_piped_input_ingestion.md)
-- 👉 [016 – Runtime Control Plane Enforcement](/build-logs/016_runtime_control_plane_enforcement.md)
-- 👉 [017 – Execution Layer and Control Integration](/build-logs/017_execution_layer_and_control_integration.md)
-- 👉 [018 – Observability and Tracing](/build-logs/018_observability_and_tracing.md)
-- 👉 [019 – Real Tool Execution and System Info](/build-logs/019_real_tool_execution_and_system_info.md)
+Instead of instantly flipping back to “OK,” Argus reflects reality.
+
+System load decays over time, and it tracks that:
+
+System Summary [WARNING]
+
+Findings:  
+Elevated system load (2.9)  
+Memory usage is normal  
+Disk usage is normal  
+
+Recommended Actions:  
+Monitor system load and identify heavy processes  
 
 ---
 
-### ⭐ Suggested Starting Points
+A little later:
 
-If you don’t want to read everything:
+System Summary [OK]
 
-- 👉 000 – Foundation  
-- 👉 009 – Daemon Foundation  
-- 👉 012 – Streaming Pipeline  
-- 👉 016 – Control Plane Enforcement  
-- 👉 017 – Execution Layer Integration  
-- 👉 019 – Real Tool Execution  
-
-These represent major system milestones.
+Findings:  
+System load is normal (0.45)  
+Memory usage is normal  
+Disk usage is normal  
 
 ---
 
-## 🧭 How to Navigate
+That’s the whole point of this project.
 
-### If you're new:
-- Start with **NeuroCore Vision**
-- Then read **Argus ACLI Vision**
-- Then **Argus Lab Vision**
-- Then check **System State**
+It’s not just running commands.  
+It’s understanding system behavior over time.
 
 ---
 
-### If you're technical:
-- Start with **System Architecture**
-- Then **Control Plane**
-- Then **Tool Execution System**
-- Then explore **Build Logs**
+## Who this is for
+
+This is especially useful if:
+
+- you don’t have a full-time admin watching everything  
+- you’re running systems where downtime costs time and money  
+- you need to understand issues quickly without digging through logs for hours  
+
+Startups, small teams, homelabs, or anyone wearing multiple hats — this is built for that reality.
 
 ---
 
-### If you're interested in using the system:
-- Read **Argus ACLI Vision**
-- Then **Argus Blueprint**
-- Then explore architecture as needed
+## What’s actually happening under the hood?
+
+Argus looks at your system as a whole.
+
+CPU. Memory. Disk. Network.
+
+It pulls real data, combines it, and asks:
+
+What matters here?  
+Is anything wrong?  
+What should the user check next?
+
+And then it answers those questions directly.
 
 ---
 
-## 💡 Final Note
+## Where it’s at right now
 
-This repository reflects a real system under active development.
+This is V1, and it’s actively being built.
 
-Documentation is:
+Right now:
 
-- structured  
-- layered  
-- aligned with actual system behavior  
+- System Summary is implemented and sets the pattern for all Argus tools  
+- Multi-signal system analysis is working  
+- Output is structured, readable, and grounded in real data  
+- It reacts correctly to real system conditions  
 
-This is not theoretical.
+In progress:
 
-This is a working platform being built in real time.
+- Expanding Argus across more system areas (processes, logs, network, etc.)  
+- Reducing output noise (some commands still return a lot of raw data)  
+- Adding filtering and summarization  
+- Improving the CLI experience  
 
 ---
 
-# End of Document
+## What’s coming next
+
+Right now, Argus tells you what’s happening.
+
+Soon, it will also remember what *keeps happening*.
+
+Not vague “AI memory”… real operational history.
+
+So instead of:
+
+“nginx is down”
+
+You’ll get:
+
+“this is the third time nginx has gone down in 14 days”
+
+That’s the difference between reacting to issues… and understanding your system.
+
+---
+
+## Where this goes long term
+
+Argus won’t just be trained on documentation.
+
+It will be trained on real systems.
+
+I’m building a controlled lab environment where I can:
+
+- inject failures  
+- break services  
+- simulate real-world issues  
+
+…and train Argus to troubleshoot them correctly.
+
+Not theoretically.
+
+Practically.
+
+---
+
+## Supported environments (current)
+
+Initial support is focused on:
+
+Ubuntu (Linux)
+
+That’s the primary environment for V1.
+
+Support for additional Linux distributions will follow once the core system is fully stable.
+
+---
+
+## What this is NOT
+
+This isn’t a chatbot wrapper.  
+It’s not a collection of scripts.  
+It’s not trying to automate everything.
+
+This is a system that helps you understand what’s going on so you can make the right call.
+
+---
+
+## Powered by NeuroCore
+
+Argus runs on NeuroCore, a local runtime that enforces how everything works.
+
+Every request, every action, every piece of system interaction goes through a controlled execution layer.
+
+Nothing bypasses it.
+
+That’s what keeps this predictable, safe, and grounded in reality.
+
+---
+
+## Learn More
+
+More detailed documentation is being organized and will be added here:
+
+- How Argus works (coming soon)  
+- Safety and execution model (coming soon)  
+- System intelligence model (coming soon)  
+- Roadmap (coming soon)  
+
+---
+
+## Final thought
+
+This started as frustration.
+
+System tools don’t explain anything.  
+AI doesn’t understand real systems.  
+
+This is an attempt to fix both.
+
+It’s not finished.
+
+But it’s already doing something useful:
+
+It takes a system that normally requires experience to understand…
+
+…and makes it readable.
