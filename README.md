@@ -275,7 +275,7 @@ That’s what keeps this predictable, safe, and grounded in reality.
 
 More detailed documentation is being organized and will be added here:
 
-- How Argus works (coming soon)  
+- [How Argus works](docs/how_argus_works.md)  
 - Safety and execution model (coming soon)  
 - System intelligence model (coming soon)  
 - Roadmap (coming soon)  
