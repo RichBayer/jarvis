@@ -54,6 +54,9 @@ class UptimeAnalysis(BaseTool):
         load = data.get("load_average", {})
         load_1 = load.get("1min", 0.0)
 
+        raw_result = data.get("raw", {})
+        raw_output = raw_result.get("stdout", "")
+
         findings: List[Dict[str, Any]] = []
         recommendations: List[str] = []
 
@@ -99,6 +102,9 @@ class UptimeAnalysis(BaseTool):
             data={
                 "severity": severity,
                 "findings": findings,
-                "recommendations": recommendations
+                "recommendations": recommendations,
+                "raw": {
+                    "uptime_load": raw_output
+                }
             }
         )

@@ -52,10 +52,12 @@ class LogsAnalysis(BaseTool):
         data = result.get("data", {})
         logs = data.get("logs", [])
 
+        raw_result = data.get("raw", {})
+        raw_output = raw_result.get("stdout", "")
+
         findings: List[Dict[str, Any]] = []
         recommendations: List[str] = []
 
-        severity_priority = ["OK", "INFO", "WARN", "CRITICAL"]
         highest_severity = "OK"
 
         # -------------------------
@@ -119,6 +121,9 @@ class LogsAnalysis(BaseTool):
             data={
                 "severity": highest_severity,
                 "findings": findings,
-                "recommendations": recommendations
+                "recommendations": recommendations,
+                "raw": {
+                    "system_logs": raw_output
+                }
             }
         )

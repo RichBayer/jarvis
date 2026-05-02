@@ -52,10 +52,12 @@ class ConnectionsAnalysis(BaseTool):
         data = result.get("data", {})
         connections = data.get("connections", [])
 
+        raw_result = data.get("raw", {})
+        raw_output = raw_result.get("stdout", "")
+
         findings: List[Dict[str, Any]] = []
         recommendations: List[str] = []
 
-        severity_priority = ["OK", "INFO", "WARN", "CRITICAL"]
         highest_severity = "OK"
 
         # -------------------------
@@ -111,6 +113,9 @@ class ConnectionsAnalysis(BaseTool):
             data={
                 "severity": highest_severity,
                 "findings": findings,
-                "recommendations": recommendations
+                "recommendations": recommendations,
+                "raw": {
+                    "network_connections": raw_output
+                }
             }
         )

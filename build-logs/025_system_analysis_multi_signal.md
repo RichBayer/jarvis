@@ -309,6 +309,53 @@ At this point, disk, memory, network, and processes all followed the same diagno
 
 ---
 
+## Contract Closeout Correction
+
+After the main system-analysis work was completed, a follow-up validation pass found that several implemented Argus tools were working correctly from a routing and interpretation standpoint, but had not yet been aligned with the final raw-evidence diagnostic contract established during this phase.
+
+The affected tools were:
+
+- `tools/argus/connections_analysis.py`
+- `tools/argus/uptime_analysis.py`
+- `tools/argus/logs_analysis.py`
+- `tools/argus/system_summary.py`
+
+These tools already returned the core diagnostic fields:
+
+- severity
+- findings
+- recommendations
+
+However, they did not consistently expose top-level raw evidence through `data["raw"]` in the same pattern used by the completed diagnostic tools:
+
+- `disk_analysis`
+- `memory_analysis`
+- `network_analysis`
+- `process_top_analysis`
+- `system_analysis`
+
+This mattered because the final diagnostic contract is not just about interpretation.
+
+Argus needs to show both:
+
+- what it thinks
+- what evidence it used
+
+Without raw evidence, the tools were useful, but they still required the user to trust the interpretation without seeing the supporting system output.
+
+The follow-up correction updated the remaining implemented Argus tools to preserve raw system evidence using the same pattern already established by the completed tools.
+
+This was not new Phase 6 work.
+
+No new execution path was introduced.  
+No control-plane behavior was changed.  
+No new system intelligence was added.  
+No tool bypassed the existing architecture.
+
+This was a contract-alignment cleanup to fully close the Phase 5J diagnostic layer before moving into Distribution Layer work.
+
+---
+
 ## Final System Output
 
 With the individual signals cleaned up, they were combined into the final system view.

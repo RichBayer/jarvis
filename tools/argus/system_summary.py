@@ -54,6 +54,8 @@ class SystemSummary(BaseTool):
         findings: List[Dict[str, Any]] = []
         recommendations: List[str] = []
 
+        raw_outputs: Dict[str, str] = {}
+
         def extract_stdout(section: Dict) -> str:
             return section.get("raw", {}).get("stdout", "")
 
@@ -63,6 +65,13 @@ class SystemSummary(BaseTool):
         uptime_output = extract_stdout(raw_data.get("uptime", {}))
         os_output = extract_stdout(raw_data.get("os", {}))
         hostname_output = extract_stdout(raw_data.get("hostname", {}))
+
+        raw_outputs["cpu"] = cpu_output
+        raw_outputs["memory"] = memory_output
+        raw_outputs["disk"] = disk_output
+        raw_outputs["uptime"] = uptime_output
+        raw_outputs["os"] = os_output
+        raw_outputs["hostname"] = hostname_output
 
         if not cpu_output:
             findings.append({
@@ -145,6 +154,7 @@ class SystemSummary(BaseTool):
             data={
                 "severity": highest_severity,
                 "findings": findings,
-                "recommendations": recommendations
+                "recommendations": recommendations,
+                "raw": raw_outputs
             }
         )
