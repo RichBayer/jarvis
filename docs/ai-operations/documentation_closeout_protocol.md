@@ -229,6 +229,33 @@ The assistant MUST NOT:
 
 ---
 
+## Surgical Documentation Update Rule (CRITICAL)
+
+Before providing any documentation replacement, the assistant MUST state:
+
+1. the exact file being updated
+2. the specific intended changes
+3. why those changes are required
+
+The assistant MUST NOT:
+
+- make unknown changes to documentation
+- silently rewrite existing prose
+- perform style cleanup unless explicitly requested
+- restructure sections unless required by the current change
+- add extra navigation links beyond the stated scope
+- modify content unrelated to the build phase or explicit user request
+
+If a full-file replacement is required, unchanged sections MUST remain unchanged unless modification is necessary to add the new verified details.
+
+If the assistant believes a broader cleanup or rewrite would improve the document:
+
+→ STOP  
+→ explain the optional improvement  
+→ request explicit user approval before including it  
+
+---
+
 ## Observability Protection Rule
 
 Documentation updates MUST NOT:

@@ -13,6 +13,7 @@ At this stage, NeuroCore supports:
 - an Argus tool layer for system-level reasoning and diagnostics  
 - **multi-signal system diagnostics through aggregation tools**
 - **structured CLI diagnostic output (UX layer)**
+- **Phase 6 CLI output-control modes for concise, raw, summary, and JSON output**
 - **raw evidence preservation across implemented Argus diagnostic tools**
 
 ---
@@ -48,13 +49,21 @@ Capabilities:
 - JSON response parsing and clean output formatting
 - Piped input support (`command | ai`)
 - Automatic trace context generation
+- Concise default Argus diagnostic output
+- Optional raw evidence display with `--raw`
+- Summary-only diagnostic display with `--summary`
+- Full structured response display with `--json`
+- Copy/paste raw evidence hint when raw evidence exists
 
 Notes:
 
 - CLI is intentionally simple  
 - Responsible only for input + output formatting  
 - Does not contain execution logic  
-- **Now provides structured diagnostic presentation (severity, findings, recommendations, raw evidence)**
+- **Now provides structured diagnostic presentation (severity, findings, recommendations, controlled raw evidence visibility)**  
+- Raw evidence is preserved by Argus tools but hidden by default in normal CLI output  
+- Raw evidence remains available on demand through `--raw`  
+- Machine-readable structured responses remain available through `--json`  
 
 ---
 
@@ -393,6 +402,11 @@ NeuroCore now supports:
 - **Raw evidence preservation across implemented Argus diagnostic tools**
 - **Multi-signal system diagnostics (aggregation layer)**
 - **Human-readable CLI diagnostic output (UX layer)**
+- **Concise default Argus CLI output**
+- **On-demand raw evidence display through `--raw`**
+- **Summary-only diagnostic display through `--summary`**
+- **Full structured JSON response display through `--json`**
+- **Copy/paste raw evidence hints for discoverability**
 - Full observability and tracing  
 
 ---
@@ -419,14 +433,15 @@ NeuroCore is now:
 - preserving raw evidence across implemented Argus diagnostic outputs  
 - supporting multi-signal system analysis  
 - presenting structured diagnostic output through the CLI  
+- supporting Phase 6 CLI output-control behavior  
 - fully observable end-to-end  
-- stable for Phase 6 distribution-layer work  
+- stable for continued Phase 6 distribution-layer work  
 
 ---
 
 ## Next Phase
 
-- Begin Phase 6 Distribution Layer work  
+- Continue Phase 6 Distribution Layer work  
 - Refine Argus ACLI output control (filtering, summarization, signal selection)  
 - Improve default diagnostic readability while preserving access to raw evidence  
 - Maintain strict control plane enforcement  

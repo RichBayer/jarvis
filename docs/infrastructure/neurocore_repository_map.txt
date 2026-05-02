@@ -50,7 +50,8 @@ build-logs/
 ├── 022_structured_tool_contract.md
 ├── 023_system_tool_structuring_and_normalization.md
 ├── 024_argus_tool_layer_foundation_and_expansion.md
-└── 025_system_analysis_multi_signal.md
+├── 025_system_analysis_multi_signal.md
+└── 026_phase_6_argus_acli_output_control.md
 
 ---
 
@@ -118,7 +119,8 @@ docs/design/
 ├── argus_tool_creation_workflow.md
 ├── argus_tool_layer.md
 ├── phase_5i_real_execution.md
-└── phase_5j_argus_core_tool_expansion.md
+├── phase_5j_argus_core_tool_expansion.md
+└── phase_6_argus_acli_output_control.md
 
 ---
 
@@ -193,6 +195,7 @@ docs/screenshots/
 ├── knowledge/
 ├── logic/
 ├── observability-tracing/
+├── phase-6-output-control/
 ├── rag/
 ├── runtime/
 ├── runtime-behavior/
@@ -299,6 +302,21 @@ docs/screenshots/argus_acli_ux/
 
 ---
 
+### PHASE 6 OUTPUT CONTROL SCREENSHOTS
+
+docs/screenshots/phase-6-output-control/
+
+├── 01_disk_before_raw_output_default.png
+├── 02_disk_after_concise_default.png
+├── 03_disk_after_raw_flag_enabled.png
+├── 04_disk_after_raw_hint_added.png
+├── 05_disk_summary_mode.png
+├── 06_disk_json_mode.png
+├── 07_memory_concise_with_raw_hint.png
+└── 08_system_concise_with_raw_hint.png
+
+---
+
 ### SYSTEM TOOL STRUCTURING SCREENSHOTS
 
 docs/screenshots/system-tool-structuring/
@@ -393,12 +411,13 @@ tools/system/
 
 ## NOTES
 
-- Repository map reflects live tree output after Phase 5J raw-evidence contract closeout.
-- Repository contains 55 directories and 280 files at the time of this update.
-- Phase 5J build logs are complete through `025_system_analysis_multi_signal.md`.
+- Repository map reflects live tree output after the first Phase 6 Argus ACLI output-control pass.
+- Repository contains 56 directories and 290 files at the time of this update.
+- Phase 6 build logs are complete through `026_phase_6_argus_acli_output_control.md`.
+- Phase 6 output-control design is documented in `docs/design/phase_6_argus_acli_output_control.md`.
 - Argus tool layer includes implemented diagnostic tools and multi-signal `system_analysis`.
 - Implemented Argus diagnostic tools preserve raw evidence for verification.
 - System tools conform to the structured output contract and preserve raw command output.
 - Argus tools consume structured data and produce deterministic diagnostics.
 - Runtime and daemon layers enforce full data propagation and trace continuity.
-- Phase 6 work begins from this state with Distribution Layer / Argus ACLI output control.
+- Phase 6 work is active with Distribution Layer / Argus ACLI output control.

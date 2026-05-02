@@ -59,6 +59,15 @@ Phase 5J should be considered complete only after the raw-evidence contract clos
 build-logs/025_system_analysis_multi_signal.md
 ```
 
+Phase 6A first output-control pass is COMPLETE.
+
+Phase 6A output-control behavior is documented in:
+
+```text
+build-logs/026_phase_6_argus_acli_output_control.md
+docs/design/phase_6_argus_acli_output_control.md
+```
+
 Confirmed capabilities:
 
 - execution engine COMPLETE
@@ -70,6 +79,11 @@ Confirmed capabilities:
 - **raw evidence preservation ACTIVE across implemented Argus diagnostic tools**
 - **multi-signal system aggregation ACTIVE through `system_analysis`**
 - **structured CLI diagnostic output ACTIVE**
+- **Phase 6 concise default Argus output ACTIVE**
+- **Phase 6 raw evidence mode ACTIVE through `--raw`**
+- **Phase 6 summary mode ACTIVE through `--summary`**
+- **Phase 6 JSON mode ACTIVE through `--json`**
+- **Phase 6 copy/paste raw evidence hints ACTIVE**
 
 ---
 
@@ -231,6 +245,51 @@ Constraints:
 - MUST preserve access to raw evidence  
 - MUST consume Argus tool outputs (not system tools directly)
 - MUST NOT move diagnostic interpretation into the CLI/distribution layer
+
+#### Phase 6A Output-Control Pass
+
+Status: ✅ COMPLETE
+
+Implemented in:
+
+```text
+scripts/ai_cli.py
+```
+
+Documented in:
+
+```text
+build-logs/026_phase_6_argus_acli_output_control.md
+docs/design/phase_6_argus_acli_output_control.md
+```
+
+Completed behavior:
+
+- concise default Argus diagnostic output
+- on-demand raw evidence display through `--raw`
+- summary-only output through `--summary`
+- full structured response output through `--json`
+- copy/paste raw evidence hints when raw evidence exists
+- validation across single-domain and multi-signal Argus commands
+
+Validated commands:
+
+```bash
+ai "disk"
+ai --raw "disk"
+ai --summary "disk"
+ai --json "disk"
+ai "memory"
+ai "system"
+```
+
+Remaining Phase 6 output-control work may include:
+
+- selected-signal output controls
+- severity/filtering modes
+- improved multi-signal formatting
+- production vs training output profiles
+- eventual move or mirror of finalized behavior into `distributions/argus/cli/acli.py`
 
 ---
 

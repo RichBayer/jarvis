@@ -96,6 +96,7 @@ In-progress and phase-specific design work.
 - 👉 [Argus System Summary V1](./design/argus_system_summary_v1.md)
 - 👉 [Phase 5J – Argus Core Tool Expansion](./design/phase_5j_argus_core_tool_expansion.md)
 - 👉 [Argus ACLI User Experience Layer](./design/argus_acli_user_experience_layer.md)
+- 👉 [Phase 6 – Argus ACLI Output Control](./design/phase_6_argus_acli_output_control.md)
 
 ---
 
@@ -143,6 +144,7 @@ Complete system evolution from initial build to current state.
 - 👉 [023 – System Tool Structuring and Normalization](../build-logs/023_system_tool_structuring_and_normalization.md)
 - 👉 [024 – Argus Tool Layer Foundation and Expansion](../build-logs/024_argus_tool_layer_foundation_and_expansion.md)
 - 👉 [025 – System Analysis Multi-Signal Aggregation and CLI UX](../build-logs/025_system_analysis_multi_signal.md)
+- 👉 [026 – Phase 6 Argus ACLI Output Control](../build-logs/026_phase_6_argus_acli_output_control.md)
 
 ---
 

@@ -353,6 +353,38 @@ ACLI may format structured Argus output for readability as long as it does not c
 
 ---
 
+### Phase 6A Output-Control Behavior
+
+The Phase 6A output-control pass added display-only CLI behavior for controlling how Argus diagnostic output is presented.
+
+This behavior is implemented in:
+
+scripts/ai_cli.py
+
+Documented in:
+
+build-logs/026_phase_6_argus_acli_output_control.md  
+docs/design/phase_6_argus_acli_output_control.md
+
+Current output modes:
+
+- default concise output
+- raw evidence output through `--raw`
+- summary-only output through `--summary`
+- full structured response output through `--json`
+
+Rules:
+
+- raw evidence may be hidden by default at the CLI / ACLI presentation layer
+- raw evidence must remain preserved in structured tool data
+- raw evidence must remain available through an explicit raw-output mode
+- JSON / structured response output must remain available for machine-readable workflows
+- output-control behavior must not change diagnostic meaning
+- output-control behavior must not move interpretation into the CLI / ACLI layer
+- output-control behavior must not bypass the control plane or tool contract
+
+---
+
 ## Command Consistency Requirement
 
 Commands must remain stable and predictable.

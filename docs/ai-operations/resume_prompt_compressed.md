@@ -193,6 +193,26 @@ If required documentation is not identifiable:
 
 ---
 
+# 🧠 DOCUMENTATION CLOSEOUT RULES (CRITICAL)
+
+During documentation closeout:
+
+- Do NOT make unknown documentation changes  
+- Do NOT silently rewrite existing prose  
+- Do NOT perform style cleanup unless explicitly requested  
+- Do NOT restructure sections unless required by the current change  
+- Explain the exact intended documentation changes before providing a full-file replacement  
+- Only update content directly impacted by the build phase or explicit user request  
+- Preserve unchanged sections unless modification is necessary to add verified new details  
+
+If a broader cleanup or rewrite would improve a document:
+
+→ STOP  
+→ explain the optional improvement  
+→ request explicit approval before including it  
+
+---
+
 # 🧠 SYSTEM IDENTITY
 
 (unchanged)
@@ -238,6 +258,15 @@ These tools now match the raw-evidence pattern already established by:
 - `tools/argus/process_top.py`
 - `tools/argus/system_analysis.py`
 
+Phase 6A output-control pass is also COMPLETE.
+
+The first Phase 6 output-control pass is documented in:
+
+```
+build-logs/026_phase_6_argus_acli_output_control.md
+docs/design/phase_6_argus_acli_output_control.md
+```
+
 The system now includes:
 
 - full structured system tool layer  
@@ -249,13 +278,28 @@ The system now includes:
 - **multi-signal system aggregation (`system_analysis`)**
 - **structured CLI diagnostic UX layer**
 - **human-readable diagnostics backed by real system data**
+- **Phase 6 CLI output-control behavior**
+- **concise default Argus diagnostic output**
+- **on-demand raw evidence display through `--raw`**
+- **summary-only diagnostic display through `--summary`**
+- **full structured JSON response display through `--json`**
+- **copy/paste raw evidence hints for discoverability**
 
-Validated closeout behavior:
+Validated Phase 5J closeout behavior:
 
 - `ai "summary"` returns interpreted output with raw evidence  
 - `ai "connections"` returns interpreted output with raw evidence  
 - `ai "uptime"` returns interpreted output with raw evidence  
 - `ai "logs"` returns interpreted output with a raw evidence field  
+
+Validated Phase 6A output-control behavior:
+
+- `ai "disk"` returns concise diagnostic output with a raw evidence hint  
+- `ai --raw "disk"` returns diagnostic output with raw evidence displayed  
+- `ai --summary "disk"` returns title, severity, and raw evidence hint only  
+- `ai --json "disk"` returns the full structured JSON response  
+- `ai "memory"` confirms output-control behavior works beyond disk analysis  
+- `ai "system"` confirms output-control behavior works with multi-signal analysis  
 
 Known note:
 
@@ -270,6 +314,7 @@ It is now a working diagnostic system capable of:
 - individual domain diagnostics  
 - human-readable diagnostics backed by real system data  
 - deterministic first-pass interpretation before future model reasoning  
+- controlled CLI presentation for concise, raw, summary, and JSON output modes  
 
 ---
 
@@ -279,21 +324,34 @@ Current phase:
 
 ## Phase 6 – Distribution Layer / Argus ACLI Output Control
 
-Next phase focus:
+Current completed Phase 6 work:
 
-## Output Control and Signal Management
+## Phase 6A – First Output-Control Pass
+
+Completed:
+
+- concise default Argus diagnostic output  
+- `--raw` mode for raw evidence inspection  
+- `--summary` mode for quick health checks  
+- `--json` mode for full machine-readable response output  
+- copy/paste raw evidence hints  
+- validation across disk, memory, and multi-signal system analysis  
+
+Next Phase 6 focus:
+
+## Continue Output Control and Signal Management
 
 Goals:
 
-- reduce output noise  
+- continue reducing output noise  
 - introduce filtering  
-- introduce summarization  
+- introduce summarization refinements  
 - allow signal selection  
-- control raw output visibility  
-- improve readability without losing data  
+- improve multi-signal output formatting  
 - preserve access to full raw evidence  
 - keep diagnostic logic inside Argus tools  
 - keep presentation behavior in the interface/distribution layer  
+- eventually move or mirror finalized ACLI behavior into `distributions/argus/cli/acli.py`  
 
 This phase prepares the system for:
 
@@ -306,11 +364,18 @@ This phase prepares the system for:
 
 ## Secondary Direction (After Output Control)
 
+- initial runtime packaging  
+- filesystem layout planning  
 - deeper multi-signal correlation  
 - improved detection logic  
 - reduction of false positives  
 - better log interpretation  
-- incident memory design/implementation if phase-aligned  
+- incident memory design/implementation if explicitly selected and phase-aligned  
+
+Deferred beyond the current output-control lane:
+
+- broad natural-language command routing  
+- model/router fuzzy intent reasoning  
 
 ---
 
@@ -328,5 +393,7 @@ Continue development aligned with:
 - phase-aware development rules  
 - strict control plane enforcement  
 - completed Phase 5J raw-evidence contract closeout  
+- completed Phase 6A output-control pass  
 - Phase 6 Distribution Layer work  
 - Argus ACLI output control and signal management  
+- documentation closeout surgical-update rules  

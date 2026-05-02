@@ -68,6 +68,41 @@ The next problem is controlling how much of it is shown by default.
 
 ---
 
+## Implementation Status
+
+The first Phase 6 output-control pass is complete.
+
+Documented in:
+
+```text
+docs/design/phase_6_argus_acli_output_control.md
+build-logs/026_phase_6_argus_acli_output_control.md
+```
+
+Implemented in:
+
+```text
+scripts/ai_cli.py
+```
+
+Completed behavior:
+
+- concise default Argus diagnostic output
+- on-demand raw evidence display with `--raw`
+- summary-only output with `--summary`
+- full structured response output with `--json`
+- copy/paste raw evidence hint when raw evidence exists
+
+Remaining Phase 6 work may still include:
+
+- selected-signal output controls
+- severity/filtering modes
+- improved multi-signal formatting
+- production vs training output profiles
+- eventual move or mirror of finalized behavior into `distributions/argus/cli/acli.py`
+
+---
+
 ## Problem
 
 Current CLI output:

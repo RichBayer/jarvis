@@ -266,6 +266,53 @@ Design goals:
 
 ---
 
+## Phase 6A Output-Control Behavior
+
+The first Phase 6 output-control pass is implemented in the current NeuroCore CLI and defines the expected behavior pattern for Argus ACLI output.
+
+Current examples:
+
+```bash
+ai "disk"
+ai --raw "disk"
+ai --summary "disk"
+ai --json "disk"
+```
+
+The final Argus command name may be `argus`, `acli`, or a user-defined alias, but the output-control behavior should remain consistent.
+
+Default output should be concise and show:
+
+- title / summary
+- severity
+- findings
+- recommendations
+- raw evidence hint when raw evidence exists
+
+Raw evidence is preserved by the Argus diagnostic layer but hidden by default in normal CLI output.
+
+Raw evidence remains available on demand through explicit raw mode:
+
+```bash
+ai --raw "disk"
+```
+
+Summary mode supports quick health checks:
+
+```bash
+ai --summary "disk"
+```
+
+JSON mode preserves the complete structured response for machine-readable workflows:
+
+```bash
+ai --json "disk"
+```
+
+This behavior keeps the normal CLI experience readable while preserving trust, verification, automation, and future model-facing workflows.
+
+---
+
 ## Model Strategy (Ollama Integration)
 
 Argus V1 supports model-assisted reasoning.

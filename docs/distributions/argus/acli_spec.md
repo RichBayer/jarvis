@@ -411,6 +411,127 @@ Where appropriate, output should include:
 
 ---
 
+## Current Phase 6A Output Modes
+
+The initial Phase 6A output-control pass is implemented in the current NeuroCore CLI and should guide future ACLI behavior.
+
+Current supported modes:
+
+```bash
+ai "disk"
+ai --raw "disk"
+ai --summary "disk"
+ai --json "disk"
+```
+
+The eventual Argus ACLI should preserve the same behavior pattern, even if the final command name changes from `ai` to `argus`, `acli`, or another configured alias.
+
+---
+
+### Default Concise Output
+
+Default diagnostic output should be concise.
+
+Example:
+
+```bash
+ai "disk"
+```
+
+Default output should show:
+
+- title / summary
+- severity
+- findings
+- recommendations
+- raw evidence hint when raw evidence exists
+
+Raw evidence should not be dumped by default.
+
+---
+
+### Raw Evidence Output
+
+Raw evidence must remain available on demand.
+
+Example:
+
+```bash
+ai --raw "disk"
+```
+
+Raw mode should show:
+
+- title / summary
+- severity
+- findings
+- recommendations
+- supporting raw evidence
+
+This mode exists for verification, deeper inspection, troubleshooting, and trust.
+
+---
+
+### Summary Output
+
+Summary mode supports fast health checks.
+
+Example:
+
+```bash
+ai --summary "disk"
+```
+
+Summary mode should show:
+
+- title / summary
+- severity
+- raw evidence hint when raw evidence exists
+
+It should omit detailed findings, recommendations, and raw evidence.
+
+---
+
+### JSON Output
+
+JSON mode supports machine-readable workflows.
+
+Example:
+
+```bash
+ai --json "disk"
+```
+
+JSON mode should print the full structured response returned by NeuroCore.
+
+This preserves automation, testing, scripting, and future model-facing workflows.
+
+---
+
+## Raw Evidence Discoverability
+
+When raw evidence exists but is hidden by default, the CLI should provide a copy/paste-ready hint.
+
+Example:
+
+```text
+Raw evidence hidden by default.
+To inspect raw evidence, run:
+ai --raw "disk"
+```
+
+This lets users inspect raw evidence without memorizing flags.
+
+This is preferred over an interactive `y/n` prompt for the current phase because it preserves predictable behavior for:
+
+- piping
+- automation
+- screenshots
+- JSON output
+- repeatable CLI workflows
+
+---
+
 ## Output Must NOT Be
 
 - raw command dumps without interpretation
