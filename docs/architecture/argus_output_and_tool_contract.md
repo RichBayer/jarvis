@@ -32,12 +32,15 @@ All tools must produce:
 - deterministic results
 - structured data
 - human-readable summaries
+- raw evidence for verification
 
 The system must never depend on:
 
 - parsing formatted text
 - CLI-specific output
 - implicit assumptions
+
+Raw evidence may be preserved and displayed for user verification, but Argus interpretation must be derived from structured data.
 
 ---
 
@@ -69,6 +72,7 @@ Responsibilities:
 - execute system commands via CommandRunner
 - collect raw system signals
 - return structured data
+- preserve raw command output
 
 Rules:
 
@@ -91,6 +95,7 @@ Responsibilities:
 - aggregate structured data
 - interpret system state
 - produce findings and recommendations
+- preserve raw evidence for verification
 
 Rules:
 
@@ -98,6 +103,7 @@ Rules:
 - MUST NOT execute system commands directly
 - MUST consume structured data only
 - MUST NOT parse formatted message output
+- MUST preserve raw evidence when available from system tool data
 
 ---
 
@@ -147,7 +153,8 @@ Example:
 {
   "cpu": {...},
   "memory": {...},
-  "disk": {...}
+  "disk": {...},
+  "raw": {...}
 }
 
 System tools MUST NOT:
@@ -155,6 +162,8 @@ System tools MUST NOT:
 - return only raw text
 - require parsing of message field
 - mix formatting with data
+
+System tools SHOULD preserve raw command output inside structured data so downstream Argus tools can expose supporting evidence.
 
 ---
 
@@ -165,7 +174,7 @@ Argus tools MUST return structured interpretation in data.
 Minimum required structure:
 
 {
-  "severity": "OK" | "WARNING" | "CRITICAL",
+  "severity": "OK" | "INFO" | "WARN" | "CRITICAL",
   "findings": [
     {
       "severity": "...",
@@ -175,7 +184,8 @@ Minimum required structure:
   ],
   "recommendations": [
     "..."
-  ]
+  ],
+  "raw": { ... }
 }
 
 Optional (future-ready):
@@ -188,12 +198,35 @@ Optional (future-ready):
 
 ---
 
+## Raw Evidence Requirement
+
+Implemented Argus diagnostic tools MUST preserve raw evidence when available from the underlying system tool.
+
+Raw evidence is used for:
+
+- user verification
+- trust
+- future model grounding
+- incident review
+- diagnostic traceability
+
+Rules:
+
+- raw evidence must not replace structured interpretation
+- raw evidence must not be parsed as the primary diagnostic source
+- raw evidence should be exposed under `data["raw"]`
+- empty raw output is acceptable if the underlying system command returns no visible output
+- raw evidence must remain read-only and must not trigger automatic actions
+
+---
+
 ## Severity Model
 
 Allowed severity values:
 
 OK  
-WARNING  
+INFO  
+WARN  
 CRITICAL  
 
 Rules:
@@ -308,12 +341,15 @@ ACLI consumes:
 
 - message → display to user
 - data → internal use (future expansion)
+- raw evidence → optional display / verification support
 
 ACLI must NOT:
 
-- reformat tool output
-- interpret raw data
-- perform logic outside tool system
+- perform diagnostic interpretation outside the tool system
+- depend on raw output parsing for logic
+- perform logic outside its interface/distribution responsibility
+
+ACLI may format structured Argus output for readability as long as it does not change diagnostic meaning or bypass tool output.
 
 ---
 
@@ -329,6 +365,9 @@ disk
 memory  
 logs  
 network  
+connections  
+uptime  
+system  
 
 The control plane mapping defines the system API.
 
@@ -397,6 +436,7 @@ This document defines:
 - how data is structured
 - how Argus maintains consistency
 - how future systems integrate cleanly
+- how raw evidence is preserved without becoming the source of interpretation
 
 This is the foundation for:
 

@@ -271,6 +271,7 @@ Purpose:
 - aggregate signals  
 - interpret system state  
 - produce diagnostic output  
+- preserve raw evidence for verification  
 
 Rules:
 
@@ -278,6 +279,7 @@ Rules:
 - MUST use system tools  
 - MUST consume structured `data`  
 - MUST NOT parse formatted message output  
+- MUST preserve raw evidence passed through from system tools  
 
 ---
 
@@ -329,6 +331,7 @@ Strict separation ensures:
 
 - perform execution  
 - return structured system data  
+- preserve raw command output  
 - remain narrow in scope  
 - do not interpret  
 
@@ -340,6 +343,7 @@ Strict separation ensures:
 - aggregate signals  
 - interpret findings  
 - produce recommendations  
+- preserve raw evidence for verification  
 
 ---
 
@@ -361,6 +365,7 @@ Return:
 - interpreted findings  
 - severity classification  
 - recommended actions  
+- raw evidence  
 
 ---
 
@@ -406,7 +411,10 @@ BaseTool Contract: COMPLETE
 System Tool Layer: ACTIVE  
 CommandRunner: ACTIVE  
 Real System Execution: ACTIVE  
-Argus Tool Layer: ACTIVE (system_summary implemented)  
+Argus Tool Layer: ACTIVE  
+Argus Diagnostic Tools: IMPLEMENTED across current core domains  
+Raw Evidence Contract: COMPLETE across implemented Argus diagnostic tools  
+System Analysis Aggregation: ACTIVE  
 
 ---
 
@@ -417,6 +425,9 @@ The execution architecture now supports:
 - controlled system execution  
 - structured system data  
 - an interpretation layer (Argus)  
+- deterministic diagnostic output  
+- raw evidence preservation  
+- multi-signal system analysis  
 - strict safety boundaries  
 - full observability  
 
@@ -424,7 +435,7 @@ The execution architecture now supports:
 
 # Next Step
 
-- expand Argus tool layer  
-- implement process_top (Argus version)  
-- continue manifest-driven development  
+- proceed into Phase 6 Distribution Layer work  
+- refine Argus ACLI output control  
+- add filtering, summarization, signal selection, and raw visibility controls  
 - maintain strict execution boundaries  

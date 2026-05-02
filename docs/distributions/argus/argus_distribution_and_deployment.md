@@ -89,9 +89,10 @@ Argus provides:
 
 - system inspection
 - structured diagnostics
+- raw evidence for verification
 - recommended next steps
 - optional AI explanation layer
-- persistent resolved issue memory and recurrence awareness
+- planned persistent resolved issue memory and recurrence awareness
 
 ---
 
@@ -125,15 +126,25 @@ acli command
 
 tools/argus/
 
-- system_summary (implemented)
-- future tools (process, disk, logs, etc.)
+Implemented diagnostic tools:
+
+- system_summary
+- process_top_analysis
+- memory_analysis
+- disk_analysis
+- network_analysis
+- connections_analysis
+- uptime_analysis
+- logs_analysis
+- system_analysis
 
 Responsibilities:
 
 - aggregate system signals
 - interpret structured data
 - produce findings + recommendations
-- surface recurrence insights from incident memory
+- preserve raw evidence for verification
+- surface recurrence insights from incident memory when that system is implemented
 
 ---
 
@@ -144,6 +155,7 @@ tools/system/
 - performs all system interaction
 - uses CommandRunner
 - returns structured data
+- preserves raw command output for downstream evidence
 
 ---
 
@@ -184,9 +196,9 @@ Local model runtime for reasoning.
 
 ---
 
-### 7. Incident Memory System (V1)
+### 7. Incident Memory System (V1 Planned)
 
-A structured, deterministic incident memory system is included in V1.
+A structured, deterministic incident memory system is planned for V1.
 
 Purpose:
 
@@ -222,6 +234,12 @@ Key Principles:
 - no system state modification
 - no automated fixes
 - operates entirely within Argus read-only model
+
+Implementation status:
+
+- incident memory integration points are defined
+- full incident memory implementation is not yet complete
+- implementation must remain phase-aligned and must not interrupt primary output-control work unless explicitly selected as the active task
 
 ---
 
@@ -264,6 +282,7 @@ Model is NOT required for:
 - core diagnostics
 - system inspection
 - structured findings
+- raw evidence preservation
 
 ---
 
@@ -275,6 +294,8 @@ No model or very small model (1–3B)
 
 - system tools + Argus tools only
 - deterministic diagnostics
+- structured findings
+- raw evidence for verification
 - lightweight and fast
 
 ---
@@ -318,6 +339,8 @@ If model is unavailable:
 
 - Argus tools still function
 - diagnostics still work
+- findings and recommendations still work
+- raw evidence remains available for verification
 - system remains usable
 
 Model enhances system, but does not define it.

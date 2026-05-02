@@ -166,16 +166,26 @@ Purpose:
 - aggregate signals  
 - interpret system state  
 - produce diagnostic output  
+- preserve raw evidence for verification  
 
 Rules:
 
 - MUST NOT call CommandRunner  
 - MUST use system tools only  
 - MUST consume structured `data`  
+- MUST preserve raw evidence passed through from system tools  
 
 Current Implementation:
 
-- `system_summary` (active)
+- `system_summary`
+- `process_top_analysis`
+- `memory_analysis`
+- `disk_analysis`
+- `network_analysis`
+- `connections_analysis`
+- `uptime_analysis`
+- `logs_analysis`
+- `system_analysis`
 
 ---
 
@@ -362,6 +372,7 @@ Argus defines:
 - system intelligence behavior  
 - read-only constraints  
 - diagnostic capabilities  
+- raw-evidence-backed system interpretation  
 
 Argus does NOT:
 

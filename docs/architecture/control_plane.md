@@ -177,6 +177,11 @@ Examples:
 - `disk`
 - `memory`
 - `summary`
+- `logs`
+- `network`
+- `connections`
+- `uptime`
+- `system`
 
 ---
 
@@ -336,6 +341,6 @@ Observability Integration: COMPLETE
 
 # Next Step
 
-- Continue Argus tool layer expansion  
+- Proceed into Phase 6 Distribution Layer work  
 - Maintain strict execution boundaries  
-- Ensure all new tools comply with control plane enforcement  
+- Ensure output-control and ACLI work continues to route through the control plane  

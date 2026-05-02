@@ -385,6 +385,15 @@ All ACLI output must be:
 - readable
 - grounded in real findings
 - concise but useful
+- able to expose raw evidence when helpful
+
+ACLI output should make a clear distinction between:
+
+- interpreted findings
+- recommendations
+- supporting raw evidence
+
+Raw evidence is allowed, but it must be presented as verification context, not as an unexplained command dump.
 
 ---
 
@@ -393,10 +402,12 @@ All ACLI output must be:
 Where appropriate, output should include:
 
 - issue summary
+- severity
 - where Argus looked
 - what it found
 - why the finding matters
 - recommended next steps
+- supporting raw evidence when requested or useful
 
 ---
 
@@ -406,6 +417,7 @@ Where appropriate, output should include:
 - unexplained log blocks
 - vague AI-style filler
 - generic advice disconnected from findings
+- raw evidence presented as a replacement for diagnosis
 
 Argus must never expose raw output without making it understandable.
 

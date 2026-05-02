@@ -46,6 +46,7 @@ Detailed breakdown of how the system operates internally.
 
 - 👉 [Control Plane](./architecture/control_plane.md)
 - 👉 [Tool Execution System](./architecture/tool_execution.md)
+- 👉 [Tool Pattern](./architecture/tool_pattern.md)
 - 👉 [Task Engine](./architecture/task_engine.md)
 - 👉 [Observability](./architecture/observability.md)
 - 👉 [Evaluation Framework](./architecture/evaluation_framework.md)
@@ -60,6 +61,7 @@ User-facing systems built on top of NeuroCore.
 - 👉 [Argus V1 Blueprint](./distributions/argus_v1_blueprint.md)
 - 👉 [Argus ACLI Specification](./distributions/argus/acli_spec.md)
 - 👉 [Argus Distribution & Deployment Plan](./distributions/argus/argus_distribution_and_deployment.md)
+- 👉 [Argus Tool Manifest](../distributions/argus/manifests/argus_tool_manifest.md)
 
 ---
 
@@ -80,6 +82,8 @@ How the AI system is operated, resumed, and interacted with.
 
 - 👉 [Resume Prompt (Primary)](./ai-operations/resume_prompt_compressed.md)
 - 👉 [Context Loading Strategy](./ai-operations/context_loading_strategy.md)
+- 👉 [Documentation Closeout Protocol](./ai-operations/documentation_closeout_protocol.md)
+- 👉 [Mid-Phase Reset Protocol](./ai-operations/mid_phase_reset_protocol.md)
 
 ---
 
@@ -88,6 +92,10 @@ How the AI system is operated, resumed, and interacted with.
 In-progress and phase-specific design work.
 
 - 👉 [Phase 5I – Real Execution](./design/phase_5i_real_execution.md)
+- 👉 [Argus Tool Layer](./design/argus_tool_layer.md)
+- 👉 [Argus System Summary V1](./design/argus_system_summary_v1.md)
+- 👉 [Phase 5J – Argus Core Tool Expansion](./design/phase_5j_argus_core_tool_expansion.md)
+- 👉 [Argus ACLI User Experience Layer](./design/argus_acli_user_experience_layer.md)
 
 ---
 
@@ -129,6 +137,12 @@ Complete system evolution from initial build to current state.
 - 👉 [017 – Execution Layer and Control Integration](../build-logs/017_execution_layer_and_control_integration.md)
 - 👉 [018 – Observability and Tracing](../build-logs/018_observability_and_tracing.md)
 - 👉 [019 – Real Tool Execution and System Info](../build-logs/019_real_tool_execution_and_system_info.md)
+- 👉 [020 – NeuroCore System Tool Expansion](../build-logs/020_neurocore_system_tool_expansion.md)
+- 👉 [021 – Argus Tool Layer Initial](../build-logs/021_argus_tool_layer_initial.md)
+- 👉 [022 – Structured Tool Contract](../build-logs/022_structured_tool_contract.md)
+- 👉 [023 – System Tool Structuring and Normalization](../build-logs/023_system_tool_structuring_and_normalization.md)
+- 👉 [024 – Argus Tool Layer Foundation and Expansion](../build-logs/024_argus_tool_layer_foundation_and_expansion.md)
+- 👉 [025 – System Analysis Multi-Signal Aggregation and CLI UX](../build-logs/025_system_analysis_multi_signal.md)
 
 ---
 
@@ -136,12 +150,15 @@ Complete system evolution from initial build to current state.
 
 If you don’t want to read everything:
 
-- 👉 000 – Foundation  
-- 👉 009 – Daemon Foundation  
-- 👉 012 – Streaming Pipeline  
-- 👉 016 – Control Plane Enforcement  
-- 👉 017 – Execution Layer Integration  
-- 👉 019 – Real Tool Execution  
+- 👉 [000 – Foundation](../build-logs/000_foundation.md)
+- 👉 [009 – Daemon Foundation](../build-logs/009_neurocore_daemon_foundation.md)
+- 👉 [012 – Streaming Pipeline](../build-logs/012_streaming_pipeline_and_cli_behavior.md)
+- 👉 [016 – Control Plane Enforcement](../build-logs/016_runtime_control_plane_enforcement.md)
+- 👉 [017 – Execution Layer Integration](../build-logs/017_execution_layer_and_control_integration.md)
+- 👉 [019 – Real Tool Execution](../build-logs/019_real_tool_execution_and_system_info.md)
+- 👉 [023 – System Tool Structuring and Normalization](../build-logs/023_system_tool_structuring_and_normalization.md)
+- 👉 [024 – Argus Tool Layer Foundation and Expansion](../build-logs/024_argus_tool_layer_foundation_and_expansion.md)
+- 👉 [025 – System Analysis Multi-Signal Aggregation and CLI UX](../build-logs/025_system_analysis_multi_signal.md)
 
 These represent major system milestones.
 
@@ -161,6 +178,7 @@ These represent major system milestones.
 - Start with **System Architecture**
 - Then **Control Plane**
 - Then **Tool Execution System**
+- Then **Tool Pattern**
 - Then explore **Build Logs**
 
 ---
@@ -168,6 +186,7 @@ These represent major system milestones.
 ### If you're interested in using the system:
 - Read **Argus ACLI Vision**
 - Then **Argus Blueprint**
+- Then **Argus ACLI Specification**
 - Then explore architecture as needed
 
 ---

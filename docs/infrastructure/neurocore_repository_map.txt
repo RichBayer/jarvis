@@ -6,12 +6,18 @@
 
 /mnt/g/ai/projects/neurocore
 
-├── README.md
-├── NeuroCore_Map.md
 ├── .gitignore
 ├── .obsidian/
+├── NeuroCore_Map.md
+├── README.md
 ├── bootstrap/
+├── build-logs/
 ├── diagrams/
+├── distributions/
+├── docs/
+├── runtime/
+├── scripts/
+└── tools/
 
 ---
 
@@ -44,7 +50,7 @@ build-logs/
 ├── 022_structured_tool_contract.md
 ├── 023_system_tool_structuring_and_normalization.md
 ├── 024_argus_tool_layer_foundation_and_expansion.md
-├── 025_system_analysis_multi_signal.md
+└── 025_system_analysis_multi_signal.md
 
 ---
 
@@ -65,66 +71,109 @@ distributions/
 docs/
 
 ├── README.md
+├── how_argus_works.md
+├── neurocore_development_notebook.md
+
+---
 
 ### AI OPERATIONS
-├── ai-operations/
-│   ├── context_loading_strategy.md
-│   ├── documentation_closeout_protocol.md
-│   ├── mid_phase_reset_protocol.md
-│   └── resume_prompt_compressed.md
+
+docs/ai-operations/
+
+├── context_loading_strategy.md
+├── documentation_closeout_protocol.md
+├── mid_phase_reset_protocol.md
+├── neurocore_argus_profile_context_pack.md
+└── resume_prompt_compressed.md
+
+---
 
 ### ARCHITECTURE
-├── architecture/
-│   ├── argus_output_and_tool_contract.md
-│   ├── control_plane.md
-│   ├── evaluation_framework.md
-│   ├── neurocore_master_blueprint.md
-│   ├── neurocore_vision.md
-│   ├── observability.md
-│   ├── phase_aware_development.md
-│   ├── platform_ecosystem.md
-│   ├── security_policy.md
-│   ├── system_architecture.md
-│   ├── system_state.md
-│   ├── task_engine.md
-│   ├── tool_execution.md
-│   └── tool_pattern.md
+
+docs/architecture/
+
+├── argus_output_and_tool_contract.md
+├── control_plane.md
+├── evaluation_framework.md
+├── neurocore_master_blueprint.md
+├── neurocore_vision.md
+├── observability.md
+├── phase_aware_development.md
+├── platform_ecosystem.md
+├── security_policy.md
+├── system_architecture.md
+├── system_state.md
+├── task_engine.md
+├── tool_execution.md
+└── tool_pattern.md
+
+---
 
 ### DESIGN
-├── design/
-│   ├── argus_acli_user_experience_layer.md
-│   ├── argus_system_summary_v1.md
-│   ├── argus_tool_layer.md
-│   ├── phase_5i_real_execution.md
-│   └── phase_5j_argus_core_tool_expansion.md
 
-### DISTRIBUTIONS DOCS
-├── distributions/
-│   ├── argus/
-│   │   ├── acli_spec.md
-│   │   └── argus_distribution_and_deployment.md
-│   └── argus_v1_blueprint.md
+docs/design/
+
+├── argus_acli_user_experience_layer.md
+├── argus_system_summary_v1.md
+├── argus_tool_creation_workflow.md
+├── argus_tool_layer.md
+├── phase_5i_real_execution.md
+└── phase_5j_argus_core_tool_expansion.md
+
+---
+
+### DISTRIBUTION DOCS
+
+docs/distributions/
+
+├── argus/
+│   ├── acli_spec.md
+│   └── argus_distribution_and_deployment.md
+└── argus_v1_blueprint.md
+
+---
 
 ### INFRASTRUCTURE
-├── infrastructure/
-│   ├── home_infrastructure.md
-│   ├── home_system_map.md
-│   ├── neurocore_repository_map.txt
-│   └── neurocore_system_map.txt
+
+docs/infrastructure/
+
+├── home_infrastructure.md
+├── home_system_map.md
+├── neurocore_repository_map.txt
+└── neurocore_system_map.txt
+
+---
+
+### IDEAS BACKLOG
+
+docs/ideas/backlog/
+
+├── agent_capability_layer_neurocore.md
+├── ai_documentation_intelligence_system.md
+├── argus_acli_incident_memory.md
+├── argus_acli_update_distribution_strategy.md
+├── book_ai_workflow_transformation.md
+├── content_engine_neurocore_narrative_series.md
+├── feature_tracking_phase_id_system.md
+├── knowledge_base_karpathy_style_layer.md
+├── neurocore_daemon_service_management.md
+└── snapshot_state_model_deterministic_execution.md
+
+---
 
 ### ADDITIONAL DOC DOMAINS
+
+docs/
+
 ├── ai-stack/
 ├── hardware/
 │   └── home_ai_hardware.md
-├── ideas/
-│   └── backlog/
 ├── network/
 ├── security/
 ├── vision/
 │   ├── argus_acli_vision.md
 │   └── argus_lab_vision.md
-├── voice/
-├── neurocore_development_notebook.md
+└── voice/
 
 ---
 
@@ -150,7 +199,122 @@ docs/screenshots/
 ├── runtime-control-plane/
 ├── structured-tool-contract/
 ├── system-info-tool/
-├── system-tool-structuring/
+└── system-tool-structuring/
+
+---
+
+### ARGUS CORE TOOLS SCREENSHOTS
+
+docs/screenshots/argus-core-tools/
+
+├── 01_process_top_not_routed.png
+├── 02_process_top_working_output.png
+├── 02a_process_top_label_issue.png
+├── 02b_process_top_label_fixed.png
+├── 03_disk_usage_output.png
+├── 04_memory_usage_output.png
+├── 05_disk_layout_output.png
+├── 06_network_interfaces_output.png
+├── 07_network_connections_output.png
+├── 08_uptime_load_output.png
+├── 09_system_logs_output.png
+├── 10_users_sessions_output.png
+└── 11_recent_logins_output.png
+
+---
+
+### ARGUS SYSTEM SUMMARY SCREENSHOTS
+
+docs/screenshots/argus-system-summary/
+
+├── 01_first_execution.png
+├── 02_broken_output.png
+├── 03_no_signal_detected.png
+├── 04_system_info_structured_raw.png
+├── 05_structured_parsing_success.png
+├── 06_intelligent_summary.png
+├── 07_high_load_test.png
+├── 08_load_decay_initial.png
+├── 09_load_decay_recovered.png
+└── Screenshot 2026-04-25 143104.png
+
+---
+
+### ARGUS TOOL EXPANSION SCREENSHOTS
+
+docs/screenshots/argus-tool-expansion/
+
+├── 01_summary_before.png
+├── 02_system_info_raw_output.png
+├── 03_summary_after.png
+├── 04_summary_argus_active.png
+├── 05_summary_findings_output.png
+├── 06_summary_final_output.png
+├── 07_process_top_before.png
+├── 08_process_top_argus_output.png
+├── 09_memory_before_system_tool.png
+├── 10_memory_system_tool.png
+├── 11_memory_argus_output.png
+├── 12_disk_system_tool.png
+├── 13_disk_argus_output.png
+├── 14_network_system_tool.png
+├── 15_network_argus_output.png
+├── 16_connections_system_tool.png
+├── 17_connections_argus_output.png
+├── 18_uptime_system_tool.png
+├── 19_uptime_argus_output.png
+├── 20_logs_system_tool.png
+└── 21_logs_argus_output.png
+
+---
+
+### ARGUS ACLI UX SCREENSHOTS
+
+docs/screenshots/argus_acli_ux/
+
+├── 01_disk_command_current_cli_output.png
+├── 02_disk_command_structured_output_cleaned.png
+├── 03_disk_command_cleaned_output_before_raw_fix.png
+├── 04_disk_command_final_output_with_real_raw.png
+├── 05_disk_command_with_severity_scale.png
+├── 06_cli_formatter_extracted_no_behavior_change.png
+├── 07_memory_no_raw_output.png
+├── 08_memory_with_raw_output.png
+├── 09_memory_full_contract_output.png
+├── 10_system_command_not_routed.png
+├── 11_system_tool_not_registered.png
+├── 12_system_analysis_raw_unstructured.png
+├── 13_system_analysis_final_clean_output.png
+├── 14_network_no_raw_output.png
+├── 15_network_with_raw_output.png
+├── 16_system_analysis_with_network.png
+├── 17_processes_no_raw_output.png
+├── 18_processes_raw_empty.png
+├── 19_processes_with_raw_output.png
+├── 20_system_analysis_overview.png
+├── 21_system_analysis_disk_section.png
+├── 22_system_analysis_memory_section.png
+├── 23_system_analysis_network_section.png
+└── 24_system_analysis_process_section.png
+
+---
+
+### SYSTEM TOOL STRUCTURING SCREENSHOTS
+
+docs/screenshots/system-tool-structuring/
+
+├── 01_memory_usage_before_raw.png
+├── 02_memory_usage_cli_output_before.png
+├── 03_runtime_manager_function_context.png
+├── 04_runtime_manager_drops_data_return.png
+├── 05_daemon_calls_missing_handle_request.png
+├── 06_runtime_manager_preserves_data_after.png
+├── 07_memory_usage_full_pipeline_verified.png
+├── 08_disk_usage_structured_output.png
+├── 09_network_interfaces_structured_output.png
+├── 10_network_connections_structured_output.png
+├── 11_users_sessions_structured_output.png
+└── 12_uptime_load_structured_output.png
 
 ---
 
@@ -162,7 +326,7 @@ runtime/
 ├── control_plane.py
 ├── neurocore_daemon.py
 ├── runtime_manager.py
-├── tracing.py
+└── tracing.py
 
 ---
 
@@ -188,42 +352,53 @@ tools/
 ├── execution_engine.py
 ├── tool_registry.py
 
+---
+
 ### ARGUS TOOL LAYER
-├── argus/
-│   ├── __init__.py
-│   ├── system_summary.py
-│   ├── process_top.py
-│   ├── memory_analysis.py
-│   ├── disk_analysis.py
-│   ├── network_analysis.py
-│   ├── connections_analysis.py
-│   ├── uptime_analysis.py
-│   ├── logs_analysis.py
-│   └── system_analysis.py
+
+tools/argus/
+
+├── __init__.py
+├── connections_analysis.py
+├── disk_analysis.py
+├── logs_analysis.py
+├── memory_analysis.py
+├── network_analysis.py
+├── process_top.py
+├── system_analysis.py
+├── system_summary.py
+└── uptime_analysis.py
+
+---
 
 ### SYSTEM TOOL LAYER
-├── system/
-│   ├── command_runner.py
-│   ├── disk_layout.py
-│   ├── disk_usage.py
-│   ├── memory_usage.py
-│   ├── network_connections.py
-│   ├── network_interfaces.py
-│   ├── process_top.py
-│   ├── recent_logins.py
-│   ├── service_manager.py
-│   ├── system_info.py
-│   ├── system_logs.py
-│   ├── uptime_load.py
-│   └── users_sessions.py
+
+tools/system/
+
+├── command_runner.py
+├── disk_layout.py
+├── disk_usage.py
+├── memory_usage.py
+├── network_connections.py
+├── network_interfaces.py
+├── process_top.py
+├── recent_logins.py
+├── service_manager.py
+├── system_info.py
+├── system_logs.py
+├── uptime_load.py
+└── users_sessions.py
 
 ---
 
 ## NOTES
 
-- Repository map reflects current state after Phase 5J Argus tool expansion and system analysis aggregation
-- Argus tool layer now includes multi-signal system analysis capability
-- Screenshots are organized by feature and phase for build log traceability
-- All system tools conform to structured output contract
-- Argus tools consume structured data and produce deterministic diagnostics
-- Runtime and daemon layers enforce full data propagation and trace continuity
+- Repository map reflects live tree output after Phase 5J raw-evidence contract closeout.
+- Repository contains 55 directories and 280 files at the time of this update.
+- Phase 5J build logs are complete through `025_system_analysis_multi_signal.md`.
+- Argus tool layer includes implemented diagnostic tools and multi-signal `system_analysis`.
+- Implemented Argus diagnostic tools preserve raw evidence for verification.
+- System tools conform to the structured output contract and preserve raw command output.
+- Argus tools consume structured data and produce deterministic diagnostics.
+- Runtime and daemon layers enforce full data propagation and trace continuity.
+- Phase 6 work begins from this state with Distribution Layer / Argus ACLI output control.

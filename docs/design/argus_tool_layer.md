@@ -11,6 +11,7 @@ This layer will:
 - aggregate multiple system tool outputs
 - interpret system signals
 - produce structured, human-meaningful results
+- preserve raw evidence for verification
 - remain strictly read-only
 - fully respect control plane and execution boundaries
 
@@ -18,11 +19,11 @@ This layer will:
 
 # Architecture Impact
 
-NeuroCore currently supports:
+NeuroCore supports:
 
 control_plane → execution_engine → system_tool → command_runner
 
-We are extending this to:
+The Argus Tool Layer extends this to:
 
 control_plane → execution_engine → argus_tool
 → system_tool(s)
@@ -43,6 +44,7 @@ Argus tools MUST:
 - NEVER execute subprocess directly
 - remain read-only
 - return structured output
+- preserve raw evidence when available from system tool data
 
 ---
 
@@ -52,15 +54,17 @@ Each Argus tool will:
 
 1. Receive request from execution engine
 2. Call one or more system tools directly
-3. Aggregate results
-4. Interpret findings
-5. Return structured response
+3. Consume structured system tool data
+4. Aggregate results
+5. Interpret findings
+6. Preserve raw evidence
+7. Return structured response
 
 ---
 
 # Initial Tool Target
 
-First tool to implement:
+First tool implemented:
 
 system_summary
 
@@ -71,17 +75,32 @@ Reason:
 - exercises multi-command aggregation
 - validates composition pattern
 
+Status:
+
+- implemented
+- aligned with final raw-evidence diagnostic contract during Phase 5J closeout
+
 ---
 
 # Output Model
 
-All Argus tools must return:
+All implemented Argus diagnostic tools must return:
 
 - status
 - message
 - structured data (interpreted)
+- raw evidence
 
-No raw command dumps allowed.
+Raw command output may be preserved and displayed as supporting evidence.
+
+Raw evidence must NOT replace interpretation.
+
+Argus output must always make clear:
+
+- what Argus found
+- what severity Argus assigned
+- what Argus recommends
+- what evidence supports the finding
 
 ---
 
@@ -108,6 +127,7 @@ Argus tools are responsible for:
 - producing clear, human-readable summaries  
 - formatting findings in a consistent way  
 - presenting recommendations in a usable format  
+- preserving raw evidence for verification  
 
 Example:
 
@@ -122,6 +142,8 @@ The tool should return something like:
 
 Recommendation:  
 → Check interface configuration  
+
+Raw evidence may then be shown separately as supporting context.
 
 ---
 
@@ -157,6 +179,7 @@ With this layer:
 - Argus is immediately useful without a model  
 - output feels intentional and readable  
 - system behavior remains fully trustworthy  
+- users can verify findings against raw evidence  
 
 ---
 
@@ -182,6 +205,7 @@ The following must remain true:
 - Argus tools do NOT call execution_engine
 - system tools remain the ONLY execution primitives
 - CommandRunner remains isolated
+- raw evidence is passed through from system tools, not collected directly by Argus tools
 
 ---
 
@@ -192,11 +216,38 @@ The following must remain true:
 - Output is human-readable and structured
 - Trace context preserved
 - Output is readable and usable without a model
+- Raw evidence is preserved for verification
+
+---
+
+# Current Status
+
+The Argus Tool Layer is implemented across the current core diagnostic tools.
+
+Implemented Argus tools include:
+
+- `system_summary`
+- `process_top_analysis`
+- `memory_analysis`
+- `disk_analysis`
+- `network_analysis`
+- `connections_analysis`
+- `uptime_analysis`
+- `logs_analysis`
+- `system_analysis`
+
+Phase 5J closeout aligned the remaining implemented tools with the final raw-evidence diagnostic contract.
 
 ---
 
 # Next Step
 
-Implement first Argus tool:
+Proceed into Phase 6 Distribution Layer work:
 
-tools/argus/system_summary.py
+- Argus ACLI output control
+- filtering
+- summarization
+- signal selection
+- raw output visibility controls
+
+The Argus tool layer should remain stable while Phase 6 focuses on presentation and distribution behavior.

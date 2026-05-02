@@ -46,12 +46,25 @@ Argus tools return structured output:
   "data": {
     "severity": "...",
     "findings": [...],
-    "recommendations": [...]
+    "recommendations": [...],
+    "raw": { ... }
   }
 }
 ```
 
-This is correct but not optimized for CLI usability.
+The current CLI already presents:
+
+- title / summary
+- severity
+- findings
+- recommendations
+- raw evidence
+
+This is correct and contract-aligned.
+
+The next problem is not whether the data exists.
+
+The next problem is controlling how much of it is shown by default.
 
 ---
 
@@ -59,10 +72,17 @@ This is correct but not optimized for CLI usability.
 
 Current CLI output:
 
-- feels like structured data, not a tool
-- lacks visual hierarchy
-- mixes raw and interpreted data
-- is harder to scan quickly
+- can become noisy as raw evidence grows
+- mixes interpreted findings and raw evidence in one long output
+- lacks output modes for different user needs
+- does not yet support summary-only views
+- does not yet support raw-output toggles
+- does not yet support signal selection
+- is harder to scan quickly during repeated diagnostic workflows
+
+The system now has the evidence it needs.
+
+Phase 6 focuses on making that evidence usable without overwhelming the user.
 
 ---
 
@@ -102,6 +122,7 @@ Each output should follow:
 2. Severity
 3. Findings
 4. Recommendations
+5. Raw Evidence (optional or controlled by output mode)
 
 ---
 
@@ -122,13 +143,15 @@ All structured data must still exist.
 This layer:
 
 - formats
-- does NOT remove or alter data
+- filters display
+- controls visibility
+- does NOT remove or alter underlying diagnostic data
 
 ---
 
 ## Proposed Output Format
 
-Example:
+Default concise example:
 
 ```
 === Disk Analysis ===
@@ -143,21 +166,60 @@ Recommendations:
 - Free up space
 ```
 
+Verbose / raw-enabled example:
+
+```
+=== Disk Analysis ===
+
+Severity: WARN
+
+Findings:
+- High disk usage on /mnt/c (77%)
+
+Recommendations:
+- Investigate disk usage
+- Free up space
+
+--- RAW OUTPUT ---
+
+[DISK_USAGE]
+Filesystem      Size  Used Avail Use% Mounted on
+...
+```
+
 ---
 
 ## Implementation Approach
 
-### Option A – CLI Formatting Layer (Preferred)
+### Option A – CLI / ACLI Formatting Layer (Preferred)
 
-Modify:
+Modify or extend the interface layer:
 
+```
 scripts/ai_cli.py
+```
+
+and later:
+
+```
+distributions/argus/cli/acli.py
+```
 
 Responsibilities:
 
 - detect Argus output
-- format for display
-- preserve raw JSON if needed
+- format structured diagnostic data for display
+- support output modes
+- control raw evidence visibility
+- preserve raw JSON / structured data internally
+
+Possible output modes:
+
+- default concise output
+- verbose output with raw evidence
+- summary-only output
+- filtered severity output
+- selected-signal output
 
 ---
 
@@ -169,6 +231,7 @@ NOT preferred because:
 
 - mixes logic and presentation
 - breaks separation of concerns
+- makes future output modes harder to manage
 
 ---
 
@@ -176,7 +239,23 @@ NOT preferred because:
 
 Use:
 
-→ CLI Formatting Layer
+→ CLI / ACLI Formatting Layer
+
+Argus tools remain responsible for:
+
+- interpretation
+- severity
+- findings
+- recommendations
+- raw evidence preservation
+
+The interface/distribution layer is responsible for:
+
+- presentation
+- filtering
+- summarization
+- raw visibility control
+- user-facing output behavior
 
 ---
 
@@ -186,6 +265,9 @@ Use:
 - MUST NOT modify tool output contract
 - MUST NOT parse `message` field for logic
 - MUST rely on structured `data` field
+- MUST preserve access to raw evidence
+- MUST NOT move diagnostic interpretation into the CLI / ACLI layer
+- MUST NOT hide data permanently; filtering is display-only
 
 ---
 
@@ -195,6 +277,11 @@ Use:
 - table formatting
 - interactive CLI
 - filtering options (e.g. show only WARN/CRITICAL)
+- summary-only mode
+- verbose/raw mode
+- signal selection (e.g. disk only, network only, processes only)
+- machine-readable output mode
+- profile-based output behavior for production vs training personalities
 
 ---
 
@@ -202,13 +289,13 @@ Use:
 
 This phase converts:
 
-structured diagnostic output  
+structured diagnostic output with raw evidence  
 → into  
-usable system interface
+a controlled, usable system interface
 
 No new intelligence is added.
 
-Only clarity.
+Only clarity, control, and usability.
 
 ---
 
@@ -220,10 +307,17 @@ A user can run:
 ai "disk"
 ```
 
+or later:
+
+```
+argus disk
+```
+
 And instantly understand:
 
 - system health
 - problems
 - what to do next
+- whether raw evidence is needed
 
-Without interpreting raw output.
+Without being forced to read every raw command output by default.

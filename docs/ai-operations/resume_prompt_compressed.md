@@ -215,16 +215,51 @@ If required documentation is not identifiable:
 
 Phase 5J is COMPLETE.
 
+Important closeout correction:
+
+Phase 5J should be considered complete only after the raw-evidence contract closeout documented in:
+
+```
+build-logs/025_system_analysis_multi_signal.md
+```
+
+The closeout aligned the remaining implemented Argus tools with the raw-evidence diagnostic contract:
+
+- `tools/argus/connections_analysis.py`
+- `tools/argus/uptime_analysis.py`
+- `tools/argus/logs_analysis.py`
+- `tools/argus/system_summary.py`
+
+These tools now match the raw-evidence pattern already established by:
+
+- `tools/argus/disk_analysis.py`
+- `tools/argus/memory_analysis.py`
+- `tools/argus/network_analysis.py`
+- `tools/argus/process_top.py`
+- `tools/argus/system_analysis.py`
+
 The system now includes:
 
 - full structured system tool layer  
 - enforced structured output contract  
-- Argus diagnostic layer (implemented)  
+- Argus diagnostic layer across implemented core domains  
 - deterministic system interpretation  
-- severity + findings + recommendations across core domains  
+- severity + findings + recommendations across implemented Argus tools  
+- **raw evidence preserved through implemented Argus diagnostic outputs**
 - **multi-signal system aggregation (`system_analysis`)**
 - **structured CLI diagnostic UX layer**
-- **full diagnostic output including raw evidence across all tools**
+- **human-readable diagnostics backed by real system data**
+
+Validated closeout behavior:
+
+- `ai "summary"` returns interpreted output with raw evidence  
+- `ai "connections"` returns interpreted output with raw evidence  
+- `ai "uptime"` returns interpreted output with raw evidence  
+- `ai "logs"` returns interpreted output with a raw evidence field  
+
+Known note:
+
+- `logs_analysis` may show an empty raw log section when the underlying system log command returns no visible log output. This is acceptable because the raw field is preserved and exposed.
 
 Argus is no longer conceptual.
 
@@ -232,11 +267,17 @@ It is now a working diagnostic system capable of:
 
 - multi-domain visibility  
 - aggregated system state  
+- individual domain diagnostics  
 - human-readable diagnostics backed by real system data  
+- deterministic first-pass interpretation before future model reasoning  
 
 ---
 
 # 🧭 NEXT PHASE DIRECTION (UPDATED)
+
+Current phase:
+
+## Phase 6 – Distribution Layer / Argus ACLI Output Control
 
 Next phase focus:
 
@@ -250,12 +291,16 @@ Goals:
 - allow signal selection  
 - control raw output visibility  
 - improve readability without losing data  
+- preserve access to full raw evidence  
+- keep diagnostic logic inside Argus tools  
+- keep presentation behavior in the interface/distribution layer  
 
 This phase prepares the system for:
 
 - real-world usability  
 - repeated diagnostic workflows  
 - future model integration  
+- Argus ACLI distribution behavior  
 
 ---
 
@@ -264,6 +309,8 @@ This phase prepares the system for:
 - deeper multi-signal correlation  
 - improved detection logic  
 - reduction of false positives  
+- better log interpretation  
+- incident memory design/implementation if phase-aligned  
 
 ---
 
@@ -280,5 +327,6 @@ Continue development aligned with:
 - current system_state  
 - phase-aware development rules  
 - strict control plane enforcement  
-- Argus diagnostic system expansion  
-- output control layer development  
+- completed Phase 5J raw-evidence contract closeout  
+- Phase 6 Distribution Layer work  
+- Argus ACLI output control and signal management  

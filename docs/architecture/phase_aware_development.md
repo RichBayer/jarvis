@@ -49,9 +49,15 @@ Each layer depends on the one before it.
 
 System is currently in:
 
-## Phase 6 – Distribution Layer (NEXT)
+## Phase 6 – Distribution Layer (CURRENT)
 
 Phase 5J is COMPLETE.
+
+Phase 5J should be considered complete only after the raw-evidence contract closeout documented in:
+
+```text
+build-logs/025_system_analysis_multi_signal.md
+```
 
 Confirmed capabilities:
 
@@ -59,8 +65,11 @@ Confirmed capabilities:
 - control plane COMPLETE
 - system tools ACTIVE
 - **structured data model FULLY ENFORCED across all system tools**
-- **Argus diagnostic layer FULLY IMPLEMENTED across core domains**
+- **Argus diagnostic layer FULLY IMPLEMENTED across implemented core domains**
 - **deterministic interpretation ACTIVE (severity + findings + recommendations)**
+- **raw evidence preservation ACTIVE across implemented Argus diagnostic tools**
+- **multi-signal system aggregation ACTIVE through `system_analysis`**
+- **structured CLI diagnostic output ACTIVE**
 
 ---
 
@@ -74,16 +83,18 @@ This phase is COMPLETE and serves as a foundational reference.
 
 What was achieved:
 
-- full Argus diagnostic layer across system domains  
+- full Argus diagnostic layer across implemented system domains  
 - structured output contract enforced across ALL system tools  
 - deterministic interpretation pattern established  
 - consistent tool composition model (system → Argus)  
 - stable control plane routing for diagnostic commands  
+- raw evidence preservation across implemented Argus diagnostic tools  
+- multi-signal system aggregation through `system_analysis`  
 
 Established pattern:
 
 ```
-system tool → structured data → interpretation → normalized output
+system tool → structured data → interpretation → normalized output → raw evidence
 ```
 
 This pattern is now **canonical** and must be followed for all future Argus development.
@@ -106,6 +117,7 @@ Argus tools include:
 - severity
 - findings
 - recommendations
+- raw evidence
 
 Status: ✅ COMPLETE
 
@@ -117,6 +129,7 @@ ALL system tools:
 
 - return structured data
 - do NOT rely on raw text output
+- preserve raw command output for downstream use
 
 Status: ✅ COMPLETE
 
@@ -124,11 +137,12 @@ Status: ✅ COMPLETE
 
 #### 3. Argus Tool Pattern Enforcement
 
-ALL Argus tools:
+ALL implemented Argus tools:
 
 - consume system tool data
 - produce structured findings
 - remain deterministic
+- preserve raw evidence for verification
 
 Status: ✅ COMPLETE
 
@@ -144,6 +158,9 @@ disk
 memory  
 logs  
 network  
+connections  
+uptime  
+system  
 
 Status: ✅ STABLE (treated as product API moving forward)
 
@@ -157,7 +174,7 @@ Defined but NOT implemented:
 - generation point (Argus tools)
 - deterministic signature approach
 
-Status: ⚠️ DEFINED ONLY (implementation deferred to Phase 6)
+Status: ⚠️ DEFINED ONLY (implementation deferred to Phase 6 or later if phase-aligned)
 
 ---
 
@@ -179,7 +196,7 @@ Foundation had to be completed first.
 
 ---
 
-## Phase 6 – Distribution Layer (CURRENT / NEXT)
+## Phase 6 – Distribution Layer (CURRENT)
 
 This is where Argus becomes a **real user-facing product**.
 
@@ -201,13 +218,19 @@ Goals:
 - structure findings clearly  
 - group results by severity  
 - refine human-readable summaries  
+- introduce filtering  
+- introduce summarization  
+- allow signal selection  
+- control raw output visibility  
 - make outputs feel like a real tool, not raw data  
 
 Constraints:
 
 - MUST NOT bypass control plane  
 - MUST preserve structured output contract  
+- MUST preserve access to raw evidence  
 - MUST consume Argus tool outputs (not system tools directly)
+- MUST NOT move diagnostic interpretation into the CLI/distribution layer
 
 ---
 
@@ -242,9 +265,11 @@ User data:
 
 ---
 
-#### 4. Incident Memory (FULL IMPLEMENTATION)
+#### 4. Incident Memory (PHASE-ALIGNED FUTURE WORK)
 
-Now that structured diagnostics exist, implement:
+Now that structured diagnostics and raw evidence exist, incident memory can be considered during Phase 6 if it fits the active workstream.
+
+Potential implementation:
 
 - save incident after user confirmation
 - store structured diagnostic output
@@ -254,6 +279,10 @@ Now that structured diagnostics exist, implement:
 Reason:
 
 Phase 5J made this possible.
+
+Constraint:
+
+Incident memory must not interrupt the primary Phase 6 output-control work unless explicitly selected as the current task.
 
 ---
 
@@ -350,5 +379,6 @@ A system that:
 
 - gathers real system data
 - interprets it deterministically
+- preserves supporting evidence
 - optionally enhances it with AI
 - evolves into a full training and intelligence platform

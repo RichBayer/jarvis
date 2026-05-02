@@ -13,6 +13,7 @@ At this stage, NeuroCore supports:
 - an Argus tool layer for system-level reasoning and diagnostics  
 - **multi-signal system diagnostics through aggregation tools**
 - **structured CLI diagnostic output (UX layer)**
+- **raw evidence preservation across implemented Argus diagnostic tools**
 
 ---
 
@@ -245,6 +246,30 @@ All system tools now return:
 
 This contract is now **enforced across all system tools** and is no longer optional.
 
+Implemented Argus diagnostic tools now return:
+
+```
+{
+  "status": "...",
+  "message": "...",
+  "data": {
+    "severity": "...",
+    "findings": [...],
+    "recommendations": [...],
+    "raw": { ... }
+  }
+}
+```
+
+The Phase 5J closeout aligned the remaining implemented Argus tools with this raw-evidence pattern:
+
+- `system_summary`
+- `connections_analysis`
+- `uptime_analysis`
+- `logs_analysis`
+
+This completed the raw-evidence diagnostic contract across the implemented Argus tool layer.
+
 ---
 
 ### 7. Command Execution Layer
@@ -363,8 +388,9 @@ NeuroCore now supports:
 - Tool-based execution framework  
 - Real system command execution across multiple domains  
 - **Guaranteed structured system data across all system tools**  
-- **Full Argus diagnostic layer across core system domains**
+- **Full Argus diagnostic layer across implemented core system domains**
 - **Deterministic system interpretation (severity + findings + recommendations)**
+- **Raw evidence preservation across implemented Argus diagnostic tools**
 - **Multi-signal system diagnostics (aggregation layer)**
 - **Human-readable CLI diagnostic output (UX layer)**
 - Full observability and tracing  
@@ -390,16 +416,17 @@ NeuroCore is now:
 - executing real system commands across multiple domains  
 - exposing structured system state  
 - supporting a full diagnostic interpretation layer (Argus)  
+- preserving raw evidence across implemented Argus diagnostic outputs  
 - supporting multi-signal system analysis  
 - presenting structured diagnostic output through the CLI  
 - fully observable end-to-end  
-- stable for further expansion  
+- stable for Phase 6 distribution-layer work  
 
 ---
 
 ## Next Phase
 
-- Expand Argus tool intelligence (deeper reasoning, multi-signal correlation)  
-- Continue manifest-driven tool development  
+- Begin Phase 6 Distribution Layer work  
 - Refine Argus ACLI output control (filtering, summarization, signal selection)  
+- Improve default diagnostic readability while preserving access to raw evidence  
 - Maintain strict control plane enforcement  

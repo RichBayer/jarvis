@@ -49,6 +49,7 @@ control_plane
 - aggregate signals  
 - interpret system state  
 - return findings and recommendations  
+- preserve raw evidence for verification  
 
 ---
 
@@ -69,6 +70,7 @@ Argus tools MUST:
 - consume `data`  
 - NOT parse formatted message output  
 - NOT rely on string matching  
+- preserve raw evidence from system tool data  
 
 ---
 
@@ -81,10 +83,12 @@ Every Argus tool must:
 3. extract structured data  
 4. evaluate system signals  
 5. assign severity (if applicable)  
-6. return:
+6. preserve raw evidence  
+7. return:
    - findings  
    - severity  
    - recommended actions  
+   - raw evidence  
 
 ---
 
@@ -125,11 +129,12 @@ Capabilities:
 - memory usage analysis  
 - disk usage analysis  
 - OS identification  
+- raw evidence preservation across system summary sources  
 
 Notes:
 
 - first completed Argus tool  
-- defines the reference pattern  
+- aligned with the final raw-evidence diagnostic contract during Phase 5J closeout  
 
 ---
 
@@ -145,6 +150,7 @@ Capabilities:
 
 - identify high CPU processes  
 - identify high memory processes  
+- preserve CPU and memory raw process evidence  
 
 ---
 
@@ -160,6 +166,7 @@ Capabilities:
 
 - evaluate memory usage  
 - detect memory pressure  
+- preserve raw memory command evidence  
 
 ---
 
@@ -175,6 +182,7 @@ Capabilities:
 
 - detect high disk usage  
 - evaluate filesystem capacity  
+- preserve raw disk usage evidence  
 
 ---
 
@@ -190,6 +198,7 @@ Capabilities:
 
 - evaluate interface state  
 - detect inactive or abnormal interfaces  
+- preserve raw network interface evidence  
 
 ---
 
@@ -205,6 +214,11 @@ Capabilities:
 
 - evaluate connection volume  
 - detect abnormal connection counts  
+- preserve raw network connection evidence  
+
+Notes:
+
+- aligned with the final raw-evidence diagnostic contract during Phase 5J closeout  
 
 ---
 
@@ -220,6 +234,11 @@ Capabilities:
 
 - evaluate system load  
 - detect high load conditions  
+- preserve raw uptime/load evidence  
+
+Notes:
+
+- aligned with the final raw-evidence diagnostic contract during Phase 5J closeout  
 
 ---
 
@@ -234,6 +253,37 @@ System Tools Used:
 Capabilities:
 
 - detect errors and warnings in logs  
+- preserve raw log evidence when available  
+
+Notes:
+
+- aligned with the final raw-evidence diagnostic contract during Phase 5J closeout  
+- raw log output may be empty when the underlying system log command returns no visible output  
+
+---
+
+## system_analysis (IMPLEMENTED)
+
+Argus Tool
+
+System Tools Used:
+
+- disk_analysis
+- memory_analysis
+- network_analysis
+- process_top_analysis
+
+Capabilities:
+
+- aggregate multiple Argus diagnostic signals  
+- combine findings across core domains  
+- determine highest system severity  
+- preserve raw evidence from aggregated diagnostic tools  
+
+Notes:
+
+- first multi-signal Argus aggregation tool  
+- established the system-level diagnostic view  
 
 ---
 
@@ -519,11 +569,12 @@ impact: capability limitation
 # Build Rules (CRITICAL)
 
 - implement ONE Argus tool at a time  
-- follow system_summary pattern exactly  
+- follow the established Argus diagnostic pattern exactly  
 - do NOT introduce new execution paths  
 - do NOT call CommandRunner from Argus  
 - do NOT duplicate system tool logic  
 - reuse system tools  
+- preserve raw evidence from system tool data  
 
 ---
 
@@ -532,7 +583,8 @@ impact: capability limitation
 Argus must:
 
 - provide structured interpretation  
-- never expose raw command output  
+- preserve raw evidence for verification  
+- never expose raw command output without interpretation  
 - remain read-only  
 - operate within controlled execution  
 
