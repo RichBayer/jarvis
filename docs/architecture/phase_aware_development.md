@@ -55,35 +55,43 @@ Phase 5J is COMPLETE.
 
 Phase 5J should be considered complete only after the raw-evidence contract closeout documented in:
 
-```text
 build-logs/025_system_analysis_multi_signal.md
-```
 
 Phase 6A first output-control pass is COMPLETE.
 
 Phase 6A output-control behavior is documented in:
 
-```text
-build-logs/026_phase_6_argus_acli_output_control.md
-docs/design/phase_6_argus_acli_output_control.md
-```
+build-logs/026_phase_6_argus_acli_output_control.md  
+docs/design/phase_6_argus_acli_output_control.md  
+
+Phase 6 output-control continuation is COMPLETE.
+
+Documented in:
+
+build-logs/027_phase_6_argus_acli_completion.md  
+docs/design/phase_6_argus_acli_output_control.md  
+docs/design/argus_acli_user_experience_layer.md  
+docs/distributions/argus/acli_spec.md  
 
 Confirmed capabilities:
 
 - execution engine COMPLETE
 - control plane COMPLETE
 - system tools ACTIVE
-- **structured data model FULLY ENFORCED across all system tools**
-- **Argus diagnostic layer FULLY IMPLEMENTED across implemented core domains**
-- **deterministic interpretation ACTIVE (severity + findings + recommendations)**
-- **raw evidence preservation ACTIVE across implemented Argus diagnostic tools**
-- **multi-signal system aggregation ACTIVE through `system_analysis`**
-- **structured CLI diagnostic output ACTIVE**
-- **Phase 6 concise default Argus output ACTIVE**
-- **Phase 6 raw evidence mode ACTIVE through `--raw`**
-- **Phase 6 summary mode ACTIVE through `--summary`**
-- **Phase 6 JSON mode ACTIVE through `--json`**
-- **Phase 6 copy/paste raw evidence hints ACTIVE**
+- structured data model FULLY ENFORCED across all system tools
+- Argus diagnostic layer FULLY IMPLEMENTED across implemented core domains
+- deterministic interpretation ACTIVE (severity + findings + recommendations)
+- raw evidence preservation ACTIVE across implemented Argus diagnostic tools
+- multi-signal system aggregation ACTIVE through system_analysis
+- structured CLI diagnostic output ACTIVE
+- Phase 6 concise default Argus output ACTIVE
+- Phase 6 raw evidence mode ACTIVE through --raw
+- Phase 6 summary mode ACTIVE through --summary
+- Phase 6 JSON mode ACTIVE through --json
+- Phase 6 copy/paste raw evidence hints ACTIVE
+- Phase 6 severity filtering ACTIVE through --severity
+- Phase 6 signal filtering ACTIVE through --signal
+- Argus-facing acli command path ACTIVE
 
 ---
 
@@ -103,15 +111,13 @@ What was achieved:
 - consistent tool composition model (system → Argus)  
 - stable control plane routing for diagnostic commands  
 - raw evidence preservation across implemented Argus diagnostic tools  
-- multi-signal system aggregation through `system_analysis`  
+- multi-signal system aggregation through system_analysis  
 
 Established pattern:
 
-```
 system tool → structured data → interpretation → normalized output → raw evidence
-```
 
-This pattern is now **canonical** and must be followed for all future Argus development.
+This pattern is now canonical and must be followed for all future Argus development.
 
 ---
 
@@ -133,7 +139,7 @@ Argus tools include:
 - recommendations
 - raw evidence
 
-Status: ✅ COMPLETE
+Status: COMPLETE
 
 ---
 
@@ -145,7 +151,7 @@ ALL system tools:
 - do NOT rely on raw text output
 - preserve raw command output for downstream use
 
-Status: ✅ COMPLETE
+Status: COMPLETE
 
 ---
 
@@ -158,7 +164,7 @@ ALL implemented Argus tools:
 - remain deterministic
 - preserve raw evidence for verification
 
-Status: ✅ COMPLETE
+Status: COMPLETE
 
 ---
 
@@ -176,7 +182,7 @@ connections
 uptime  
 system  
 
-Status: ✅ STABLE (treated as product API moving forward)
+Status: STABLE
 
 ---
 
@@ -188,13 +194,11 @@ Defined but NOT implemented:
 - generation point (Argus tools)
 - deterministic signature approach
 
-Status: ⚠️ DEFINED ONLY (implementation deferred to Phase 6 or later if phase-aligned)
+Status: DEFINED ONLY
 
 ---
 
-## MUST NOT be implemented in Phase 5J
-
-(Still applies historically — preserved for reference)
+### MUST NOT be implemented in Phase 5J
 
 - full installer
 - packaging (deb, rpm, etc.)
@@ -204,15 +208,11 @@ Status: ⚠️ DEFINED ONLY (implementation deferred to Phase 6 or later if phas
 - evaluation systems
 - automation / remediation
 
-Reason:
-
-Foundation had to be completed first.
-
 ---
 
 ## Phase 6 – Distribution Layer (CURRENT)
 
-This is where Argus becomes a **real user-facing product**.
+This is where Argus becomes a real user-facing product.
 
 ---
 
@@ -222,9 +222,7 @@ This is where Argus becomes a **real user-facing product**.
 
 Create:
 
-```
 distributions/argus/cli/acli.py
-```
 
 Goals:
 
@@ -246,67 +244,60 @@ Constraints:
 - MUST consume Argus tool outputs (not system tools directly)
 - MUST NOT move diagnostic interpretation into the CLI/distribution layer
 
+---
+
 #### Phase 6A Output-Control Pass
 
-Status: ✅ COMPLETE
+Status: COMPLETE
 
 Implemented in:
 
-```text
 scripts/ai_cli.py
-```
-
-Documented in:
-
-```text
-build-logs/026_phase_6_argus_acli_output_control.md
-docs/design/phase_6_argus_acli_output_control.md
-```
 
 Completed behavior:
 
 - concise default Argus diagnostic output
-- on-demand raw evidence display through `--raw`
-- summary-only output through `--summary`
-- full structured response output through `--json`
-- copy/paste raw evidence hints when raw evidence exists
-- validation across single-domain and multi-signal Argus commands
+- on-demand raw evidence display through --raw
+- summary-only output through --summary
+- full structured response output through --json
+- copy/paste raw evidence hints
 
-Validated commands:
+---
 
-```bash
-ai "disk"
-ai --raw "disk"
-ai --summary "disk"
-ai --json "disk"
-ai "memory"
-ai "system"
-```
+#### Phase 6 Output-Control Completion Pass
 
-Remaining Phase 6 output-control work may include:
+Status: COMPLETE
 
-- selected-signal output controls
-- severity/filtering modes
-- improved multi-signal formatting
+Implemented in:
+
+scripts/ai_cli.py
+
+Completed behavior:
+
+- report-style diagnostic formatting
+- severity-sorted findings
+- component/severity finding labels
+- display-only severity filtering through --severity
+- display-only signal filtering through --signal
+- combined signal + severity filtering
+- filtered recommendation labeling
+- command-name-aware behavior (ai vs acli)
+- Argus-facing acli command available via symlink
+- target-first command ergonomics (acli system --signal disk)
+
+Remaining Phase 6 distribution-layer work may include:
+
+- improved multi-signal formatting if needed
 - production vs training output profiles
-- eventual move or mirror of finalized behavior into `distributions/argus/cli/acli.py`
+- eventual move or mirror into distributions/argus/cli/acli.py
+- runtime packaging planning
+- filesystem layout planning
 
 ---
 
 #### 2. Runtime Packaging (INITIAL, NOT FINAL)
 
-Bundle:
-
-- runtime/
-- tools/
-- Argus tools
-
-Ensure:
-
-- clean reproducible setup
-- minimal install friction
-
-(NOT full packaging system yet)
+Bundle runtime, tools, and Argus tools with minimal friction.
 
 ---
 
@@ -326,77 +317,28 @@ User data:
 
 #### 4. Incident Memory (PHASE-ALIGNED FUTURE WORK)
 
-Now that structured diagnostics and raw evidence exist, incident memory can be considered during Phase 6 if it fits the active workstream.
-
-Potential implementation:
-
-- save incident after user confirmation
-- store structured diagnostic output
-- load historical incidents
-- detect recurrence patterns
-
-Reason:
-
-Phase 5J made this possible.
-
-Constraint:
-
-Incident memory must not interrupt the primary Phase 6 output-control work unless explicitly selected as the current task.
+May be implemented later if aligned with current work.
 
 ---
 
 ## Phase 7 – Intelligence Layer
 
----
-
-### To be implemented AFTER distribution is stable
-
-#### 1. Model Integration (Ollama)
-
-Capabilities:
-
-- explanation
-- reasoning
-- follow-up interaction
-
-Model must:
-
-- consume structured data
-- NOT replace deterministic logic
-
----
-
-#### 2. Optional Enhancements
-
-- better log interpretation
-- contextual explanations
-- deeper diagnostics
+Model integration and reasoning enhancements.
 
 ---
 
 ## Phase 8 – Training System (Argus Lab)
 
----
-
-### NOT part of ACLI product
-
-Includes:
-
-- scenario generation
-- guided troubleshooting
-- performance tracking
-- coaching behavior
+Scenario-driven training environment.
 
 ---
 
 ## Documentation Integration Rules
 
-When adding documentation:
-
-- Phase 5J docs → architecture/ or design/
-- Distribution docs → distributions/argus/
-- Contracts → architecture/
-- Vision → vision/
+Phase 5J docs → architecture/ or design/  
+Distribution docs → distributions/argus/  
+Contracts → architecture/  
+Vision → vision/
 
 ---
 
@@ -404,15 +346,11 @@ When adding documentation:
 
 Before implementing ANY feature:
 
-Ask:
-
 1. Does the required lower layer exist?
 2. Is structured data available?
 3. Does this violate current phase boundaries?
 
-If ANY answer is “no”:
-
-→ STOP
+If any answer is no → STOP
 
 ---
 
@@ -425,10 +363,6 @@ Do NOT:
 - skip layers
 - mix responsibilities
 - introduce future features early
-
-The system must evolve:
-
-capability → interpretation → distribution → intelligence
 
 ---
 

@@ -5,8 +5,21 @@ import json
 import socket
 import uuid
 import argparse
+from pathlib import Path
 
 SOCKET_PATH = "/tmp/neurocore.sock"
+
+SEVERITY_ORDER = {
+    "CRITICAL": 0,
+    "WARN": 1,
+    "INFO": 2,
+    "OK": 3,
+    "UNKNOWN": 4
+}
+
+
+def command_name():
+    return Path(sys.argv[0]).name or "ai"
 
 
 def build_trace(source: str) -> dict:
@@ -23,7 +36,7 @@ def build_trace(source: str) -> dict:
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        prog="ai",
+        prog=command_name(),
         description="NeuroCore CLI interface"
     )
 
@@ -51,6 +64,17 @@ def parse_args():
         help="Print full JSON response from NeuroCore"
     )
 
+    parser.add_argument(
+        "--severity",
+        choices=["CRITICAL", "WARN", "INFO", "OK", "UNKNOWN"],
+        help="Only display findings at this severity or higher"
+    )
+
+    parser.add_argument(
+        "--signal",
+        help="Only display findings for this signal/component"
+    )
+
     return parser.parse_args()
 
 
@@ -73,34 +97,146 @@ def clean_title(output):
     return title
 
 
-def print_findings(findings):
-    if not findings:
+def severity_rank(severity):
+    return SEVERITY_ORDER.get(str(severity).upper(), SEVERITY_ORDER["UNKNOWN"])
+
+
+def sorted_findings(findings):
+    return sorted(
+        findings,
+        key=lambda finding: severity_rank(finding.get("severity"))
+        if isinstance(finding, dict)
+        else severity_rank("UNKNOWN")
+    )
+
+
+def finding_matches_severity(finding, minimum_severity):
+    if not minimum_severity:
+        return True
+
+    if not isinstance(finding, dict):
+        return True
+
+    minimum_rank = severity_rank(minimum_severity)
+    finding_rank = severity_rank(finding.get("severity"))
+
+    return finding_rank <= minimum_rank
+
+
+def finding_matches_signal(finding, signal_filter):
+    if not signal_filter:
+        return True
+
+    if not isinstance(finding, dict):
+        return False
+
+    component = finding.get("component")
+
+    if not component:
+        return False
+
+    return str(component).lower() == str(signal_filter).lower()
+
+
+def filter_findings(findings, minimum_severity=None, signal_filter=None):
+    filtered_findings = []
+
+    for finding in findings:
+        if not finding_matches_severity(finding, minimum_severity):
+            continue
+
+        if not finding_matches_signal(finding, signal_filter):
+            continue
+
+        filtered_findings.append(finding)
+
+    return filtered_findings
+
+
+def format_finding(finding):
+    if isinstance(finding, dict):
+        message = finding.get("message", str(finding))
+        severity = finding.get("severity")
+        component = finding.get("component")
+
+        label_parts = []
+
+        if component:
+            label_parts.append(str(component))
+
+        if severity:
+            label_parts.append(str(severity))
+
+        if label_parts:
+            label = " ".join(f"[{part}]" for part in label_parts)
+            return f"  - {label} {message}"
+
+        return f"  - {message}"
+
+    return f"  - {str(finding)}"
+
+
+def no_findings_message(minimum_severity=None, signal_filter=None):
+    if minimum_severity and signal_filter:
+        return (
+            f"  - None for signal {signal_filter} "
+            f"at severity {minimum_severity} or higher"
+        )
+
+    if minimum_severity:
+        return f"  - None at severity {minimum_severity} or higher"
+
+    if signal_filter:
+        return f"  - None for signal {signal_filter}"
+
+    return "  - None"
+
+
+def print_findings(findings, minimum_severity=None, signal_filter=None):
+    filtered_findings = filter_findings(
+        findings,
+        minimum_severity=minimum_severity,
+        signal_filter=signal_filter
+    )
+
+    if not filtered_findings:
         print("Findings:")
-        print("- None")
+        print(no_findings_message(
+            minimum_severity=minimum_severity,
+            signal_filter=signal_filter
+        ))
         print()
         return
 
     print("Findings:")
 
-    for finding in findings:
-        if isinstance(finding, dict):
-            message = finding.get("message", str(finding))
-        else:
-            message = str(finding)
+    formatted_findings = [
+        format_finding(finding)
+        for finding in sorted_findings(filtered_findings)
+    ]
 
-        print(f"- {message}")
-
+    print("\n\n".join(formatted_findings))
     print()
 
 
-def print_recommendations(recommendations):
-    print("Recommendations:")
+def print_recommendations(
+    recommendations,
+    filtered_view=False
+):
+    if filtered_view:
+        print("Recommendations from full diagnostic:")
+    else:
+        print("Recommendations:")
 
     if recommendations:
-        for recommendation in recommendations:
-            print(f"- {recommendation}")
+        formatted_recommendations = [
+            f"  - {recommendation}"
+            for recommendation in recommendations
+        ]
+
+        print("\n\n".join(formatted_recommendations))
     else:
-        print("- None")
+        print("  - None")
 
     print()
 
@@ -129,8 +265,11 @@ def print_raw_hint(user_input, raw_available):
         return
 
     print("Raw evidence hidden by default.")
-    print("To inspect raw evidence, run:")
-    print(f'ai --raw "{user_input}"')
+    print()
+    print(
+        f'  - To inspect raw evidence, run: '
+        f'{command_name()} --raw "{user_input}"'
+    )
 
 
 def format_argus_output(
@@ -138,7 +277,9 @@ def format_argus_output(
     data,
     user_input,
     show_raw=False,
-    summary_only=False
+    summary_only=False,
+    minimum_severity=None,
+    signal_filter=None
 ):
     severity = data.get("severity", "UNKNOWN")
     findings = data.get("findings", [])
@@ -147,22 +288,34 @@ def format_argus_output(
 
     title = clean_title(output)
 
+    print()
     print(f"=== {title} ===\n")
     print(f"Severity: {severity} (Scale: OK < INFO < WARN < CRITICAL)\n")
 
     raw_available = isinstance(raw, dict) and bool(raw)
+    filtered_view = bool(minimum_severity or signal_filter)
 
     if summary_only:
         print_raw_hint(user_input, raw_available)
+        print()
         return
 
-    print_findings(findings)
-    print_recommendations(recommendations)
+    print_findings(
+        findings,
+        minimum_severity=minimum_severity,
+        signal_filter=signal_filter
+    )
+    print_recommendations(
+        recommendations,
+        filtered_view=filtered_view
+    )
 
     if show_raw:
         print_raw_evidence(raw)
+        print()
     else:
         print_raw_hint(user_input, raw_available)
+        print()
 
 
 # -------------------------
@@ -174,7 +327,9 @@ def send_request(
     user_input,
     show_raw=False,
     summary_only=False,
-    json_mode=False
+    json_mode=False,
+    minimum_severity=None,
+    signal_filter=None
 ):
     client = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
     client.connect(SOCKET_PATH)
@@ -212,7 +367,9 @@ def send_request(
                     data,
                     user_input=user_input,
                     show_raw=show_raw,
-                    summary_only=summary_only
+                    summary_only=summary_only,
+                    minimum_severity=minimum_severity,
+                    signal_filter=signal_filter
                 )
             else:
                 print(output)
@@ -255,12 +412,14 @@ def main():
             user_input="<piped input>",
             show_raw=args.raw,
             summary_only=args.summary,
-            json_mode=args.json
+            json_mode=args.json,
+            minimum_severity=args.severity,
+            signal_filter=args.signal
         )
         return
 
     if not args.query:
-        print('Usage: ai "your query"')
+        print(f'Usage: {command_name()} "your query"')
         return
 
     user_input = " ".join(args.query)
@@ -280,7 +439,9 @@ def main():
         user_input=user_input,
         show_raw=args.raw,
         summary_only=args.summary,
-        json_mode=args.json
+        json_mode=args.json,
+        minimum_severity=args.severity,
+        signal_filter=args.signal
     )
 
 

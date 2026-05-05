@@ -82,9 +82,7 @@ When creating or modifying ANY tool:
 
 The assistant MUST follow:
 
-```
 docs/design/argus_tool_creation_workflow.md
-```
 
 This includes:
 
@@ -239,9 +237,7 @@ Important closeout correction:
 
 Phase 5J should be considered complete only after the raw-evidence contract closeout documented in:
 
-```
 build-logs/025_system_analysis_multi_signal.md
-```
 
 The closeout aligned the remaining implemented Argus tools with the raw-evidence diagnostic contract:
 
@@ -258,14 +254,21 @@ These tools now match the raw-evidence pattern already established by:
 - `tools/argus/process_top.py`
 - `tools/argus/system_analysis.py`
 
-Phase 6A output-control pass is also COMPLETE.
+Phase 6A output-control pass is COMPLETE.
 
 The first Phase 6 output-control pass is documented in:
 
-```
-build-logs/026_phase_6_argus_acli_output_control.md
+build-logs/026_phase_6_argus_acli_output_control.md  
 docs/design/phase_6_argus_acli_output_control.md
-```
+
+Phase 6 output-control continuation is COMPLETE.
+
+The continuation pass is documented in:
+
+build-logs/027_phase_6_argus_acli_completion.md  
+docs/design/phase_6_argus_acli_output_control.md  
+docs/design/argus_acli_user_experience_layer.md  
+docs/distributions/argus/acli_spec.md  
 
 The system now includes:
 
@@ -284,6 +287,15 @@ The system now includes:
 - **summary-only diagnostic display through `--summary`**
 - **full structured JSON response display through `--json`**
 - **copy/paste raw evidence hints for discoverability**
+- **report-style diagnostic formatting**
+- **severity-sorted findings**
+- **component/severity finding labels**
+- **display-only severity filtering through `--severity`**
+- **display-only signal filtering through `--signal`**
+- **combined signal + severity filtering**
+- **filtered recommendation labeling**
+- **command-name-aware CLI behavior (`ai` vs `acli`)**
+- **Argus-facing `acli` command available via symlink**
 
 Validated Phase 5J closeout behavior:
 
@@ -301,6 +313,21 @@ Validated Phase 6A output-control behavior:
 - `ai "memory"` confirms output-control behavior works beyond disk analysis  
 - `ai "system"` confirms output-control behavior works with multi-signal analysis  
 
+Validated Phase 6 output-control continuation behavior:
+
+- `ai --severity WARN "system"` filters displayed findings by severity  
+- `ai --signal disk "system"` filters displayed findings by component/signal  
+- `ai --signal disk --severity WARN "system"` combines display filters  
+- `ai --json --signal disk "system"` confirms JSON remains unfiltered  
+- `ai --raw --signal disk "system"` confirms raw evidence remains available  
+- `ai --summary --signal disk "system"` confirms summary mode remains summary-only  
+- `acli system` works as the Argus-facing command form  
+- `acli system --signal disk` supports target-first filtering  
+- `acli system --severity WARN` supports target-first severity filtering  
+- `acli --raw system` displays raw evidence through the `acli` command  
+- `acli --json system` preserves full structured JSON output  
+- `acli disk`, `acli memory`, `acli network`, and `acli logs` work as direct diagnostic commands  
+
 Known note:
 
 - `logs_analysis` may show an empty raw log section when the underlying system log command returns no visible log output. This is acceptable because the raw field is preserved and exposed.
@@ -314,19 +341,16 @@ It is now a working diagnostic system capable of:
 - individual domain diagnostics  
 - human-readable diagnostics backed by real system data  
 - deterministic first-pass interpretation before future model reasoning  
-- controlled CLI presentation for concise, raw, summary, and JSON output modes  
+- controlled CLI presentation for concise, raw, summary, JSON, filtered, and signal-focused output modes  
+- Argus-facing ACLI usage through the `acli` command  
 
 ---
 
 # 🧭 NEXT PHASE DIRECTION (UPDATED)
 
-Current phase:
+Current completed phase work:
 
 ## Phase 6 – Distribution Layer / Argus ACLI Output Control
-
-Current completed Phase 6 work:
-
-## Phase 6A – First Output-Control Pass
 
 Completed:
 
@@ -335,23 +359,61 @@ Completed:
 - `--summary` mode for quick health checks  
 - `--json` mode for full machine-readable response output  
 - copy/paste raw evidence hints  
-- validation across disk, memory, and multi-signal system analysis  
+- report-style diagnostic formatting  
+- severity-sorted findings  
+- component/severity finding labels  
+- display-only severity filtering  
+- display-only signal filtering  
+- combined signal + severity filtering  
+- filtered recommendation labeling  
+- command-name-aware behavior (`ai` vs `acli`)  
+- Argus-facing `acli` command availability  
+- validation across disk, memory, network, logs, and multi-signal system analysis  
 
-Next Phase 6 focus:
+Important UX direction:
 
-## Continue Output Control and Signal Management
+Argus ACLI should be easy and natural for homelab users while remaining powerful for advanced users.
 
-Goals:
+The intended UX supports:
 
-- continue reducing output noise  
-- introduce filtering  
-- introduce summarization refinements  
-- allow signal selection  
-- improve multi-signal output formatting  
-- preserve access to full raw evidence  
-- keep diagnostic logic inside Argus tools  
+- natural / fuzzy interaction:
+  - `acli "what's wrong with my system?"`
+  - `acli "why is disk warning?"`
+  - `acli "what should I check next?"`
+
+- direct command usage:
+  - `acli system`
+  - `acli disk`
+  - `acli memory`
+  - `acli network`
+  - `acli logs`
+
+- power-user control:
+  - `acli system --signal disk`
+  - `acli system --severity WARN`
+  - `acli system --signal disk --severity WARN`
+  - `acli --raw system`
+  - `acli --json system`
+
+Natural-language routing remains part of the Argus direction, but it must NOT be implemented inside the CLI formatter.
+
+Future natural-language routing belongs in:
+
+router → reasoning → control plane
+
+Recommended next work:
+
+## Phase 6B / Next Distribution-Layer Work
+
+Potential next tasks:
+
+- decide whether to create a dedicated `distributions/argus/cli/acli.py` implementation or continue sharing `scripts/ai_cli.py` temporarily  
+- continue improving multi-signal presentation if needed  
+- begin planning the actual ACLI distribution structure  
+- clarify install/symlink behavior for `acli`  
+- prepare for natural-language routing through the correct router/control-plane path  
 - keep presentation behavior in the interface/distribution layer  
-- eventually move or mirror finalized ACLI behavior into `distributions/argus/cli/acli.py`  
+- keep diagnostic logic inside Argus tools  
 
 This phase prepares the system for:
 
@@ -374,8 +436,10 @@ This phase prepares the system for:
 
 Deferred beyond the current output-control lane:
 
-- broad natural-language command routing  
-- model/router fuzzy intent reasoning  
+- broad natural-language command routing inside CLI  
+- model/router fuzzy intent reasoning inside CLI  
+
+Natural-language routing itself remains planned, but it must be implemented through the correct router / reasoning / control-plane path, not as hidden CLI guessing.
 
 ---
 
@@ -394,6 +458,9 @@ Continue development aligned with:
 - strict control plane enforcement  
 - completed Phase 5J raw-evidence contract closeout  
 - completed Phase 6A output-control pass  
+- completed Phase 6 output-control continuation  
 - Phase 6 Distribution Layer work  
 - Argus ACLI output control and signal management  
+- Argus-facing `acli` command direction  
+- natural + direct + power-user ACLI UX model  
 - documentation closeout surgical-update rules  

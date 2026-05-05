@@ -15,6 +15,9 @@ This phase focuses on:
 - summary-only display mode
 - machine-readable JSON mode
 - user-facing discoverability of raw evidence
+- improved readability and report-style formatting
+- display-only filtering controls (severity + signal)
+- shaping the actual ACLI user experience
 
 This phase does not add new diagnostic intelligence.
 
@@ -26,15 +29,11 @@ This work belongs to the CLI / ACLI presentation layer.
 
 Initial implementation was performed in:
 
-```text
 scripts/ai_cli.py
-```
 
 Future distribution-specific implementation may move or extend this behavior into:
 
-```text
 distributions/argus/cli/acli.py
-```
 
 ---
 
@@ -53,17 +52,7 @@ The output-control layer must not:
 
 All requests must continue to flow through:
 
-```text
-CLI
-→ Daemon
-→ Runtime Manager
-→ Control Plane
-→ Execution Engine
-→ Argus Tool
-→ System Tool
-→ CommandRunner
-→ OS
-```
+CLI → Daemon → Runtime Manager → Control Plane → Execution Engine → Argus Tool → System Tool → CommandRunner → OS
 
 The CLI is responsible only for presentation behavior.
 
@@ -73,18 +62,16 @@ The CLI is responsible only for presentation behavior.
 
 Argus tools continue to return structured diagnostic data in the established format:
 
-```text
 {
   "severity": "...",
   "findings": [...],
   "recommendations": [...],
   "raw": { ... }
 }
-```
 
-The CLI consumes this structured `data` field.
+The CLI consumes this structured data field.
 
-It must not parse formatted `message` output for diagnostic logic.
+It must not parse formatted message output for diagnostic logic.
 
 ---
 
@@ -94,9 +81,7 @@ It must not parse formatted `message` output for diagnostic logic.
 
 Example:
 
-```bash
 ai "disk"
-```
 
 Default mode now shows:
 
@@ -106,9 +91,13 @@ Default mode now shows:
 - recommendations
 - raw evidence hint
 
-Raw evidence is hidden by default.
+Additional improvements:
 
-This reduces output noise while preserving diagnostic clarity.
+- findings are sorted by severity
+- findings include structured labels: [component] [severity]
+- output uses report-style spacing and indentation
+
+Raw evidence is hidden by default.
 
 ---
 
@@ -116,9 +105,7 @@ This reduces output noise while preserving diagnostic clarity.
 
 Example:
 
-```bash
 ai --raw "disk"
-```
 
 Raw mode shows:
 
@@ -128,17 +115,13 @@ Raw mode shows:
 - recommendations
 - raw evidence
 
-This preserves access to the original command evidence when the user wants to inspect it.
-
 ---
 
 ### Summary Mode
 
 Example:
 
-```bash
 ai --summary "disk"
-```
 
 Summary mode shows:
 
@@ -146,37 +129,101 @@ Summary mode shows:
 - severity
 - raw evidence hint when raw evidence exists
 
-This supports quick health checks without forcing the user to scan full diagnostic output.
-
 ---
 
 ### JSON Mode
 
 Example:
 
-```bash
 ai --json "disk"
-```
 
 JSON mode prints the complete structured response from NeuroCore.
 
-This preserves machine-readable workflows and verifies that the CLI presentation layer does not destroy underlying structured data.
+This remains unfiltered and untouched.
+
+---
+
+## Additional Output Controls (Build 027)
+
+### Severity Filtering (Display Only)
+
+Example:
+
+ai --severity WARN "system"
+
+- filters displayed findings by minimum severity
+- does NOT modify:
+  - underlying data
+  - recommendations
+  - raw evidence
+  - JSON output
+
+---
+
+### Signal Filtering (Display Only)
+
+Example:
+
+ai --signal disk "system"
+
+- filters findings by component
+- uses structured component field
+- works with multi-signal outputs
+
+---
+
+### Combined Filtering
+
+Example:
+
+ai --signal disk --severity WARN "system"
+
+- allows precise filtering of displayed results
+- underlying diagnostic data remains unchanged
+
+---
+
+### Recommendation Labeling
+
+When filters are active, output now shows:
+
+Recommendations from full diagnostic:
+
+This avoids implying that recommendations were filtered along with findings.
+
+---
+
+### Command Name Awareness
+
+The CLI adapts based on how it is invoked:
+
+ai "system"  
+acli "system"
+
+- raw evidence hints use the active command name
+- CLI usage reflects the invoked command
+
+---
+
+### ACLI Command Availability
+
+ACLI is now available as a command:
+
+/usr/local/bin/acli -> scripts/ai_cli.py
+
+This introduces the Argus-facing command without requiring a separate implementation yet.
 
 ---
 
 ## Raw Evidence Discoverability
 
-Raw evidence is hidden by default, but the CLI now prints a copy/paste-ready hint when raw evidence is available.
+Raw evidence is hidden by default, but the CLI prints a copy/paste-ready hint.
 
 Example:
 
-```text
-Raw evidence hidden by default.
-To inspect raw evidence, run:
+Raw evidence hidden by default.  
+To inspect raw evidence, run:  
 ai --raw "disk"
-```
-
-This avoids forcing users to memorize flags while keeping the default output concise.
 
 ---
 
@@ -184,29 +231,36 @@ This avoids forcing users to memorize flags while keeping the default output con
 
 The following commands were validated:
 
-```bash
-ai "disk"
-ai --raw "disk"
-ai --summary "disk"
-ai --json "disk"
-ai "memory"
-ai "system"
-```
+ai "disk"  
+ai --raw "disk"  
+ai --summary "disk"  
+ai --json "disk"  
+ai "memory"  
+ai "system"  
+
+ai --severity WARN "system"  
+ai --severity CRITICAL "system"  
+ai --signal disk "system"  
+ai --signal network "system"  
+ai --signal disk --severity WARN "system"  
+
+acli system  
+acli disk  
+acli memory  
+acli network  
+acli logs  
 
 Validation confirmed:
 
-- default output is concise
-- raw output remains available
-- summary mode works
-- JSON mode preserves structured response data
-- the formatter works across multiple Argus commands
-- multi-signal `system` output remains compatible
+- formatting works across all domains
+- filtering behaves correctly (including empty cases)
+- JSON output remains unmodified
+- raw evidence remains accessible
+- CLI behavior is consistent across ai and acli
 
-Syntax validation was also performed:
+Syntax validation:
 
-```bash
 python -m py_compile scripts/ai_cli.py
-```
 
 ---
 
@@ -214,57 +268,100 @@ python -m py_compile scripts/ai_cli.py
 
 Screenshots were captured under:
 
-```text
-docs/screenshots/phase-6-output-control/
-```
+docs/screenshots/phase-6-acli-completion/
 
-Captured evidence:
+Captured evidence includes:
 
-```text
-01_disk_before_raw_output_default.png
-02_disk_after_concise_default.png
-03_disk_after_raw_flag_enabled.png
-04_disk_after_raw_hint_added.png
-05_disk_summary_mode.png
-06_disk_json_mode.png
-07_memory_concise_with_raw_hint.png
-08_system_concise_with_raw_hint.png
-```
+- baseline output modes
+- formatting improvements
+- severity filtering behavior
+- signal filtering behavior
+- combined filtering
+- recommendation labeling behavior
+- ai vs acli command differences
+
+---
+
+## ACLI UX Direction (Clarified)
+
+This phase clarified how ACLI should feel to use.
+
+ACLI is not:
+
+- just a command tool
+- or just a natural-language interface
+
+It must support both.
+
+---
+
+### Natural / Fuzzy Mode (Primary UX Direction)
+
+acli "what's wrong with my system?"  
+acli "why is disk warning?"  
+acli "what should I check next?"
+
+---
+
+### Direct Command Mode
+
+acli system  
+acli disk  
+acli memory  
+acli network  
+
+---
+
+### Power User Mode
+
+acli system --signal disk  
+acli system --severity WARN  
+acli --raw system  
+acli --json system  
+
+---
+
+### Key Principle
+
+ACLI should feel simple first, but remain extremely powerful when needed.
+
+---
+
+### Important Constraint
+
+Natural-language routing must NOT be implemented in the CLI.
+
+It belongs in:
+
+router → reasoning → control plane
+
+The CLI remains a clean interface layer.
 
 ---
 
 ## Deferred Ideas
 
-During this work, additional usability ideas were identified but intentionally deferred.
-
 Deferred items:
 
-- deterministic friendly command aliases
-- broader natural-language command routing
-- model/router intent reasoning over fuzzy user phrasing
-- interactive raw evidence prompts
+- broad natural-language routing
+- router-based intent interpretation
+- pasted-output reasoning
+- interactive workflows
+- production vs training output profiles
 
-These are not part of this implementation pass.
-
-Reason:
-
-The current phase must remain focused on output control and presentation behavior.
-
-Routing changes belong in the control plane or future intelligence layers, not in the CLI formatter.
-
-Interactive prompts may be considered later, but copy/paste raw evidence hints are safer for now because they preserve predictable CLI behavior for automation, piping, screenshots, and JSON workflows.
+These are intentionally not implemented here.
 
 ---
 
-## Phase 6A Result
+## Phase 6 Result
 
-This pass establishes the first Phase 6 output-control behavior:
+Phase 6 now establishes:
 
-```text
-Default output is concise.
-Raw evidence is available on demand.
-Summary and JSON modes are supported.
-The CLI presentation layer remains separate from diagnostic logic.
-```
+Readable, structured output  
+Controlled visibility of raw evidence  
+Multiple output modes (default, raw, summary, JSON)  
+Display-only filtering (severity + signal)  
+Clear separation between presentation and logic  
+A defined ACLI user experience direction  
 
-This makes Argus easier to use without weakening the structured diagnostic contract established in Phase 5J.
+This makes Argus significantly more usable without changing the underlying system design.
